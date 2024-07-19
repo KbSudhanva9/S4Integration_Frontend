@@ -49,6 +49,7 @@ const SignupForm = () => {
           pincode: '',
           password: '',
           confpass: '',
+          user_role: [""]
         }}
         validationSchema={SignupSchema}
         onSubmit={(values) => {

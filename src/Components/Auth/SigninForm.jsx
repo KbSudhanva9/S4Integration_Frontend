@@ -14,9 +14,25 @@ const SigninForm = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
-  const handleSignUpClick = () => {
-    navigate('/sign-up');
+  const handleSignUpClick  = async (values) => {
+    try {
+      const response = await api.post('https://your-api-url.com/login', values);
+      const { token, role } = response.data;
+
+      // Store token and role in local storage
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+
+      // Redirect to a protected route after successful login
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login failed', error);
+    }
   };
+  
+  // = () => {
+  //   navigate('/sign-up');
+  // };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);

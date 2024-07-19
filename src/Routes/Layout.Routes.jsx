@@ -1,7 +1,7 @@
 
 import SigninForm from "../Components/Auth/SigninForm";
 import SignupForm from "../Components/Auth/SignupForm";
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./Protected.Routes";
 
 export const LayoutRouting = [
     {path: "", element: <SigninForm />},

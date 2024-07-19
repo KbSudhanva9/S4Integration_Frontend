@@ -40,7 +40,7 @@ form {
   /* Styling for the submit button */
   .submit{
     padding: 10px 15px;
-    background: #28a745;
+    background: #eb0101;
     border: none;
     border-radius: 4px;
     color: white;
@@ -56,7 +56,8 @@ form {
   }
   
   .submit:hover:not(:disabled) {
-    background: #218838;
+    background: #eb0101;
+     /* #218838; */
   }
 
   /* form button{
