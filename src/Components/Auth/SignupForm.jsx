@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import './Sign.css';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import api from '../../Utils/ApiCalls/Api';
 
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string().required('Required'),
@@ -26,6 +27,26 @@ const SignupForm = () => {
   const handleSigninClick = () => {
     navigate('/');
   };
+  const handleSignUpClick = async (values) => {
+    try {
+      const response = await api.post( `${import.meta.env.VITE_LOCAL}${import.meta.env.VITE_REGISTER_URL}`, values, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        navigate('/');
+      } else {
+        // alert("The email on has already registered please change the email");
+        console.log(response);
+      }
+    } catch (error) {
+      alert("This email '"+ values.email +"' on has already registered please change the email");
+      console.error('Register failed', error);
+    }
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -36,7 +57,7 @@ const SignupForm = () => {
   };
 
   return (
-    <div style={{ marginTop: '70%', marginBottom: '5%' }}>
+    <div className='sign-up-div'>
       <Formik
         initialValues={{
           firstName: '',
@@ -53,12 +74,9 @@ const SignupForm = () => {
         }}
         validationSchema={SignupSchema}
         onSubmit={(values) => {
-          // Handle form submission
-
           const { confpass, ...rest } = values;
-
           console.log(rest);
-          
+          handleSignUpClick(rest);
         }}
       >
         {({ errors, touched, isSubmitting }) => (
@@ -123,7 +141,7 @@ const SignupForm = () => {
               <ErrorMessage name='confpass' component='div' className='error-message' />
             </div>
             <div className='button-container'>
-              <button className='submit' type='submit' disabled={isSubmitting}>
+              <button className='submit' type='submit' >
                 Sign-up
               </button>
               <button className='register' type='button' onClick={handleSigninClick}>

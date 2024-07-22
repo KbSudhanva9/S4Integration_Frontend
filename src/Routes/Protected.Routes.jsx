@@ -14,7 +14,7 @@ const ProtectedRoute =({element, allowedRole})=>{
     if(allowedRole && !allowedRole.includes(role)){
         if(role === 'test'){
             return <Navigate to='/test' />;
-        }else if(role === 'admin'){
+        }else if(role === 'Admin'){
             return <Navigate to='/admin' />;
         }else if(role === 'user'){
             return <Navigate to='/user' />;

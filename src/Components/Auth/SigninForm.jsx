@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import './Sign.css';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi'; // Assuming you are using react-icons for eye icons
+import api from '../../Utils/ApiCalls/Api';
 
 const SigninSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -16,30 +17,30 @@ const SigninForm = () => {
 
   const handleSignUpClick  = async (values) => {
     try {
-      const response = await api.post('https://your-api-url.com/login', values);
-      const { token, role } = response.data;
+      const response = await api.post( `${import.meta.env.VITE_LOCAL}${import.meta.env.VITE_LOGIN_URL}`, values);
+      const { accessToken, user_role } = response.data.user;
 
       // Store token and role in local storage
-      localStorage.setItem('token', token);
-      localStorage.setItem('role', role);
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('role', user_role);
 
       // Redirect to a protected route after successful login
-      navigate('/dashboard');
+      navigate('/admin');
     } catch (error) {
       console.error('Login failed', error);
     }
   };
   
-  // = () => {
-  //   navigate('/sign-up');
-  // };
+  const handleSignInClick = () => {
+    navigate('/sign-up');
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
   return (
-    <div>
+    <div className='sign-in-div'>
       <Formik
         initialValues={{
           email: '',
@@ -49,6 +50,8 @@ const SigninForm = () => {
         onSubmit={(values) => {
           // Handle form submission
           console.log(values);
+
+          handleSignUpClick(values);
         }}
       >
         {({ errors, touched, isSubmitting }) => (
@@ -74,10 +77,11 @@ const SigninForm = () => {
               {/* <ErrorMessage name="password" component="div" className="error-message" /> */}
             </div>
             <div className='button-container'>
-              <button className='register' type="button" onClick={handleSignUpClick}>
+              <button className='register' type="button" onClick={handleSignInClick}>
                 Sign-up
               </button>
-              <button className='submit' type="submit" disabled={isSubmitting}>
+              {/* disabled={isSubmitting} */}
+              <button className='submit' type="submit" >
                 Sign-in
               </button>
             </div>
