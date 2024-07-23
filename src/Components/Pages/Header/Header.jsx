@@ -1,33 +1,51 @@
-import { useState } from 'react';
-import './Header.css'
+import { useState } from "react";
+import "./Header.css";
 import { FaSortDown } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
-
-
-
 const Header = () => {
+  // const [dropdownVisible, setDropdownVisible] = useState(true);
 
-    const [dropdownVisible, setDropdownVisible] = useState(true);
+  // const handleMouseEnter = () => {
+  //     setDropdownVisible(true);
+  // };
+  // const handleMouseLeave = () => {
+  //     setDropdownVisible(false);
+  // };
 
-    const handleMouseEnter = () => {
-        setDropdownVisible(true);
-    };
-    const handleMouseLeave = () => {
-        setDropdownVisible(false);
-    };
+  return (
+    <header>
+      <img
+        style={{ padding: "10px" }}
+        src="https://tecnics.com/wp-content/uploads/2020/03/logo1.png"
+      />
 
-    return (
-        <header>
-            {/* <div>header</div> */}
-            <img style={{padding: '10px'}} src='https://tecnics.com/wp-content/uploads/2020/03/logo1.png' />
-            {/* <p className='header-font'>Expense Statment</p> */}
-
-
-            <nav className="nav">
-                <NavLink to=''>Expenses</NavLink>
-                <NavLink to='travel'>Travel</NavLink>
-                {/* <button
+      <nav className="nav">
+        <NavLink
+          exact
+          to="expense"
+          style={({ isActive, isPending, isTransitioning }) => ({
+            padding: "10px",
+            textDecoration: "none",
+            color: isPending ? "black" : isActive ? "red" : "inherit",
+            fontWeight: isPending ? "bold" : "normal",
+          })}
+        >
+          Expenses
+        </NavLink>
+        <NavLink
+          to="travel"
+          style={({ isActive, isPending, isTransitioning }) => ({
+            padding: "10px",
+            textDecoration: "none",
+            color: isPending ? "black" : isActive ? "red" : "inherit",
+            fontWeight: isPending ? "bold" : "normal",
+          })}
+        >
+          Travel
+        </NavLink>
+        
+        {/* <button
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 className="dropdown-button"
@@ -43,8 +61,8 @@ const Header = () => {
                 </button>
                 <button>Approvels</button>
                 <button>App Center</button> */}
-            </nav>
-        </header>
-    )
-}
+      </nav>
+    </header>
+  );
+};
 export default Header;

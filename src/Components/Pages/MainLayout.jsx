@@ -5,7 +5,7 @@ const MainLayout = () => {
     return(
         <>
             <Header />
-            <div style={{marginTop: '70px'}}>
+            <div>
                 <Outlet />
             </div>
         </>
