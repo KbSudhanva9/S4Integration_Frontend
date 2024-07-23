@@ -13,7 +13,7 @@ export const LayoutRouting = [
     {path: "test", element: <ProtectedRoute element={<div>Test</div>} allowedRole={['test']} />},
     {path: "admin", element: <ProtectedRoute element={<MainLayout />} allowedRole={['Admin']} /> ,
         children : [
-            {path: "", element: <ProtectedRoute element={<Expense />}/>},
+            {path: "expense", element: <ProtectedRoute element={<Expense />}/>},
             {path: "travel", element: <ProtectedRoute element={<Travel />} />},
         ]
     },
