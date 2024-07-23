@@ -3,4 +3,15 @@ body {
     margin: 0;
     background-color: #f0f2f5;
     font-family: "Roboto Condensed", sans-serif;
-  }
+}
+.maincomponent{
+  margin: 10px;
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #fff;
+}
+.df{
+  display: flex;
+  /* justify-content: first baseline; */
+  /* align-items: center; */
+}
