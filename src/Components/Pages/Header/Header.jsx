@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './Header.css'
 import { FaSortDown } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
 
 
 
@@ -20,13 +21,13 @@ const Header = () => {
         <header>
             {/* <div>header</div> */}
             <img style={{padding: '10px'}} src='https://tecnics.com/wp-content/uploads/2020/03/logo1.png' />
-            <p className='header-font'>Expense Statment</p>
+            {/* <p className='header-font'>Expense Statment</p> */}
 
 
             <nav className="nav">
-                <button>Travel</button>
-                <button>Expenses</button>
-                <button
+                <NavLink to=''>Expenses</NavLink>
+                <NavLink to='travel'>Travel</NavLink>
+                {/* <button
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 className="dropdown-button"
@@ -41,7 +42,7 @@ const Header = () => {
                 )}
                 </button>
                 <button>Approvels</button>
-                <button>App Center</button>
+                <button>App Center</button> */}
             </nav>
         </header>
     )
