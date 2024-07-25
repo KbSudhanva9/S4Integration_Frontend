@@ -1,7 +1,8 @@
 import { useState } from "react";
 import "./Header.css";
 import { FaSortDown } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import Button from '@mui/material/Button';
 
 const Header = () => {
   // const [dropdownVisible, setDropdownVisible] = useState(true);
@@ -12,6 +13,13 @@ const Header = () => {
   // const handleMouseLeave = () => {
   //     setDropdownVisible(false);
   // };
+
+  const nav = useNavigate();
+
+  const signout =()=>{
+    localStorage.clear();
+    nav('/');
+  }
 
   return (
     <header>
@@ -44,6 +52,8 @@ const Header = () => {
         >
           Travel
         </NavLink>
+
+        <Button variant="contained" size='small' color='error' onClick={signout}>Sign out</Button>
         
         {/* <button
                 onMouseEnter={handleMouseEnter}

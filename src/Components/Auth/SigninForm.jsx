@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import './Sign.css';
@@ -25,7 +25,7 @@ const SigninForm = () => {
       localStorage.setItem('role', user_role);
 
       // Redirect to a protected route after successful login
-      navigate('/admin');
+      navigate('/home');
     } catch (error) {
       console.error('Login failed', error);
     }
@@ -38,6 +38,13 @@ const SigninForm = () => {
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/home');
+    }
+  }, [navigate]);
 
   return (
     <div className='sign-in-div'>

@@ -17,7 +17,7 @@ export const LayoutRouting = [
             {path: "travel", element: <ProtectedRoute element={<Travel />} />},
         ]
     },
-    {path: "user", element: <ProtectedRoute element={<div>User</div>} allowedRole={['user']} />},
+    {path: "home", element: <ProtectedRoute element={<div>User</div>} allowedRole={['user']} />},
     {path: "*", element: <div>wrong url</div>},
     
 ]

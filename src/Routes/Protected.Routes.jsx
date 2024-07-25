@@ -7,7 +7,7 @@ const ProtectedRoute =({element, allowedRole})=>{
     const role = localStorage.getItem('role');
     // console.log(role);
 
-    if(!token || !role){
+    if(!token ){
         return <Navigate to='/' />;
     }
 
@@ -15,9 +15,9 @@ const ProtectedRoute =({element, allowedRole})=>{
         if(role === 'test'){
             return <Navigate to='/test' />;
         }else if(role === 'Admin'){
-            return <Navigate to='/admin' />;
+            return <Navigate to='/admin/expense' />;
         }else if(role === 'user'){
-            return <Navigate to='/user' />;
+            return <Navigate to='/home' />;
         }
     }
     return React.cloneElement(element, { role });

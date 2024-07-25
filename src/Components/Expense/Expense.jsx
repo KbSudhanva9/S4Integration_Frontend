@@ -31,7 +31,7 @@ const Expense = () => {
         <div className='maincomponent'>
             <div className='df'>
                 <div className='basic-margin'>
-                    <p>Dept. Code</p>
+                    <p>Company Code</p>
                     <input type='text' />
                 </div>
                 <div className='basic-margin'>
@@ -44,10 +44,10 @@ const Expense = () => {
                 </div>
             </div>
             <div className='df'>
-                <div className='basic-margin'>
+                {/* <div className='basic-margin'>
                     <p>Document Number</p>
                     <input type='text' />
-                </div>
+                </div> */}
                 <div className='basic-margin'>
                     <p>Refrence Number</p>
                     <input type='text' />

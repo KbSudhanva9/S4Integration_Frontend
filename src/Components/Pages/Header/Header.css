@@ -38,8 +38,11 @@ header{
     position: relative;
   } */
   
-  .nav button:hover {
+  /* .nav button:hover {
     color: red;
+  } */
+  .nav button{
+    margin: 0px 10px;
   }
   
   /* .dropdown-button {
