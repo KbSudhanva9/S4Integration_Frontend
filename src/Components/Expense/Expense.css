@@ -5,6 +5,9 @@
 input{
     border: 1px solid #ccc;
     border-radius: 4px;
-    height: 30px;
+    height: 38px;
     padding: 0px 10px;
 }
+/* input:hover{
+    border: 0.5px solid #000;
+} */
