@@ -7,7 +7,7 @@ import { MdOutlineDeleteOutline } from "react-icons/md";
 import { BiSolidEdit } from "react-icons/bi";
 import { MdOutlinePostAdd } from "react-icons/md";
 import { FaMinus, FaPlus } from "react-icons/fa6";
-
+import { MdOutlineCopyAll } from "react-icons/md";
 
 import {
     Dialog,
@@ -23,22 +23,16 @@ import {
     TableRow,
     TextField,
     Paper,
-    IconButton
+    IconButton,
+    Snackbar,
+    Alert
   } from '@mui/material';
-
-
-import { MdOutlineClose } from "react-icons/md";
-
-
-
 
 const Expense = () => {
 
-    const data = [
-        { id: 1, costcenter: "234490", expense: "Office & Other Supplies", amount: '$89.09', requested: '89.09' }
-    ]
-
-    
+    // const data = [
+    //     { id: 1, costcenter: "234490", expense: "Office & Other Supplies", amount: '$89.09', requested: '89.09' }
+    // ]
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 130 },
@@ -48,44 +42,112 @@ const Expense = () => {
         { field: 'requested', headerName: 'Requested', width: 130 },
     ];
 
-    const [tdata, setTData] = useState([]);
-    const [submitExp, setSubmitExp] = useState([]);
-    const [id, setId] = useState(1);
-    const [formData, setFormData] = useState([]);
+    const [tdata, setTData] = useState([]);                 //table data
+    const [submitExp, setSubmitExp] = useState([]);         //store selected row id's tdata
+    const [sRows, setSRows] = useState([]);                 //store selected data in table tdata
+    const [id, setId] = useState(1);                        //auto increment for id in tdata
+    const [formData, setFormData] = useState([]);           //pop-up table row data
+    const [openAddExpense, setOpenAddExpense] = useState(false);    //pop-up open/close
+    const [errors, setErrors] = useState([]);               //handeling pop-up error
+    const [snackbarOpen, setSnackbarOpen] = useState(false);        //for copy display snackbar
 
-    // const addRow = () => {
-    //     let pData = { id: id, costcenter: "234490", expense: "Office Supplies", amount: '$89.09', requested: '89.09' };
-    //     setTData((preData) => [...preData, pData]);
-    //     setId(id + 1);
-    // }
+    // on selecting or un-selecting the rows in table live change
+    const handleSelectionChange = (selection) => {
+        setSubmitExp(selection); 
+        const selectedData = selection.map(id => tdata.find(row => row.id === id));
+        // console.log(selectedData);
+        setSRows(selectedData);
+    };
 
-    const [openAddExpense, setOpenAddExpense] = useState(false);
-
+    // open add expense pop-up
     const handleClickOpenExpense = () => {
         setFormData([]);
         setOpenAddExpense(true);
     };
+    // close add expense pop-up
     const handleCloseExpense = () => {
         setOpenAddExpense(false);
     };
-    const addRow = () => {
+    // add rows in add expense pop-up
+    const handleExpenseAddRow = () => {
         let pData = { id: id, costcenter: '', expense: '', amount: '', requested: '' };
         setFormData((preData) => [...preData, pData]);
+        setErrors([...errors, { costcenter: false, expense: false, amount: false, requested: false }]);
         setId(id + 1);
     };
+    // delete row in add expense pop-up
     const handleDeleteRow = (index) => {
         const newFormData = formData.filter((_, i) => i !== index);
         setFormData(newFormData);
+
+        const newErrors = errors.filter((_, i) => i !== index);
+        setErrors(newErrors);
     };
+    // onchange update for text fields in add expense pop-up 
     const handleChange = (index, field, event) => {
         const newFormData = [...formData];
         newFormData[index][field] = event.target.value;
         setFormData(newFormData);
-    };
+    
+        const newErrors = [...errors];
+        newErrors[index] = { ...newErrors[index], [field]: event.target.value === '' };
+        setErrors(newErrors);
+      };
+    // submitting in add expense pop-up
     const handleSubmit = () => {
-        console.log(JSON.stringify(formData));
-        handleCloseExpense();
+        const newErrors = formData.map(row => {
+            return {
+              costcenter: row.costcenter === '',
+              expense: row.expense === '',
+              amount: row.amount === '',
+              requested: row.requested === '',
+            };
+          });
+      
+          const hasErrors = newErrors.some(row => Object.values(row).some(error => error));
+      
+          if (hasErrors) {
+            setErrors(newErrors);
+          } else {
+            setTData( [ ...tdata, ...formData ] );
+            setFormData([{ costcenter: '', expense: '', amount: '', requested: '' }]); // Reset formData after submit
+            setErrors([{ costcenter: false, expense: false, amount: false, requested: false }]);
+            handleCloseExpense();
+        }
     };
+
+
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+        setSnackbarOpen(false);
+      };
+    
+
+    const copySeletedRowsIds =()=>{
+        const ids = sRows.map(item => `${item.id}`).join(', ');
+        const copyIds = 'ID : '+ ids;
+        navigator.clipboard.writeText(copyIds).then(() => {
+        console.log('Copied to clipboard:', copyIds);
+        setSnackbarOpen(true);
+        }).catch(err => {
+        console.error('Failed to copy:', err);
+        });
+    };
+
+    //delete the selected row in tdata in main table
+    const deleteSelected = () => {
+        const remainingData = tdata.filter(row => !submitExp.includes(row.id));
+        setTData(remainingData);
+        setSubmitExp([]);
+        console.log(remainingData);
+    };
+
+    const submitExpense =()=>{
+        console.log(tdata);
+    }
+
 
     const companycode = [
         {
@@ -96,20 +158,7 @@ const Expense = () => {
           value: '2000',
           label: '2000',
         }
-      ];
-
-    const handleSelectionChange = (selection) => {
-        setSubmitExp(selection); 
-        const selectedData = selection.map(id => tdata.find(row => row.id === id));
-        console.log(selectedData);
-    };
-
-    const deleteSelected = () => {
-        const remainingData = tdata.filter(row => !submitExp.includes(row.id));
-        setTData(remainingData);
-        setSubmitExp([]);
-        console.log(remainingData);
-    };
+    ];
 
     return (
         <div className='maincomponent'>
@@ -150,11 +199,13 @@ const Expense = () => {
             </div>
             <div style={{display: 'flex', justifyContent: 'end', margin: '10px'}}>
                 <Button style={{margin: '0px 5px'}} size="small" variant="outlined" startIcon={<MdOutlinePostAdd />} onClick={handleClickOpenExpense}>Add</Button>
-                <Button style={{margin: '0px 5px'}} size="small" variant="outlined" startIcon={<BiSolidEdit />} color='warning' onClick={addRow}>Edit</Button>
+                <Button style={{margin: '0px 5px'}} size="small" variant="outlined" startIcon={<MdOutlineCopyAll />} color='warning' onClick={copySeletedRowsIds}>Copy</Button>
                 <Button style={{margin: '0px 5px'}} size="small" variant="outlined" startIcon={<MdOutlineDeleteOutline />} color="error" onClick={deleteSelected}>Delete</Button>
             </div>
+            {/* table */}
             <div style={{ marginTop: '10px' }}>
                 <div style={{ height: 400, width: '100%' }}>
+                    {/* table data from use state automatically updated from usestate => tdata */}
                     <DataGrid
                         rows={tdata}
                         columns={columns}
@@ -169,8 +220,9 @@ const Expense = () => {
                     />
                 </div>
             </div>
+            {/* table */}
             <div style={{display: 'flex', justifyContent: 'end', margin: '10px'}}>
-                <Button style={{margin: '0px 5px'}} size="small" variant="outlined" startIcon={<RiShare2Fill />} onClick={()=>{console.log(submitExp)}}>Submit Expense</Button>
+                <Button style={{margin: '0px 5px'}} size="small" variant="outlined" startIcon={<RiShare2Fill />} onClick={submitExpense}>Submit Expense</Button>
             </div>
 
 
@@ -202,10 +254,12 @@ const Expense = () => {
                     </Button>
                 </DialogActions>
             </Dialog> */}
+
+            {/* add expenses pop-up */}
             <Dialog fullWidth={true} maxWidth={'md'} open={openAddExpense} onClose={handleCloseExpense}>
                 <DialogTitle>Add Expense</DialogTitle>
                 <DialogContent dividers>
-                <Button onClick={addRow} color='success' startIcon={<FaPlus />} >Add Row</Button>
+                <Button onClick={handleExpenseAddRow} color='success' startIcon={<FaPlus />} >Add Row</Button>
                     <TableContainer >
                     <Table>
                         <TableBody>
@@ -216,7 +270,10 @@ const Expense = () => {
                                 value={row.costcenter}
                                 placeholder='Cost Center'
                                 onChange={(event) => handleChange(index, 'costcenter', event)}
+                                error={errors[index]?.costcenter}
+                                helperText={errors[index]?.costcenter ? 'Required' : ''}
                                 size='small'
+                                type='text'
                                 />
                             </TableCell>
                             <TableCell>
@@ -224,7 +281,10 @@ const Expense = () => {
                                 value={row.expense}
                                 placeholder='Expense'
                                 onChange={(event) => handleChange(index, 'expense', event)}
+                                error={errors[index]?.expense}
+                                helperText={errors[index]?.expense ? 'Required' : ''}
                                 size='small'
+                                type='text'
                                 />
                             </TableCell>
                             <TableCell>
@@ -232,7 +292,10 @@ const Expense = () => {
                                 value={row.amount}
                                 placeholder='Amount'
                                 onChange={(event) => handleChange(index, 'amount', event)}
+                                error={errors[index]?.amount}
+                                helperText={errors[index]?.amount ? 'Required' : ''}
                                 size='small'
+                                type='number'
                                 />
                             </TableCell>
                             <TableCell>
@@ -240,7 +303,10 @@ const Expense = () => {
                                 value={row.requested} 
                                 placeholder='Requested'
                                 onChange={(event) => handleChange(index, 'requested', event)}
+                                error={errors[index]?.requested}
+                                helperText={errors[index]?.requested ? 'Required' : ''}
                                 size='small'
+                                type='number'
                                 />
                             </TableCell>
                             <TableCell>
@@ -263,6 +329,18 @@ const Expense = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            {/* add expenses pop-up */}
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert icon={<MdOutlineCopyAll />} onClose={handleSnackbarClose} severity="warning" sx={{ width: '100%' }}>
+                Selected IDs copied to clipboard!
+                </Alert>
+            </Snackbar>
 
         </div>
     );

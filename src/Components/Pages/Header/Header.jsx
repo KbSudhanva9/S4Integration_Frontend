@@ -24,7 +24,7 @@ const Header = () => {
   return (
     <header>
       <img
-        style={{ padding: "10px" }}
+        style={{ padding: "10px 0px 10px 20px", width: '185px', height: '30px' }}
         src="https://tecnics.com/wp-content/uploads/2020/03/logo1.png"
       />
 
