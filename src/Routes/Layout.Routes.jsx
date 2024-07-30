@@ -7,10 +7,15 @@ import ProtectedRoute from "./Protected.Routes";
 import Expense from "../Components/Expense/Expense";
 import Travel from "../Components/Travel/Travel";
 import CustomizedDialogs from "../Components/Expense/CustomizedDialogs";
+import VendorOnbordingLogin from "../Components/Auth/VendorOnbording/VendorOnbordingLogin";
+import VendorOnbordingSignup from "../Components/Auth/VendorOnbording/VendorOnbordingSignup";
 
 export const LayoutRouting = [
     {path: "", element: <SigninForm />},
     {path: "sign-up", element: <SignupForm />},
+    {path: "vendor-onbording-login", element: <VendorOnbordingLogin />},
+    {path: "vendor-onbording-sign-up", element: <VendorOnbordingSignup />},
+    
     {path: "hello", element: <CustomizedDialogs />},
     
     {path: "test", element: <ProtectedRoute element={<div>Test</div>} allowedRole={['test']} />},

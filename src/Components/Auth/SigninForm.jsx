@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import './Sign.css';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi'; // Assuming you are using react-icons for eye icons
 import api from '../../Utils/ApiCalls/Api';
 
@@ -91,6 +91,9 @@ const SigninForm = () => {
               <button className='submit' type="submit" >
                 Sign-in
               </button>
+            </div>
+            <div className='button-container'>
+              <NavLink to={"vendor-onbording-login"}>Vendor On-Bording</NavLink>
             </div>
           </Form>
         )}

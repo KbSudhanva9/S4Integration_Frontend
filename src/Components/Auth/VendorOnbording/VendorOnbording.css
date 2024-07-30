@@ -1,0 +1,21 @@
+.center-items{
+    display: flex;
+    justify-content: center;
+}
+
+header{
+    top: 0px !important;
+    margin: 0px;
+    background-color: #fff;
+    height: 60px;
+    position: sticky;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    z-index: 100;
+}
+.header-font{
+    color: #96a280;
+    font-size: x-large;
+    font-weight: bold;
+}
