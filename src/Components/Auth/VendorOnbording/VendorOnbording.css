@@ -19,3 +19,29 @@ header{
     font-size: x-large;
     font-weight: bold;
 }
+
+.side-by-side{
+    display: flex;
+    justify-content: space-evenly;
+    gap: 25px;
+    /* flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around; */
+}
+
+/* .child {
+    flex: 1; 
+    margin: 0 10px;
+  } */
+form{
+    width: 100%;
+}
+/* .side-by-side form input {
+    width: auto; 
+} */
+form label {
+    display: block;
+    margin-bottom: 0.5em;
+    color: #333333;
+    font-weight: lighter;
+}
