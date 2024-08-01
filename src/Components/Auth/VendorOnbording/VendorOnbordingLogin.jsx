@@ -16,24 +16,25 @@ const VendorOnbordingLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
 
     const handleVendorLogin = async (values) => {
-
+      navigate('/vendor-onbording/vendor-details');
         // `https://cors-anywhere.herokuapp.com/http://202.153.35.211:50000/sap/opu/odata/sap/ZVENDOR_ONBOARD_SRV/Vendor_loginSet(Username='17300002',Password='TEST@123')`
-
-        var loginurl = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}`+`Vendor_loginSet(Username='${values.vid}',Password='${values.password}')`
+        // ${import.meta.env.VITE_CROSS_ORIGIN_URL}
+        // ===============
+        // var loginurl = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}`+`Vendor_loginSet(Username='${values.vid}',Password='${values.password}')`
         
-        try {
-            const response = await api.get( loginurl, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': 'Basic ' + btoa( `${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
-                    'X-Requested-With': 'XMLHttpRequest' 
-                }
-            });
-            console.log(response);
-        } catch (error) {
-            console.error('Login failed', error);
-        }
+        // try {
+        //     const response = await api.get( loginurl, {
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'Accept': 'application/json',
+        //             'Authorization': 'Basic ' + btoa( `${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
+        //             'X-Requested-With': 'XMLHttpRequest' 
+        //         }
+        //     });
+        //     console.log(response);
+        // } catch (error) {
+        //     console.error('Login failed', error);
+        // }
     };
 
   const handleSignInClick = () => {
@@ -99,7 +100,7 @@ const VendorOnbordingLogin = () => {
             <p className='center-items'>
                 <b>Don't have an Account ? &nbsp;</b> <NavLink to={'/vendor-onbording-sign-up'}>Register Here</NavLink>
             </p>
-            <NavLink className='center-items' to={'#'}>Track Status</NavLink>
+            <NavLink className='center-items' to={'/vendor-track-status'}>Track Status</NavLink>
           </Form>
         )}
       </Formik>
