@@ -1,10 +1,17 @@
 .box-margin{
-    width: 180px; 
+    width: 190px; 
     margin: 0px, 10px;
     padding: 0px 10px;
 }
 .display-input{
-    padding: 12px 15px; 
+    height: 18px;
+    padding: 10px 15px; 
     border: 1px solid #ccc;
     border-radius: 4px;
+    white-space: nowrap; /* Prevents text from wrapping to the next line */
+    overflow: hidden; /* Ensures content is clipped and not overflowing */
+    text-overflow: ellipsis; /* Adds ellipsis (...) for overflowing text */
+}
+.lable{
+    margin: 0px;
 }
