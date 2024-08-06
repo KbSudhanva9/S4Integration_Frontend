@@ -11,6 +11,10 @@ import VendorOnbordingLogin from "../Components/Auth/VendorOnbording/VendorOnbor
 import VendorOnbordingSignup from "../Components/Auth/VendorOnbording/VendorOnbordingSignup";
 import VendorOnbording from "../Components/VendorOnbording/VendorOnbording";
 import VendorTrackStatus from "../Components/VendorOnbording/VendorTrackStatus";
+import VendorInvoicingLogin from "../Components/Auth/VendorInvoicing/VendorInvoicingLogin";
+import VendorInvoicingMainPage from "../Components/VendorInvoicing/VendorInvoicingMainPage";
+import VendorInvoicingHome from "../Components/VendorInvoicing/Pages/VendorInvoicingHome";
+import VendorInvoicingNewInvoice from "../Components/VendorInvoicing/Pages/VendorInvoicingNewInvoice";
 
 export const LayoutRouting = [
 
@@ -23,7 +27,7 @@ export const LayoutRouting = [
             {path: "travel", element: <ProtectedRoute element={<Travel />} />},
         ]
     },
-    {path: "home", element: <ProtectedRoute element={<div>User</div>} allowedRole={['user']} />},
+    // {path: "home", element: <ProtectedRoute element={<div>User</div>} allowedRole={['user']} />},
 
     // vendor onbording
     {path: "vendor-onbording-login", element: <VendorOnbordingLogin />,},
@@ -35,6 +39,17 @@ export const LayoutRouting = [
     {path: "vendor-onbording-sign-up", element: <VendorOnbordingSignup />},
     {path: "vendor-track-status", element: <VendorTrackStatus />},
     
+    // vendor invoicing
+    {path: "vendor-invoicing-login", element: <VendorInvoicingLogin />,},
+    {path: "vendor-invoicing", element: <VendorInvoicingMainPage />,
+        children: [
+            {path: "home", element: <VendorInvoicingHome />},
+            {path: "new-invoice", element: <VendorInvoicingNewInvoice />},
+            {path: "my-invoice", element: <VendorInvoicingNewInvoice />},
+            {path: "payment-recived", element: <VendorInvoicingNewInvoice />},
+            {path: "debit-credit", element: <VendorInvoicingNewInvoice />},
+        ]
+    },
     
     
     // default wrong path

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import './VendorOnbording.css';
+// import './VendorOnbording.css';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi'; // Assuming you are using react-icons for eye icons
 import api from '../../../Utils/ApiCalls/Api';
@@ -11,41 +11,42 @@ const SigninSchema = Yup.object().shape({
   password: Yup.string().min(6, 'Too Short!').max(50, 'Too Long!').required('Required'),
 });
 
-const VendorOnbordingLogin = () => {
+const VendorInvoicingLogin = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleVendorLogin = async (values) => {
-    // navigate('/vendor-onbording/vendor-details');
+    navigate('/vendor-invoicing/home');
     // `https://cors-anywhere.herokuapp.com/http://202.153.35.211:50000/sap/opu/odata/sap/ZVENDOR_ONBOARD_SRV/Vendor_loginSet(Username='17300002',Password='TEST@123')`
     // ${import.meta.env.VITE_CROSS_ORIGIN_URL}
     // ===============
     // var loginurl = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + `Vendor_loginSet(Username='${values.vid}',Password='${values.password}')`
-    var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
+    // var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
 
-    try {
-      const response = await api.post(loginurl,
-        {
-          "username": `${values.vid}`,
-          "password": `${values.password}`
-          // headers: {
-          //   'Content-Type': 'application/json',
-          //   'Accept': 'application/json',
-          //   'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
-          //   'X-Requested-With': 'XMLHttpRequest'
-          // }
-        }
-      );
+    // try {
+    //   const response = await api.post(loginurl,
+    //     {
+    //       "username": `${values.vid}`,
+    //       "password": `${values.password}`
+    //       // headers: {
+    //       //   'Content-Type': 'application/json',
+    //       //   'Accept': 'application/json',
+    //       //   'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
+    //       //   'X-Requested-With': 'XMLHttpRequest'
+    //       // }
+    //     }
+    //   );
+      // ============
       // console.log(response);
       // console.log(response.data);
       // console.log(response.data.user);
       // console.log(response.data.user.accessToken);
-      localStorage.setItem('token', response.data.user.accessToken);
-      navigate('/vendor-onbording/vendor-details');
+    //   localStorage.setItem('token', response.data.user.accessToken);
+    //   navigate('/vendor-onbording/vendor-details');
       
-    } catch (error) {
-      console.error('Login failed', error);
-    }
+    // } catch (error) {
+    //   console.error('Login failed', error);
+    // }
   };
 
   const handleSignInClick = () => {
@@ -80,7 +81,7 @@ const VendorOnbordingLogin = () => {
       >
         {({ errors, touched, isSubmitting }) => (
           <Form>
-            <p className='center-items'><b>Vendor On-Bording Login</b></p>
+            <p className='center-items'><b>Vendor Invoice Login</b></p>
             <div>
               <label htmlFor="vid">Vendor ID</label>
               <Field type="string" name="vid" className={touched.vid && errors.vid ? 'error' : ''} />
@@ -108,10 +109,10 @@ const VendorOnbordingLogin = () => {
                 Login
               </button>
             </div>
-            <p className='center-items'>
+            {/* <p className='center-items'>
               <b>Don't have an Account ? &nbsp;</b> <NavLink to={'/vendor-onbording-sign-up'}>Register Here</NavLink>
             </p>
-            <NavLink className='center-items' to={'/vendor-track-status'}>Track Status</NavLink>
+            <NavLink className='center-items' to={'/vendor-track-status'}>Track Status</NavLink> */}
           </Form>
         )}
       </Formik>
@@ -119,4 +120,4 @@ const VendorOnbordingLogin = () => {
   );
 };
 
-export default VendorOnbordingLogin;
+export default VendorInvoicingLogin;

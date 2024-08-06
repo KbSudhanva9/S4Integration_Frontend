@@ -36,7 +36,7 @@ const SignupForm = () => {
   };
   const handleSignUpClick = async (values) => {
     try {
-      const response = await api.post( `${import.meta.env.VITE_LOCAL}${import.meta.env.VITE_REGISTER_URL}`, values, {
+      const response = await api.post( `${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_REGISTER_URL}`, values, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -88,7 +88,7 @@ const SignupForm = () => {
       >
         {({ errors, touched, isSubmitting }) => (
           <Form>
-            <p className='title'>Signup</p>
+            <p className='title'>Sign-up</p>
             <div className='button-container'>
               <div>
                 <label htmlFor='firstName'>First Name</label>

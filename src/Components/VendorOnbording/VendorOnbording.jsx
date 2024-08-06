@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import './Vendor.css'
 import { useNavigate } from 'react-router-dom';
 import api from '../../Utils/ApiCalls/Api';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const VendorOnbording = () => {
 
@@ -10,24 +10,30 @@ const VendorOnbording = () => {
 
     const [vdata, setVData] = useState([]);
 
+    useEffect(()=>{
+        handleStatusSearch();
+    }, []);
+
     const handleStatusSearch = async () => {
         
-        const statusSearchURL = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + `VendorSet('YASWAN141')`;
+        // const statusSearchURL = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + `VendorSet('YASWAN141')`;
         // `VendorSet('${refNo}')`;
+        const statusSearchURL = `${import.meta.env.VITE_BASE_URL}` + '/sap/venDetails';
 
         try {
             const response = await api.get(statusSearchURL, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    // 'Content-Type': 'application/json',
+                    // 'Accept': 'application/json',
+                    // 'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
+                    // 'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            console.log(response);
-            console.log(response.data);
-            console.log(response.data.d);
-            setVData(response.data.d);
+            // console.log(response);
+            // console.log(response.data);
+            // console.log(response.data.data);
+            setVData(response.data.data);
 
         } catch (error) {
             console.log('Search failed', error);
@@ -45,7 +51,7 @@ const VendorOnbording = () => {
 
                 <p style={{marginRight: '11%'}}><b >Vendor Details</b></p>
 
-                <Button onClick={()=>{nav('/vendor-onbording-login')}} style={{margin : '10px', backgroundColor: '#eb0101'}} variant="contained" size='small' color='error' >Login</Button>
+                <Button onClick={()=>{nav('/vendor-onbording-login'); localStorage.clear();}} style={{margin : '10px', backgroundColor: '#eb0101'}} variant="contained" size='small' color='error' >Login</Button>
 
             </header>
             <div className='maincomponent'>

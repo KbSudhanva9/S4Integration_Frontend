@@ -17,7 +17,7 @@ const SigninForm = () => {
 
   const handleSignUpClick  = async (values) => {
     try {
-      const response = await api.post( `${import.meta.env.VITE_LOCAL}${import.meta.env.VITE_LOGIN_URL}`, values);
+      const response = await api.post( `${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`, values);
       const { accessToken, user_role } = response.data.user;
 
       // Store token and role in local storage
@@ -63,7 +63,7 @@ const SigninForm = () => {
       >
         {({ errors, touched, isSubmitting }) => (
           <Form>
-            <p className='title'>Signin</p>
+            <p className='title'>Sign-in</p>
             <div>
               <label htmlFor="email">Email</label>
               <Field type="email" name="email" className={touched.email && errors.email ? 'error' : ''} />
@@ -94,6 +94,7 @@ const SigninForm = () => {
             </div>
             <div className='button-container'>
               <NavLink to={"vendor-onbording-login"}>Vendor On-Bording</NavLink>
+              <NavLink to={"vendor-invoicing-login"}>Vendor Invoicing</NavLink>
             </div>
           </Form>
         )}

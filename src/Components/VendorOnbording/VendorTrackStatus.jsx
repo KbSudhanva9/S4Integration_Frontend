@@ -28,20 +28,31 @@ const VendorTrackStatus = () => {
         setTData([]);
 
 
-        const statusSearchURL = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + `VendorSet('${refNo}')?$expand=vendorStatusNav`;
+        // const statusSearchURL = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + `VendorSet('${refNo}')?$expand=vendorStatusNav`;
+
+        const statusSearchURL = `${import.meta.env.VITE_BASE_URL}`+'/sap/venStatus';
 
         try {
-            const response = await api.get(statusSearchURL, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+            const response = await api.post(statusSearchURL, 
+                {
+                    "referenceNo": `${refNo}`
+                // }{
+                // headers: {
+                //     'Content-Type': 'application/json',
+                //     'Accept': 'application/json',
+                //     'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
+                //     'X-Requested-With': 'XMLHttpRequest'
+                // }
             });
             // console.log(response.data.d.vendorStatusNav.results);
+            // console.log(response);
+            // console.log(response.data);
+            // console.log(response.data.data);
+            // console.log(response.data.data.results);
             
-            const newData = response.data.d.vendorStatusNav.results.map((item, index) => ({
+            
+            // const newData = response.data.d.vendorStatusNav.results.map((item, index) => ({
+            const newData = response.data.data.results.map((item, index) => ({
                 id: tdata.length + index + 1, 
                 ref_no: item.ref_no,
                 name: item.name,

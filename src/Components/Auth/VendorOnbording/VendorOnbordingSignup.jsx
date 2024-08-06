@@ -28,46 +28,90 @@ const VendorOnbordingSignup = () => {
 
     const [country, setCountry] = useState([]);
     const [industrySet, setIndustrySet] = useState([]);
+    const [region, setRegion] = useState([]);
+    const [terms, setTerms] = useState([]);
+    const [bankName, setBankName] = useState([]);
     const [currency, setCurrency] = useState("");
-    
-    const calling = async (url) => {
+
+    const getCalling = async (url) => {
         setCurrency('');
-        var currentURL = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + url;
-        // console.log(currentURL);
+        // var currentURL = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + url;
+        var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
         try {
-            const response = await api.get(currentURL, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            if (url.includes('CountrySet')) {
-                setCountry(response.data.d.results);
-            }else if(url.includes('IndustrySet')){
-                setIndustrySet(response.data.d.results);
-            }else if(url.includes('CurrencySet')){
-                setCurrency(response.data.d.Waers);
-                
+            const response = await api.get(currentURL );
+            if (url.includes('countrySet')) {
+                // console.log(response.data.data.results);
+                setCountry(response.data.data.results);
+                // setCountry(response.data.d.results);
+            }
+            else if(url.includes('industries')){
+                setIndustrySet(response.data.data.results);
+            }
+            // else if(url.includes('CurrencySet')){
+            //     setCurrency(response.data.d.Waers);
+
+            // }
+        } catch (error) {
+            console.error('unable to get the response', error);
+        }
+    };
+
+    const postCalling = async (url, body) => {
+        setCurrency('');
+        var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
+        try {
+            const response = await api.post(currentURL, body);
+            if (url.includes('currency')) {
+                setCurrency(response.data.data.Waers);
+            }else if(url.includes('regionSet')){
+                setRegion(response.data.data.results);
+            }else if(url.includes('venTermOfPaymnets')){
+                setTerms(response.data.data.results);
+            }else if(url.includes('bankName')){
+                // console.log(response.data.data.results);
+                setBankName(response.data.data.results);
             }
         } catch (error) {
             console.error('unable to get the response', error);
         }
-       };
+    };
 
     const handleCountryCode = () => {
-        const url = 'CountrySet';
-        calling(url);
+        const url = '/sap/countrySet';
+        getCalling(url);
     };
     const handleIndestry = () => {
-        const url = 'IndustrySet';
-        calling(url);
+        const url = '/sap/industries';
+        getCalling(url);
     };
-    const handleCurrency =(cCode)=>{
-        const url = `CurrencySet('${cCode}')`;
-        calling(url);
-    }    
+    const handleCurrency = (cCode) => {
+        const url = '/sap/currency';
+        const body = {
+            "currencyCode": `${cCode}`
+        }
+        postCalling(url, body);
+    }
+    const handleRegion = (cCode) => {
+        const url = '/sap/regionSet';
+        const body = {
+            "countryCode": `${cCode}`
+        }
+        postCalling(url, body);
+    }
+    const handleTermOfPaymnets = (cCode) => {
+        const url = '/sap/venTermOfPaymnets';
+        const body = {
+            "countryCode": `${cCode}`
+        }
+        postCalling(url, body);
+    }
+    const handleBankName = (cCode) => {
+        const url = '/sap/bankName';
+        const body = {
+            "countryCode": `${cCode}`
+        }
+        postCalling(url, body);
+    }
 
     const validationSchema = Yup.object().shape({
         Anred: Yup.string().required('Required'),
@@ -101,7 +145,7 @@ const VendorOnbordingSignup = () => {
 
             </header>
             <div className='maincomponent'>
-                <Button onClick={()=>{console.log(currency)}}>sadfsafd</Button>
+                {/* <Button onClick={() => { console.log(currency) }}>sadfsafd</Button> */}
                 {/* <div > */}
                 <Formik
                     initialValues={{
@@ -227,11 +271,14 @@ const VendorOnbordingSignup = () => {
                                             onChange={(event) => {
                                                 const selectedValue = event.target.value;
                                                 setFieldValue('Land1', selectedValue);
-                                                if(!selectedValue){}
-                                                else{
+                                                if (!selectedValue) { }
+                                                else {
                                                     handleCurrency(selectedValue);
+                                                    handleRegion(selectedValue);
+                                                    handleTermOfPaymnets(selectedValue);
+                                                    handleBankName(selectedValue);
                                                 }
-                                            } }
+                                            }}
                                         >
                                             {country.map((option) => (
                                                 <MenuItem key={option.Land1} value={option.Land1}>
@@ -253,9 +300,9 @@ const VendorOnbordingSignup = () => {
                                             style={{ width: '188px' }}
                                             error={touched.Regio && !!errors.Regio}
                                         >
-                                            {title.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
+                                            {region.map((option) => (
+                                                <MenuItem key={option.Bland} value={option.Bland}>
+                                                    {option.Bezei} ({option.Bland})
                                                 </MenuItem>
                                             ))}
                                         </Field>
@@ -309,9 +356,9 @@ const VendorOnbordingSignup = () => {
                                             style={{ width: '188px' }}
                                             error={touched.Bankl && !!errors.Bankl}
                                         >
-                                            {title.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
+                                            {bankName.map((option) => (
+                                                <MenuItem key={option.Bankname} value={option.Bankname}>
+                                                    {option.Description} ({option.Bankname})
                                                 </MenuItem>
                                             ))}
                                         </Field>
@@ -345,7 +392,7 @@ const VendorOnbordingSignup = () => {
                                                 </MenuItem>
                                             ))}
                                         </Field> */}
-                                        <Field style={{ width: '188px' }} disabled  value={currency} size='small' type="text" name="Waers" className={touched.Waers && errors.Waers ? 'error' : ''} />
+                                        <Field style={{ width: '188px' }} disabled value={currency} size='small' type="text" name="Waers" className={touched.Waers && errors.Waers ? 'error' : ''} />
                                         {/* value={currency}  onChange={handleCurrencyChange}*/}
                                         {/* <ErrorMessage name="Waers" component="div" className="error-message" /> */}
                                     </div>
@@ -364,9 +411,9 @@ const VendorOnbordingSignup = () => {
                                             style={{ width: '188px' }}
                                             error={touched.PaymentTerms && !!errors.PaymentTerms}
                                         >
-                                            {title.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
+                                            {terms.map((option) => (
+                                                <MenuItem key={option.TermsOfPayment} value={option.TermsOfPayment}>
+                                                    {option.TermsOfPayment}
                                                 </MenuItem>
                                             ))}
                                         </Field>
