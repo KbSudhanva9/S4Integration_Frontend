@@ -4,10 +4,12 @@ import VendorInvoicingHome from "./VendorInvoicingHeader";
 
 const VendorInvoicingMainPage = () => {
     return ( 
-        <div>
+        <>
             <VendorInvoicingHome />
-            <Outlet />
-        </div>
+            <div style={{margin: '8px', padding: '10px', borderRadius: '8px'}}>
+                <Outlet />
+            </div>
+        </>
      );
 }
  

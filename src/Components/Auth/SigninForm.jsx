@@ -25,7 +25,7 @@ const SigninForm = () => {
       localStorage.setItem('role', user_role);
 
       // Redirect to a protected route after successful login
-      navigate('/home');
+      navigate('/admin/expense');
     } catch (error) {
       console.error('Login failed', error);
     }

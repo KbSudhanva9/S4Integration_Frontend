@@ -15,6 +15,9 @@ import VendorInvoicingLogin from "../Components/Auth/VendorInvoicing/VendorInvoi
 import VendorInvoicingMainPage from "../Components/VendorInvoicing/VendorInvoicingMainPage";
 import VendorInvoicingHome from "../Components/VendorInvoicing/Pages/VendorInvoicingHome";
 import VendorInvoicingNewInvoice from "../Components/VendorInvoicing/Pages/VendorInvoicingNewInvoice";
+import VendorInvoicingMyInv from "../Components/VendorInvoicing/Pages/VendorInvoicingMyInv";
+import VendorInvoicingPaymentRecived from "../Components/VendorInvoicing/Pages/VendorInvoicingPaymentRecived";
+import VendorInvoicingDebitCredit from "../Components/VendorInvoicing/Pages/VendorInvoicingDebitCredit";
 
 export const LayoutRouting = [
 
@@ -45,9 +48,9 @@ export const LayoutRouting = [
         children: [
             {path: "home", element: <VendorInvoicingHome />},
             {path: "new-invoice", element: <VendorInvoicingNewInvoice />},
-            {path: "my-invoice", element: <VendorInvoicingNewInvoice />},
-            {path: "payment-recived", element: <VendorInvoicingNewInvoice />},
-            {path: "debit-credit", element: <VendorInvoicingNewInvoice />},
+            {path: "my-invoice", element: <VendorInvoicingMyInv />},
+            {path: "payment-recived", element: <VendorInvoicingPaymentRecived />},
+            {path: "debit-credit", element: <VendorInvoicingDebitCredit />},
         ]
     },
     
