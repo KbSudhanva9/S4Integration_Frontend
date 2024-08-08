@@ -15,9 +15,11 @@ import { axisClasses } from '@mui/x-charts/ChartsAxis';
 
 
 import './VendorInvoicing.css'
+import { useSelector } from 'react-redux';
 
 const VendorInvoicingHome = () => {
 
+    const {token, user} = useSelector((state)=>state.auth);
     const valueFormatter = (value) => `${value}mm`;
 
     const colors = [
@@ -58,7 +60,7 @@ const VendorInvoicingHome = () => {
     return (
         <div>
             <div>
-                Vendor : 17300002
+                <p style={{margin: '0px'}}>Vendor : {user}</p> 
             </div>
             <div className='df' style={{ width: '100%' }}>
                 <div className='three'>

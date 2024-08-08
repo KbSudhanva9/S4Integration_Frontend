@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-// import './VendorOnbording.css';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FiEye, FiEyeOff } from 'react-icons/fi'; // Assuming you are using react-icons for eye icons
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import api from '../../../Utils/ApiCalls/Api';
+import { useDispatch } from 'react-redux';
+import { setAuth } from '../../../Redux/AuthSlice';
+
 
 const SigninSchema = Yup.object().shape({
   vid: Yup.string('Invalid Vendor ID').required('Required'),
@@ -12,41 +14,32 @@ const SigninSchema = Yup.object().shape({
 });
 
 const VendorInvoicingLogin = () => {
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleVendorLogin = async (values) => {
-    navigate('/vendor-invoicing/home');
-    // `https://cors-anywhere.herokuapp.com/http://202.153.35.211:50000/sap/opu/odata/sap/ZVENDOR_ONBOARD_SRV/Vendor_loginSet(Username='17300002',Password='TEST@123')`
-    // ${import.meta.env.VITE_CROSS_ORIGIN_URL}
-    // ===============
-    // var loginurl = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + `Vendor_loginSet(Username='${values.vid}',Password='${values.password}')`
-    // var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
-
-    // try {
-    //   const response = await api.post(loginurl,
-    //     {
-    //       "username": `${values.vid}`,
-    //       "password": `${values.password}`
-    //       // headers: {
-    //       //   'Content-Type': 'application/json',
-    //       //   'Accept': 'application/json',
-    //       //   'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
-    //       //   'X-Requested-With': 'XMLHttpRequest'
-    //       // }
-    //     }
-    //   );
-      // ============
-      // console.log(response);
-      // console.log(response.data);
+    var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
+    try {
+      const response = await api.post(loginurl,
+        {
+          "username": `${values.vid}`,
+          "password": `${values.password}`
+        }
+      );
       // console.log(response.data.user);
-      // console.log(response.data.user.accessToken);
-    //   localStorage.setItem('token', response.data.user.accessToken);
-    //   navigate('/vendor-onbording/vendor-details');
-      
-    // } catch (error) {
-    //   console.error('Login failed', error);
-    // }
+      // localStorage.setItem('token', response.data.user.accessToken);
+
+      dispatch(setAuth({
+        token: response.data.user.accessToken,
+        user: response.data.user.Username
+      }));
+
+      navigate('/vendor-invoicing/home');
+    } catch (error) {
+      console.error('Login failed', error);
+    }
   };
 
   const handleSignInClick = () => {

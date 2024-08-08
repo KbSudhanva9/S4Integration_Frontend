@@ -3,6 +3,8 @@ import { useState } from "react";
 import { FaSortDown } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
+import { useDispatch } from "react-redux";
+import { clearAuth } from "../../Redux/AuthSlice";
 
 const VendorInvoicingHeader = () => {
   // const [dropdownVisible, setDropdownVisible] = useState(true);
@@ -13,10 +15,13 @@ const VendorInvoicingHeader = () => {
   // const handleMouseLeave = () => {
   //     setDropdownVisible(false);
   // };
-
+  const dispatch = useDispatch();
   const nav = useNavigate();
 
   const signout =()=>{
+    
+    dispatch(clearAuth());
+    localStorage.removeItem('auth');
     localStorage.clear();
     nav('/vendor-invoicing-login');
   }
