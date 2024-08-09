@@ -7,33 +7,88 @@ import { IoFileTrayFull } from "react-icons/io5";
 import { TbFileDollar } from "react-icons/tb";
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
 import { LuClipboardCheck } from "react-icons/lu";
-
-// import { PieChart } from '@mui/x-charts/PieChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { axisClasses } from '@mui/x-charts/ChartsAxis';
-
-
 import './VendorInvoicing.css'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import api from "../../../Utils/ApiCalls/Api"
+import { setEmail } from '../ReduxAuth';
 
 const VendorInvoicingHome = () => {
 
-    const {token, user} = useSelector((state)=>state.auth);
-    const valueFormatter = (value) => `${value}mm`;
+    const dispatch = useDispatch();
 
-    const colors = [
-        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
-        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
-    ];
+    const [cardData, setCardData] = useState([]);
+    const [dataset, setDataset] = useState([]);
+    const { token, user } = useSelector((state) => state.auth);
+    // const valueFormatter = (value) => `${value}mm`;
+
+    // const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+
+    const transformedData = dataset.map((item, index) => ({
+        name: monthNames[parseInt(item.month) - 1],  // Convert month number to month name
+        value: parseFloat(item.amount),              // Convert amount to a number
+        // color: colors[index],                        // Assign color from the array
+    }));
+
+    useEffect(() => {
+        handleCardData();
+        handleChartData();
+    }, []);
+
+    useEffect(() => {
+        // console.log(cardData);
+        // console.log(dataset);
+    }, [cardData, dataset]);
+
+    const handleGetData = async (url) => {
+
+        if(localStorage.getItem('email')){
+            localStorage.removeItem('email');
+        }
+
+
+        const statusSearchURL = `${import.meta.env.VITE_BASE_URL}` + url;
+
+        try {
+            const response = await api.get(statusSearchURL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (url.includes('poValues')) {
+                setCardData(response.data.data);
+
+                // console.log(response.data.data.email)
+                localStorage.setItem('email', response.data.data.email);
+                // dispatch(setEmail({
+                //     email: response.data.email
+                // }));
+
+            } else if (url.includes('dashboard')) {
+                setDataset(response.data.data.results);
+            }
+
+        } catch (error) {
+            console.log('Search failed', error);
+        }
+    };
+
+    const handleCardData = () => {
+        var url = '/sap/vim/poValues';
+        handleGetData(url);
+    }
+    const handleChartData = () => {
+        var url = '/sap/vim/dashboard';
+        handleGetData(url);
+    }
+
+
+
 
     const chartSetting = {
-        // yAxis: [
-        //     {
-        //         label: 'rainfall (mm)',
-        //     },
-        // ],
-        series: [{ dataKey: 'seoul', label: 'Seoul rainfall', valueFormatter }],
+        series: [{ dataKey: 'amount', label: 'Month Data' }],
         height: 300,
         sx: {
             [`& .${axisClasses.directionY} .${axisClasses.label}`]: {
@@ -42,25 +97,10 @@ const VendorInvoicingHome = () => {
         },
     };
 
-    const dataset = [
-        { london: 59, paris: 57, newYork: 86, seoul: 21, month: 'Jan', },
-        { london: 50, paris: 52, newYork: 78, seoul: 28, month: 'Feb', },
-        { london: 47, paris: 53, newYork: 106, seoul: 41, month: 'Mar', },
-        { london: 54, paris: 56, newYork: 92, seoul: 73, month: 'Apr', },
-        { london: 57, paris: 69, newYork: 92, seoul: 99, month: 'May', },
-        { london: 60, paris: 63, newYork: 103, seoul: 144, month: 'June', },
-        { london: 59, paris: 60, newYork: 105, seoul: 319, month: 'July', },
-        { london: 65, paris: 60, newYork: 106, seoul: 249, month: 'Aug', },
-        { london: 51, paris: 51, newYork: 95, seoul: 131, month: 'Sept', },
-        { london: 60, paris: 65, newYork: 97, seoul: 55, month: 'Oct', },
-        { london: 67, paris: 64, newYork: 76, seoul: 48, month: 'Nov', },
-        { london: 61, paris: 70, newYork: 103, seoul: 25, month: 'Dec', },
-    ];
-
     return (
         <div>
             <div>
-                <p style={{margin: '0px'}}>Vendor : {user}</p> 
+                <p style={{ margin: '0px' }}>Vendor : {user}</p>
             </div>
             <div className='df' style={{ width: '100%' }}>
                 <div className='three'>
@@ -74,11 +114,11 @@ const VendorInvoicingHome = () => {
                                         </Avatar>
                                     }
                                     title="Total PO Value"
-                                    subheader="1263916.90"
+                                    subheader={cardData.tot}
                                 />
                                 <Box sx={{ textAlign: 'right', marginRight: 2 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        123123
+                                        {cardData.total_po}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -92,11 +132,11 @@ const VendorInvoicingHome = () => {
                                         </Avatar>
                                     }
                                     title="Open PO Balance"
-                                    subheader="1263916.90"
+                                    subheader={cardData.open_amt}
                                 />
                                 <Box sx={{ textAlign: 'right', marginRight: 2 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        123123
+                                        {cardData.open_po}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -110,11 +150,11 @@ const VendorInvoicingHome = () => {
                                         </Avatar>
                                     }
                                     title="Invoice Created"
-                                    subheader="1263916.90"
+                                    subheader={cardData.cret}
                                 />
                                 <Box sx={{ textAlign: 'right', marginRight: 2 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        123123
+                                        {cardData.inv_created}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -128,11 +168,11 @@ const VendorInvoicingHome = () => {
                                         </Avatar>
                                     }
                                     title="Payment Cleared"
-                                    subheader="1263916.90"
+                                    subheader={cardData.paid}
                                 />
                                 <Box sx={{ textAlign: 'right', marginRight: 2 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        123123
+                                        {cardData.po_clrd}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -147,24 +187,15 @@ const VendorInvoicingHome = () => {
                             style={{ margin: '15px' }}
                             series={[
                                 {
-                                    data: [
-                                        { id: 1, value: 10, label: 'JAN' },
-                                        { id: 2, value: 15, label: 'FEB' },
-                                        { id: 3, value: 30, label: 'MAR' },
-                                        { id: 4, value: 200, label: 'APR' },
-                                        { id: 5, value: 25, label: 'MAY' },
-                                        { id: 6, value: 23, label: 'JUN' },
-                                        { id: 7, value: 12, label: 'JUL' },
-                                        { id: 8, value: 9, label: 'AUG' },
-                                        { id: 9, value: 0, label: 'SEP' },
-                                        { id: 10, value: 32, label: 'OCT' },
-                                        { id: 11, value: 18, label: 'NOV' },
-                                        { id: 12, value: 21, label: 'DEC' }
-                                    ],
-                                    // colors: colors},
-                                    innerRadius: 10,
+                                    data: transformedData.map((item) => ({
+                                        name: item.name,
+                                        value: item.value,
+                                        // color: item.color,
+                                        label: item.name,
+                                    })),
+                                    innerRadius: 45,
                                     outerRadius: 90,
-                                    paddingAngle: 1,
+                                    paddingAngle: 0.1,
                                     cornerRadius: 4,
                                     startAngle: 0,
                                     endAngle: 360,
@@ -182,17 +213,14 @@ const VendorInvoicingHome = () => {
                         <center><Typography>Monthly Amount</Typography></center>
                         {/* <BarChart
                             dataset={dataset}
-                            yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-                            series={[{ dataKey: 'seoul', label: 'Seoul rainfall', valueFormatter }]}
-                            layout="horizontal"
-                            grid={{ vertical: true }}
-                            {...chartSetting}
-                        /> */}
-                        <BarChart
-                            dataset={dataset}
                             xAxis={[
                                 { scaleType: 'band', dataKey: 'month' },
                             ]}
+                            {...chartSetting}
+                        /> */}
+                        <BarChart
+                            dataset={dataset.map(item => ({ ...item, month: monthNames[parseInt(item.month) - 1], }))}
+                            xAxis={[{ scaleType: 'band', dataKey: 'month' },]}
                             {...chartSetting}
                         />
                     </Card>

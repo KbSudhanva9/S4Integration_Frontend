@@ -132,7 +132,7 @@ const VendorInvoicingMyInv = () => {
                 </div>
 
             </div>
-            <div className='df' style={{padding: '10px', margin: '10px', width: '96%', left: '1%', backgroundColor: '#fff', margin: '5px', padding: '10px', borderRadius: '8px' }}>
+            <div className='df' style={{padding: '10px', margin: '10px', width: '96%', left: '1%', backgroundColor: '#fff', borderRadius: '8px' }}>
                 <label style={{ padding: '10px 0px 0px 0px' }}>Portal No</label>
                 <TextField style={{ margin: '0px 0px 0px 10px', width: '180px' }} size='small' variant="outlined" type='text' />
                 <label style={{ padding: '10px 0px 0px 15px' }}>Invoice Date</label>

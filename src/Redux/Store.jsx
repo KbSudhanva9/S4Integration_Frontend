@@ -15,13 +15,15 @@
 
 import { configureStore } from '@reduxjs/toolkit';
 import { loadState, saveState } from './localStorage';
-import { authReducer } from './AuthSlice';
+import { authReducer1 } from './AuthSlice';
+// import { authReducer2 } from '../Components/VendorInvoicing/ReduxAuth';
 
 const preloadedState = loadState(); // Load state from localStorage
 
 const store = configureStore({
   reducer: {
-    auth: authReducer,
+    auth: authReducer1,
+    // email: authReducer2,
   },
   preloadedState, // Set preloaded state
 });
