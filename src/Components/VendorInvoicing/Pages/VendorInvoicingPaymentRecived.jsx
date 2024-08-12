@@ -20,29 +20,38 @@ import Box from '@mui/material/Box'; import { useSelector } from "react-redux";
 import './VendorInvoicing.css'
 import { Button, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import api from '../../../Utils/ApiCalls/Api';
 
 const VendorInvoicingPaymentRecived = () => {
 
     const { token, user } = useSelector((state) => state.auth);
 
-    const [tdata, setTData] = useState([]);                 //table data
+    // const [tdata, setTData] = useState([]);                 //table data
     // const [submitExp, setSubmitExp] = useState([]);         //store selected row id's tdata
     // const [sRows, setSRows] = useState([]);                 //store selected data in table tdata
-    const [id, setId] = useState(1);
-    const rows = [{
-        LineNo: "00010",
-        Item: "TG0014",
-        ItemDesc: "Trading Good 0014,PD,Regular Proc.",
-        OrderQuantity: "10.000",
-        DeliverQuantity: "10.000",
-        InvoiceSubmittedQty: "10.000",
-        InvoiceQty: "0.000",
-        Taxcode: "",
-        Taxamt: "0.000",
-        Netpr: "35.000",
-        Netwr: "350.000",
-    }];
+    // const [id, setId] = useState(1);
+    // const rows = [{
+    //     LineNo: "00010",
+    //     Item: "TG0014",
+    //     ItemDesc: "Trading Good 0014,PD,Regular Proc.",
+    //     OrderQuantity: "10.000",
+    //     DeliverQuantity: "10.000",
+    //     InvoiceSubmittedQty: "10.000",
+    //     InvoiceQty: "0.000",
+    //     Taxcode: "",
+    //     Taxamt: "0.000",
+    //     Netpr: "35.000",
+    //     Netwr: "350.000",
+    // }];
+
+    useEffect(()=>{
+        // console.log('hello');
+        handlePostService('');
+    }, [])
+
+    // const [lineItems, setLineItems] = useState([]);
+    const [tdata, setTData] = useState([]);
     const columns = [
         { field: 'PortalNo', headerName: 'Portal No', width: 120 },
         { field: 'PoNo', headerName: 'PO Number', width: 130 },
@@ -52,8 +61,6 @@ const VendorInvoicingPaymentRecived = () => {
         { field: 'ItemDesc', headerName: 'Item Description', width: 170 },
         { field: 'baselin', headerName: 'Amount', width: 120 },
         { field: 'Netpr', headerName: 'Status', width: 100 },
-        // { field: 'approved_rejected', headerName: 'Appr/Rej', width: 110 },
-        // { field: 'Remarks', headerName: 'Remarks', width: 140 },
     ];
     // const handleSelectionChange = (selection) => {
     //     setSubmitExp(selection);
@@ -62,9 +69,56 @@ const VendorInvoicingPaymentRecived = () => {
     //     setSRows(selectedData);
     // };
 
-    const handleData = () => {
-        console.log('adf');
+    const [cardData, setCardData] = useState({
+        "Total_due": "",
+        "Over_due": "",
+        "Due_30": ""
+    })
+
+    const handlePostData = async (url, body) => {
+        const statusSearchURL = `${import.meta.env.VITE_BASE_URL}` + url;
+        try {
+            const response = await api.post(statusSearchURL, body, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            // console.log(response);
+            // console.log(response.data.data);
+            setCardData(preCardData => ({...preCardData, Total_due: response.data.data.Total_due, Over_due: response.data.data.Over_due, Due_30: response.data.data.Due_30 }));
+            
+            // if (url.includes('getPoDetails')) {
+                const formattedLineItems = response.data.data.po_duelineitemSet.results.map((item, index) => ({
+                    id: index + 1,
+                    PortalNo: item.PortalNo,
+                    PoNo: item.PoNo,
+                    InvoiceNo: item.InvoiceNo,
+                    Ebelp: item.Ebelp,
+                    Item: item.Item,
+                    ItemDesc: item.ItemDesc,
+                    baselin: item.baselin,
+                    Netpr: item.Netpr,
+                    // Netwr: item.Netwr,
+                    // InvoiceSubmittedQty: item.InvoiceSubmittedQty
+                }));
+
+                setTData(formattedLineItems);
+            // }
+        } catch (error) {
+            console.log('Search failed', error);
+        }
+    };
+
+    const handlePostService = (keyValue) => {
+        console.log('adf==>'+ keyValue +'<==adf');
+        var url = '/sap/vim/totalPaymentReceived';
+        const body = {
+            "key" : `${keyValue}`
+        }
+        handlePostData(url, body);
     }
+
+    // const handleData = (keyValue) => {
+    //     console.log('adf==>'+ keyValue +'<==adf');
+    // }
 
     return (
         <div>
@@ -81,8 +135,8 @@ const VendorInvoicingPaymentRecived = () => {
                                         <IoFileTrayFull style={{ color: '#c75f00' }} />
                                     </Avatar>
                                 }
-                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={handleData} >Total Due </Typography>}
-                                subheader="21600"
+                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={()=>{handlePostService('')}} >Total Due </Typography>}
+                                subheader={cardData.Total_due}
                             />
                         </Box>
                     </Card>
@@ -96,8 +150,8 @@ const VendorInvoicingPaymentRecived = () => {
                                         <LuAlertTriangle style={{ color: '#d20000' }} />
                                     </Avatar>
                                 }
-                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={handleData} >Over Due </Typography>}
-                                subheader="21600"
+                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={()=>{handlePostService('o')}} >Over Due </Typography>}
+                                subheader={cardData.Over_due}
                             />
                         </Box>
                     </Card>
@@ -111,8 +165,8 @@ const VendorInvoicingPaymentRecived = () => {
                                         <BiErrorAlt style={{ color: '#007783' }} />
                                     </Avatar>
                                 }
-                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={handleData} >Due Next 30 Days</Typography>}
-                                subheader="0"
+                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={()=>{handlePostService('w')}} >Due Next 30 Days</Typography>}
+                                subheader={cardData.Due_30}
                             />
                         </Box>
                     </Card>

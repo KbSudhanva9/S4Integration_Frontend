@@ -18,6 +18,9 @@ import VendorInvoicingNewInvoice from "../Components/VendorInvoicing/Pages/Vendo
 import VendorInvoicingMyInv from "../Components/VendorInvoicing/Pages/VendorInvoicingMyInv";
 import VendorInvoicingPaymentRecived from "../Components/VendorInvoicing/Pages/VendorInvoicingPaymentRecived";
 import VendorInvoicingDebitCredit from "../Components/VendorInvoicing/Pages/VendorInvoicingDebitCredit";
+import ASNVendorLogin from "../Components/Auth/ASNVendor/ASNVendorLogin";
+import ASNVendorMainPage from "../Components/ASNVendor/ASNVendorMainPage";
+import ASNVendorHome from "../Components/ASNVendor/Pages/ASNVendorHome";
 
 export const LayoutRouting = [
 
@@ -51,6 +54,19 @@ export const LayoutRouting = [
             {path: "my-invoice", element: <VendorInvoicingMyInv />},
             {path: "payment-recived", element: <VendorInvoicingPaymentRecived />},
             {path: "debit-credit", element: <VendorInvoicingDebitCredit />},
+        ]
+    },
+
+
+    // Advance Shipment User Vendor side
+    {path: "asn-vendor-login", element: <ASNVendorLogin />,},
+    {path: "asn-vendor", element: <ASNVendorMainPage />,
+        children: [
+            {path: "home", element: <ASNVendorHome />},
+    //         {path: "new-invoice", element: <VendorInvoicingNewInvoice />},
+    //         {path: "my-invoice", element: <VendorInvoicingMyInv />},
+    //         {path: "payment-recived", element: <VendorInvoicingPaymentRecived />},
+    //         {path: "debit-credit", element: <VendorInvoicingDebitCredit />},
         ]
     },
     

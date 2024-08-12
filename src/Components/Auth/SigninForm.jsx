@@ -15,9 +15,9 @@ const SigninForm = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
-  const handleSignUpClick  = async (values) => {
+  const handleSignUpClick = async (values) => {
     try {
-      const response = await api.post( `${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`, values);
+      const response = await api.post(`${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`, values);
       const { accessToken, user_role } = response.data.user;
 
       // Store token and role in local storage
@@ -30,7 +30,7 @@ const SigninForm = () => {
       console.error('Login failed', error);
     }
   };
-  
+
   const handleSignInClick = () => {
     navigate('/sign-up');
   };
@@ -95,6 +95,9 @@ const SigninForm = () => {
             <div className='button-container'>
               <NavLink to={"vendor-onbording-login"}>Vendor On-Bording</NavLink>
               <NavLink to={"vendor-invoicing-login"}>Vendor Invoicing</NavLink>
+            </div>
+            <div className='button-container'>
+              <NavLink to={"asn-vendor-login"}>ASN Vendor</NavLink>
             </div>
           </Form>
         )}

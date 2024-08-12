@@ -6,15 +6,26 @@ import './VendorInvoicing.css'
 import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
 import api from "../../../Utils/ApiCalls/Api";
+import { FaRegHandPointRight } from "react-icons/fa6";
+import { LuArrowRightFromLine } from "react-icons/lu";
+import { PiArrowDownRightLight } from "react-icons/pi";
+import { FaAngleDoubleRight } from "react-icons/fa";
 
 const VendorInvoicingNewInvoice = () => {
 
     const { token, user } = useSelector((state) => state.auth);
 
 
-    const [podata, setPodata] = useState([]);           //value for the field data
+    const [podata, setPodata] = useState({
+        "POTYPE": "",
+        "CRET_DATE": "",
+        "PAYMENT_TERM": "",
+        "PMNT_TM_DESCP": "",
+        "address": "",
+
+    });           //value for the field data
     const [totalAmt, setTotalAmt] = useState(0);        //to set the total amt
-    const [tdata, setTData] = useState([]);
+    // const [tdata, setTData] = useState([]);
 
     const [poList, setPOList] = useState([]);           //getting from api po numbers
 
@@ -38,8 +49,8 @@ const VendorInvoicingNewInvoice = () => {
     }, []);
 
     useEffect(() => {
-        console.log(poList);
-        console.log(lineItems);
+        // console.log(poList);
+        // console.log(lineItems);
     }, [poList, lineItems]);
 
     const handleGetData = async (url) => {
@@ -61,8 +72,12 @@ const VendorInvoicingNewInvoice = () => {
             const response = await api.post(statusSearchURL, body, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            console.log(response);
+            console.log(response.data.data);
+
+            setPodata(prePOData => ({ ...prePOData, POTYPE: response.data.data.POTYPE, CRET_DATE: formatDate(response.data.data.CRET_DATE), PAYMENT_TERM: response.data.data.PAYMENT_TERM, PMNT_TM_DESCP: response.data.data.PMNT_TM_DESCP, address: response.data.data.address }))
             if (url.includes('getPoDetails')) {
-                const formattedLineItems = response.data.data.results.map((item, index) => ({
+                const formattedLineItems = response.data.data.po_lineitemSet.results.map((item, index) => ({
                     id: index + 1,
                     LineNo: item.LineNo,
                     Item: item.Item,
@@ -118,10 +133,10 @@ const VendorInvoicingNewInvoice = () => {
         const totalAmount = selectedData.reduce((total, item) => {
             return total + parseFloat(item.Netwr);
         }, 0);
-    
+
         // Update total amount
         setTotalAmt(totalAmount);
-    
+
         // Update line items and payload
         // setLineItems(selectedData); // Update lineItems state
         setPayload(prevPayload => ({
@@ -134,14 +149,14 @@ const VendorInvoicingNewInvoice = () => {
     };
     // const handleSelectionChange = (selection) => {
     //     const selectedData = selection.map(id => tdata.find(row => row.id === id));
-        
+
     //     // Calculate the total amount for selected rows
     //     const totalAmount = selectedData.reduce((total, item) => {
     //         return total + parseFloat(item.Netwr);
     //     }, 0);
-    
+
     //     setTotalAmt(totalAmount);
-    
+
     //     // Update the payload with the selected line items
     //     setPayload(prevPayload => ({
     //         ...prevPayload,
@@ -172,6 +187,14 @@ const VendorInvoicingNewInvoice = () => {
             //   console.log(updatedPayload);  // Log the updated payload
             return updatedPayload;
         });
+    };
+
+    const formatDate = (dateStr) => {
+        if (!dateStr || dateStr.length !== 8) return '';
+        const year = dateStr.substring(0, 4);
+        const month = dateStr.substring(4, 6);
+        const day = dateStr.substring(6, 8);
+        return `${year}/${month}/${day}`;
     };
     // ===========================
     // const handleChange = (e) => {
@@ -235,22 +258,27 @@ const VendorInvoicingNewInvoice = () => {
                             </div>
                         </div>
                     </div>
-                    <div style={{ paddingTop: '50px', marginLeft: '15px' }}>
+                    <div style={{ marginTop: '50px', marginLeft: '15px', }}>
+                        {/* border: '1px solid #ccc', borderRadius: '8px', padding: '5px'}}> */}
                         <div className="df minMargin">
+                            {/* <FaRegHandPointRight /> */}
+                            {/* <LuArrowRightFromLine  */}
+                            {/* <PiArrowDownRightLight  */}
+                            <FaAngleDoubleRight style={{ padding: '8px 0px 0px 0px', marginLeft: '-33px', marginRight: '15px', fontSize: 'larger' }}/>
                             <label style={{ padding: '8px 70px 0px 0px' }} htmlFor="poType">PO Type : </label>
-                            <TextField disabled style={{ width: '200px' }} size='small' type="text" value={podata.poType} name="poType" />
+                            <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.POTYPE} name="poType" />
                         </div>
                         <div className="df minMargin">
                             <label style={{ padding: '8px 39px 0px 0px' }} htmlFor="createdDate">Created Date : </label>
-                            <TextField disabled style={{ width: '200px' }} size='small' type="Date" value={podata.createdDate} name="createdDate" />
+                            <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.CRET_DATE} name="createdDate" />
                         </div>
                         <div className="df minMargin">
                             <label style={{ padding: '8px 24px 0px 0px' }} htmlFor="paymentTerms">Payment Terms : </label>
-                            <TextField disabled style={{ width: '200px' }} size='small' type="text" value={podata.paymentTerms} name="paymentTerms" />
+                            <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.PAYMENT_TERM + ", " + podata.PMNT_TM_DESCP} name="paymentTerms" />
                         </div>
                         <div className="df minMargin">
                             <label style={{ padding: '8px 15px 0px 0px' }} htmlFor="deliveryAdd">Delivery Address : </label>
-                            <TextField disabled style={{ width: '200px' }} size='small' type="text" value={podata.deliveryAdd} name="deliveryAdd" />
+                            <TextField disabled style={{ width: '240px' }} multiline maxRows={4} size='small' type="text" value={podata.address} name="deliveryAdd" />
                         </div>
                     </div>
                 </div>

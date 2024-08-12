@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import { useDispatch } from "react-redux";
 import { clearAuth } from "../../Redux/AuthSlice";
 
-const VendorInvoicingHeader = () => {
+const ASNVendorHeader = () => {
   // const [dropdownVisible, setDropdownVisible] = useState(true);
 
   // const handleMouseEnter = () => {
@@ -34,7 +34,7 @@ const VendorInvoicingHeader = () => {
       />
 
       <nav className="nav">
-        <NavLink
+        {/* <NavLink
           exact
           to="home"
           style={({ isActive, isPending, isTransitioning }) => ({
@@ -91,11 +91,11 @@ const VendorInvoicingHeader = () => {
           })}
         >
           Debit/Credit
-        </NavLink>
+        </NavLink> */}
         
         <Button variant="contained" size='small' color='error' onClick={signout}>Sign out</Button>
       </nav>
     </header>
   );
 };
-export default VendorInvoicingHeader;
+export default ASNVendorHeader;
