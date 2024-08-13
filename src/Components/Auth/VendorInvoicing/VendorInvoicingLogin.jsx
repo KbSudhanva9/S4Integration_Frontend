@@ -5,7 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import api from '../../../Utils/ApiCalls/Api';
 import { useDispatch } from 'react-redux';
-import { setAuth } from '../../../Redux/AuthSlice';
+import { clearAuth, setAuth } from '../../../Redux/AuthSlice';
 
 
 const SigninSchema = Yup.object().shape({
@@ -49,6 +49,12 @@ const VendorInvoicingLogin = () => {
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
+
+  useEffect(() => {
+    dispatch(clearAuth());
+    localStorage.removeItem('auth');
+    localStorage.clear();
+  }, [])
 
   // useEffect(() => {
   //   const token = localStorage.getItem('token');

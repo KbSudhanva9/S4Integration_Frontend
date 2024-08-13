@@ -151,9 +151,16 @@ const Expense = () => {
     }
 
 
-    const companycode = [
-        { value: '1000', label: '1000' },
-        { value: '2000', label: '2000' }
+    const cocode = [
+        { value: '1000', label: 'Company Code 1000' },
+        { value: '2000', label: 'Company Code 2000' },
+        { value: '3000', label: 'BestRun USA' },
+    ];
+
+    const costce = [
+        { value: '1000', label: 'Cost center' },
+        { value: '1100', label: 'Manufacturing 1 (US)' },
+        { value: '2000', label: 'Production Unit Plant 2000' },
     ];
 
     const currency = [
@@ -172,9 +179,9 @@ const Expense = () => {
                         size='small'
                         style={{ width: '221px' }}
                     >
-                        {companycode.map((option) => (
+                        {cocode.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                                {option.value} ({option.label})
                             </MenuItem>
                         ))}
                     </TextField>
@@ -287,9 +294,9 @@ const Expense = () => {
                                                 size='small'
                                                 style={{ width: '150px' }}
                                             >
-                                                {companycode.map((option) => (
+                                                {costce.map((option) => (
                                                     <MenuItem key={option.value} value={option.value}>
-                                                        {option.label}
+                                                        {option.value} ({option.label})
                                                     </MenuItem>
                                                 ))}
                                             </TextField>

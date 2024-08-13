@@ -5,6 +5,8 @@ import './Sign.css';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi'; // Assuming you are using react-icons for eye icons
 import api from '../../Utils/ApiCalls/Api';
+import { clearAuth } from '../../Redux/AuthSlice';
+import { useDispatch } from 'react-redux';
 
 const SigninSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -13,6 +15,7 @@ const SigninSchema = Yup.object().shape({
 
 const SigninForm = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   const handleSignUpClick = async (values) => {
@@ -40,11 +43,18 @@ const SigninForm = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/home');
-    }
-  }, [navigate]);
+    dispatch(clearAuth());
+    localStorage.removeItem('auth');
+    localStorage.clear();
+  }, [])
+
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token');
+  //   if (token) {
+  //     navigate('/home');
+  //   }
+  // }, [navigate]);
 
   return (
     <div className='sign-in-div'>

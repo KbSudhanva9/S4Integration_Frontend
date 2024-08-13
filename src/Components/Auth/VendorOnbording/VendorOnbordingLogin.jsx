@@ -5,6 +5,8 @@ import './VendorOnbording.css';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi'; // Assuming you are using react-icons for eye icons
 import api from '../../../Utils/ApiCalls/Api';
+import { clearAuth } from '../../../Redux/AuthSlice';
+import { useDispatch } from 'react-redux';
 
 const SigninSchema = Yup.object().shape({
   vid: Yup.string('Invalid Vendor ID').required('Required'),
@@ -13,6 +15,7 @@ const SigninSchema = Yup.object().shape({
 
 const VendorOnbordingLogin = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleVendorLogin = async (values) => {
@@ -55,6 +58,12 @@ const VendorOnbordingLogin = () => {
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
+
+  useEffect(() => {
+    dispatch(clearAuth());
+    localStorage.removeItem('auth');
+    localStorage.clear();
+  }, [])
 
   // useEffect(() => {
   //   const token = localStorage.getItem('token');
