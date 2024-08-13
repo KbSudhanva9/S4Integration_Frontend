@@ -66,10 +66,24 @@ const VendorInvoicingMyInv = () => {
     // };
 
     const [cardData, setCardData] = useState({
-        "Total_due": "",
-        "Over_due": "",
-        "Due_30": ""
-    })
+        "submited": "",
+        "verified": "",
+        "blocked": "",
+        "cleared": ""
+    });
+
+    const handleGetData = async (url) => {
+        const statusSearchURL = `${import.meta.env.VITE_BASE_URL}` + url;
+        try {
+            const response = await api.get(statusSearchURL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setCardData(preCardData => ({ ...preCardData, submited: response.data.data.submited, verified: response.data.data.verified, blocked: response.data.data.blocked, cleared: response.data.data.cleared}));
+
+        } catch (error) {
+            console.log('Search failed', error);
+        }
+    };
 
     const handlePostData = async (url, body) => {
 
@@ -81,7 +95,7 @@ const VendorInvoicingMyInv = () => {
             });
             console.log(response);
             // console.log(response.data.data);
-            setCardData(preCardData => ({ ...preCardData, Total_due: response.data.data.Total_due, Over_due: response.data.data.Over_due, Due_30: response.data.data.Due_30 }));
+            // setCardData(preCardData => ({ ...preCardData, Total_due: response.data.data.Total_due, Over_due: response.data.data.Over_due, Due_30: response.data.data.Due_30 }));
 
             // if (url.includes('getPoDetails')) {
             const formattedLineItems = response.data.data.po_inv_statusSet.results.map((item, index) => ({
@@ -107,6 +121,10 @@ const VendorInvoicingMyInv = () => {
         }
     };
 
+    const handleCardData = () => {
+        var url = '/sap/vim/poValues';
+        handleGetData(url);
+    }
     const handlePostService = (keyValue) => {
         console.log('adf==>' + keyValue + '<==adf');
         var url = '/sap/vim/totalInvoices';
@@ -122,6 +140,7 @@ const VendorInvoicingMyInv = () => {
 
     useEffect(() => {
         handlePostService('S');
+        handleCardData();
     }, []);
 
     return (
@@ -133,7 +152,7 @@ const VendorInvoicingMyInv = () => {
                         <CircularProgress />
                     </Box>
                 ) : ( */}
-                    <p style={{ margin: '0px' }}>Vendor : {user}</p>
+                <p style={{ margin: '0px' }}>Vendor : {user}</p>
                 {/* )} */}
             </div>
 
@@ -149,7 +168,7 @@ const VendorInvoicingMyInv = () => {
                                     </Avatar>
                                 }
                                 title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={() => { handlePostService('S') }} >Total Invoice Submitted </Typography>}
-                                subheader="44"
+                                subheader={cardData.submited}
                             />
                         </Box>
                     </Card>
@@ -164,7 +183,7 @@ const VendorInvoicingMyInv = () => {
                                     </Avatar>
                                 }
                                 title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={() => { handlePostService('V') }} >Total Invoice Verified </Typography>}
-                                subheader="39"
+                                subheader={cardData.verified}
                             />
                         </Box>
                     </Card>
@@ -179,7 +198,7 @@ const VendorInvoicingMyInv = () => {
                                     </Avatar>
                                 }
                                 title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={() => { handlePostService('B') }} >Total Invoice Blocked </Typography>}
-                                subheader="5"
+                                subheader={cardData.blocked}
                             />
                         </Box>
                     </Card>
@@ -194,7 +213,7 @@ const VendorInvoicingMyInv = () => {
                                     </Avatar>
                                 }
                                 title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={() => { handlePostService('C') }} >Total Invoice Payment </Typography>}
-                                subheader="36"
+                                subheader={cardData.cleared}
                             />
                         </Box>
                     </Card>

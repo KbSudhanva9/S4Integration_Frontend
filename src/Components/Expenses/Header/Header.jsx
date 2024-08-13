@@ -50,7 +50,7 @@ const Header = () => {
             fontWeight: isPending ? "bold" : "normal",
           })}
         >
-          Travel
+          Second Screen
         </NavLink>
 
         <Button variant="contained" size='small' color='error' onClick={signout}>Sign out</Button>

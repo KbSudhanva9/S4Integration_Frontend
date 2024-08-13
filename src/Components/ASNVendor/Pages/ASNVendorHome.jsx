@@ -178,7 +178,7 @@ const ASNVendorHome = () => {
                                 </Button>
                             </div>
 
-                            <NavLink >Track ASN Status</NavLink>
+                            <NavLink to='/asn-vendor/track-status'>Track ASN Status</NavLink>
                         </center>
                     </Form>
 

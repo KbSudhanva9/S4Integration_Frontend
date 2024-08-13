@@ -69,7 +69,7 @@ const ASNVendorHeader = () => {
           My Invoice
         </NavLink>
         <NavLink
-          to="payment-recived"
+          to="payment-received"
           style={({ isActive, isPending, isTransitioning }) => ({
             padding: "10px",
             textDecoration: "none",
@@ -77,7 +77,7 @@ const ASNVendorHeader = () => {
             fontWeight: isPending ? "bold" : "normal",
           })}
         >
-          Payment Recived
+          Payment Received
         </NavLink>
         <NavLink
           to= "#"

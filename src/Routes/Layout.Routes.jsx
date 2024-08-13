@@ -2,11 +2,11 @@
 import { Children } from "react";
 import SigninForm from "../Components/Auth/SigninForm";
 import SignupForm from "../Components/Auth/SignupForm";
-import MainLayout from "../Components/Pages/MainLayout";
+// import MainLayout from "../Components/Pages/MainLayout";
 import ProtectedRoute from "./Protected.Routes";
-import Expense from "../Components/Expense/Expense";
-import Travel from "../Components/Travel/Travel";
-import CustomizedDialogs from "../Components/Expense/CustomizedDialogs";
+// import Expense from "../Components/Expenses/Expense/Expense";
+// import Travel from "../Components/Expenses/Travel/Travel";
+import CustomizedDialogs from "../Components/Expenses/Expense/CustomizedDialogs";
 import VendorOnbordingLogin from "../Components/Auth/VendorOnbording/VendorOnbordingLogin";
 import VendorOnbordingSignup from "../Components/Auth/VendorOnbording/VendorOnbordingSignup";
 import VendorOnbording from "../Components/VendorOnbording/VendorOnbording";
@@ -21,6 +21,10 @@ import VendorInvoicingDebitCredit from "../Components/VendorInvoicing/Pages/Vend
 import ASNVendorLogin from "../Components/Auth/ASNVendor/ASNVendorLogin";
 import ASNVendorMainPage from "../Components/ASNVendor/ASNVendorMainPage";
 import ASNVendorHome from "../Components/ASNVendor/Pages/ASNVendorHome";
+import Expense from "../Components/Expenses/Expense/Expense";
+import Travel from "../Components/Expenses/Travel/Travel";
+import MainLayout from "../Components/Expenses/MainLayout";
+import ASNVendorTrackStatus from "../Components/ASNVendor/Pages/ASNVendorTrackStatus";
 
 export const LayoutRouting = [
 
@@ -52,7 +56,7 @@ export const LayoutRouting = [
             {path: "home", element: <VendorInvoicingHome />},
             {path: "new-invoice", element: <VendorInvoicingNewInvoice />},
             {path: "my-invoice", element: <VendorInvoicingMyInv />},
-            {path: "payment-recived", element: <VendorInvoicingPaymentRecived />},
+            {path: "payment-received", element: <VendorInvoicingPaymentRecived />},
             {path: "debit-credit", element: <VendorInvoicingDebitCredit />},
         ]
     },
@@ -63,7 +67,7 @@ export const LayoutRouting = [
     {path: "asn-vendor", element: <ASNVendorMainPage />,
         children: [
             {path: "home", element: <ASNVendorHome />},
-    //         {path: "new-invoice", element: <VendorInvoicingNewInvoice />},
+            {path: "track-status", element: <ASNVendorTrackStatus />},
     //         {path: "my-invoice", element: <VendorInvoicingMyInv />},
     //         {path: "payment-recived", element: <VendorInvoicingPaymentRecived />},
     //         {path: "debit-credit", element: <VendorInvoicingDebitCredit />},
