@@ -25,6 +25,12 @@ import Expense from "../Components/Expenses/Expense/Expense";
 import Travel from "../Components/Expenses/Travel/Travel";
 import MainLayout from "../Components/Expenses/MainLayout";
 import ASNVendorTrackStatus from "../Components/ASNVendor/Pages/ASNVendorTrackStatus";
+import ASNVendorDetails from "../Components/ASNVendor/Pages/ASNVendorDetails";
+import VendorNonPOLogin from "../Components/Auth/VendorNonPO/VendorNonPOLogin";
+import VendorNonPOMainPage from "../Components/VendorNonPO/VendorNonPOMainPage";
+import VendorNonPOHome from "../Components/VendorNonPO/Pages/VendorNonPOHome";
+import VendorNonPOInvoiceUpload from "../Components/VendorNonPO/Pages/VendorNonPOInvoiceUpload";
+import VendorNonPOInvoiceStatus from "../Components/VendorNonPO/Pages/VendorNonPOInvoiceStatus";
 
 export const LayoutRouting = [
 
@@ -68,9 +74,17 @@ export const LayoutRouting = [
         children: [
             {path: "home", element: <ASNVendorHome />},
             {path: "track-status", element: <ASNVendorTrackStatus />},
-    //         {path: "my-invoice", element: <VendorInvoicingMyInv />},
-    //         {path: "payment-recived", element: <VendorInvoicingPaymentRecived />},
-    //         {path: "debit-credit", element: <VendorInvoicingDebitCredit />},
+            {path: "asn-details", element: <ASNVendorDetails />},
+        ]
+    },
+
+    // Vendor Non-PO
+    {path: "vendor-non-po-login", element: <VendorNonPOLogin />,},
+    {path: "vendor-non-po", element: <VendorNonPOMainPage />,
+        children: [
+            {path: "home", element: <VendorNonPOHome />},
+            {path: "invoice-upload", element: <VendorNonPOInvoiceUpload />},
+            {path: "invoice-status", element: <VendorNonPOInvoiceStatus />},
         ]
     },
     

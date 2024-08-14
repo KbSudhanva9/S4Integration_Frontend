@@ -1,6 +1,6 @@
 import './ASNVendor.css'
 import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useOutletContext } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -9,14 +9,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, MenuItem, Select, TextField } from '@mui/material';
 
 
-// const SigninSchema = Yup.object().shape({
-//     vid: Yup.string('Invalid Vendor ID').required('Required'),
-//     password: Yup.string().min(6, 'Too Short!').max(50, 'Too Long!').required('Required'),
-// });
-
 const ASNVendorHome = () => {
 
     const { token, user } = useSelector((state) => state.auth);
+    const { po, setPO } = useOutletContext();
+
     // const dispatch = useDispatch();
     const navigate = useNavigate();
     const [poList, setPOList] = useState([]);
@@ -41,45 +38,18 @@ const ASNVendorHome = () => {
         handleGetData(url);
     }
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        // console.log(value);
-        // console.log(name);
-        if (name === 'PoNo') {
-            console.log(value);
-            // handlePOdetailsAndLineItems(value);
-        }
-    }
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     if (name === 'PoNo') {
+    //         console.log(value);
+    //     }
+    // }
 
     useEffect(() => {
         handlePODataLineItemsData();
+        setPO("");
     }, []);
-    //   const handleVendorLogin = async (values) => {
-    //     var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
-    //     try {
-    //       const response = await api.post(loginurl,
-    //         {
-    //           "username": `${values.vid}`,
-    //           "password": `${values.password}`
-    //         }
-    //       );
-    //       // console.log(response.data.user);
-    //       // localStorage.setItem('token', response.data.user.accessToken);
-
-    //       dispatch(setAuth({
-    //         token: response.data.user.accessToken,
-    //         user: response.data.user.Username
-    //       }));
-
-    //       navigate('/asn-vendor/home');
-    //     } catch (error) {
-    //       console.error('Login failed', error);
-    //     }
-    //   };
-
     const Schema = Yup.object().shape({
-        // vid: Yup.string('Invalid Vendor ID').required('Required'),
-        // password: Yup.string().min(6, 'Too Short!').max(50, 'Too Long!').required('Required'),
         ponumber: Yup.string().required(),
     });
 
@@ -96,30 +66,6 @@ const ASNVendorHome = () => {
 
     return (
         <div className='sign-in-div' style={{ marginTop: '-40px' }}>
-            {/* <div className='maincomponent' style={{ padding: '20px 20px 20px 20px', borderRadius: '8px' }}> */}
-
-            {/* <div>
-                    <p><b>Purchase Order Number</b></p>
-                    <Select
-                        size="small"
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        fullWidth
-                        name="PoNo"
-                        style={{ width: '200px' }}
-                        onChange={handleChange}
-                    >
-                        {poList.map((option) => (
-                            <MenuItem key={option.po_no} value={option.po_no}>
-                                {option.po_no}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </div>
-                <center>
-                    <Button style={{ margin: '20px' }} variant='contained' color='error' size='small'>Submit</Button>
-                </center> */}
-
 
             <Formik
                 initialValues={{
@@ -127,10 +73,8 @@ const ASNVendorHome = () => {
                 }}
                 validationSchema={Schema}
                 onSubmit={(values) => {
-                    // Handle form submission
-                    console.log(values);
-
-                    // handleVendorLogin(values);
+                    // console.log(values);
+                    navigate('/asn-vendor/asn-details');
                 }}
             >
                 {({ errors, touched, isSubmitting, setFieldValue }) => (
@@ -141,13 +85,13 @@ const ASNVendorHome = () => {
                         </div>
                         <div>
                             <p htmlFor="vid">PO Number</p>
-                            {/* <Field type="string" name="vid" className={touched.vid && errors.vid ? 'error' : ''} /> */}
                             <Field
                                 as={Select}
                                 id="ponumber"
                                 name="ponumber"
                                 size='small'
                                 fullWidth
+                                value={po}
                                 // style={{ width: '188px' }}
                                 error={touched.ponumber && !!errors.ponumber}
                                 onChange={(event) => {
@@ -161,6 +105,8 @@ const ASNVendorHome = () => {
                                     //     handleTermOfPaymnets(selectedValue);
                                     //     handleBankName(selectedValue);
                                     // }
+
+                                    setPO(event.target.value)
                                 }}
                             >
                                 {poList.map((option) => (
@@ -184,14 +130,6 @@ const ASNVendorHome = () => {
 
                 )}
             </Formik>
-
-
-
-            {/* <center>
-                <NavLink >Track ASN Status</NavLink>
-            </center> */}
-            {/* </div> */}
-
         </div>
     );
 };
