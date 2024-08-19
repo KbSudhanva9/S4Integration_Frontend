@@ -188,6 +188,7 @@ const VendorOnbordingSignup = () => {
                         values.Ort01 = values.Pstlz;
                         values.Pfach = values.Pstlz;
                         values.Waers = currency;
+                        values.Pstl2 = values.Pstlz;
                         console.log(values);
                         // console.log(currency);
                         // handleSignUpClick(values);

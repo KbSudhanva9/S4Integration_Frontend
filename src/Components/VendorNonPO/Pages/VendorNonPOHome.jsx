@@ -1,5 +1,5 @@
 import { Avatar, Box, Card, CardHeader, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoFileTrayFull } from "react-icons/io5";
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
 import { LuClipboardCheck } from "react-icons/lu";
@@ -7,6 +7,8 @@ import { TbFileDollar } from "react-icons/tb";
 import { TbDeviceIpadCheck } from "react-icons/tb";
 
 import { useSelector } from "react-redux";
+import api from "../../../Utils/ApiCalls/Api";
+import { axisClasses, BarChart } from "@mui/x-charts";
 
 const VendorNonPOHome = () => {
 
@@ -14,7 +16,62 @@ const VendorNonPOHome = () => {
     const [dataset, setDataset] = useState([]);
     const { token, user } = useSelector((state) => state.auth);
 
-    return ( 
+    const handleGetData = async (url) => {
+
+        if (localStorage.getItem('email')) {
+            localStorage.removeItem('email');
+        }
+
+        const statusSearchURL = `${import.meta.env.VITE_BASE_URL}` + url;
+
+        try {
+            const response = await api.get(statusSearchURL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (url.includes('headData')) {
+                setCardData(response.data.data);
+            } else if (url.includes('dashboardGraph')) {
+                setDataset(response.data.data.results);
+                // console.log(response.data.data);
+            }
+        } catch (error) {
+            console.log('Search failed', error);
+        }
+    };
+
+    const handleCardData = () => {
+        var url = '/sap/nonpo/headData';
+        handleGetData(url);
+    }
+    const handleGraphData = () => {
+        var url = '/sap/nonpo/dashboardGraph';
+        handleGetData(url);
+    }
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+
+    // const transformedData = dataset.map((item, index) => ({
+    //     name: monthNames[parseInt(item.month) - 1],  // Convert month number to month name
+    //     value: parseFloat(item.amount),              // Convert amount to a number
+    //     // color: colors[index],                        // Assign color from the array
+    // }));
+
+    const chartSetting = {
+        series: [{ dataKey: 'amount', label: 'Month Data' }],
+        height: 300,
+        sx: {
+            [`& .${axisClasses.directionY} .${axisClasses.label}`]: {
+                transform: 'translateX(-10px)',
+            },
+        },
+    };
+
+    useEffect(() => {
+        handleCardData();
+        handleGraphData();
+    }, [])
+
+    return (
         <div>
             <div>
                 <p style={{ margin: '0px' }}>Vendor : {user}</p>
@@ -31,11 +88,11 @@ const VendorNonPOHome = () => {
                                         </Avatar>
                                     }
                                     title="Invoice Created"
-                                    // subheader={cardData.tot}
+                                    subheader={cardData.created_amt}
                                 />
                                 <Box sx={{ textAlign: 'right', marginRight: 2 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        {/* {cardData.total_po} */}
+                                        {cardData.inv_created}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -49,33 +106,15 @@ const VendorNonPOHome = () => {
                                         </Avatar>
                                     }
                                     title="Invoice Approved"
-                                    // subheader={cardData.open_amt}
+                                    subheader={cardData.approved_amt}
                                 />
                                 <Box sx={{ textAlign: 'right', marginRight: 2 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        {/* {cardData.open_po} */}
+                                        {cardData.inv_approved}
                                     </Typography>
                                 </Box>
                             </Box>
                         </Card>
-                        {/* <Card style={{ margin: '15px' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: '#c6fff9', width: 56, height: 56 }} variant="rounded">
-                                            <TbFileDollar  style={{ color: '#007783' }} />
-                                        </Avatar>
-                                    }
-                                    title="Invoice Created"
-                                    subheader={cardData.cret}
-                                />
-                                <Box sx={{ textAlign: 'right', marginRight: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {cardData.inv_created}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </Card> */}
                         <Card style={{ margin: '15px' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <CardHeader
@@ -85,11 +124,11 @@ const VendorNonPOHome = () => {
                                         </Avatar>
                                     }
                                     title="Payment Cleared"
-                                    // subheader={cardData.paid}
+                                    subheader={cardData.payment_clrd}
                                 />
                                 <Box sx={{ textAlign: 'right', marginRight: 2 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        {/* {cardData.po_clrd} */}
+                                        {cardData.CLEARED_AMT}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -97,54 +136,27 @@ const VendorNonPOHome = () => {
 
                     </div>
                 </div>
-                {/* <div className='three'>
-                    <Card style={{ margin: '37px 10px 0px 10px', padding: '80px 0px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                        <center><Typography>Monthly Count</Typography></center>
-                        <PieChart
-                            style={{ margin: '15px' }}
-                            series={[
-                                {
-                                    data: transformedData.map((item) => ({
-                                        name: item.name,
-                                        value: item.value,
-                                        // color: item.color,
-                                        label: item.name,
-                                    })),
-                                    innerRadius: 45,
-                                    outerRadius: 90,
-                                    paddingAngle: 0.1,
-                                    cornerRadius: 4,
-                                    startAngle: 0,
-                                    endAngle: 360,
-                                    cx: 110,
-                                    cy: 100,
-                                },
-                            ]}
-                            width={400}
-                            height={200}
-                        />
-                    </Card>
-                </div> */}
-                {/* <div className='three'>
+
+                <div style={{width: '70%'}}>
                     <Card style={{ margin: '37px 10px 0px 0px', padding: '50px 0px 35px 0px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                        <center><Typography>Monthly Amount</Typography></center>
-                        <BarChart
-                            dataset={dataset}
-                            xAxis={[
-                                { scaleType: 'band', dataKey: 'month' },
-                            ]}
-                            {...chartSetting}
-                        />
+                        <center><Typography>Non-PO Monthly Amount</Typography></center>
                         <BarChart
                             dataset={dataset.map(item => ({ ...item, month: monthNames[parseInt(item.month) - 1], }))}
                             xAxis={[{ scaleType: 'band', dataKey: 'month' },]}
                             {...chartSetting}
+                            series={[
+                                { dataKey: 'invCreated', label: 'invCreated' },
+                                { dataKey: 'invApproved', label: 'invApproved' },
+                                { dataKey: 'pmtCleared', label: 'pmtCleared' }
+                              ]}
                         />
                     </Card>
-                </div> */}
+                </div>
             </div>
+
+
         </div>
-     );
+    );
 }
- 
+
 export default VendorNonPOHome;
