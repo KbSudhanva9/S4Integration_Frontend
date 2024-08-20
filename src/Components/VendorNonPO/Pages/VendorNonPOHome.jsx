@@ -30,6 +30,9 @@ const VendorNonPOHome = () => {
             });
             if (url.includes('headData')) {
                 setCardData(response.data.data);
+
+                localStorage.setItem('email', response.data.data.mail)
+
             } else if (url.includes('dashboardGraph')) {
                 setDataset(response.data.data.results);
                 // console.log(response.data.data);
@@ -145,9 +148,9 @@ const VendorNonPOHome = () => {
                             xAxis={[{ scaleType: 'band', dataKey: 'month' },]}
                             {...chartSetting}
                             series={[
-                                { dataKey: 'invCreated', label: 'invCreated' },
-                                { dataKey: 'invApproved', label: 'invApproved' },
-                                { dataKey: 'pmtCleared', label: 'pmtCleared' }
+                                { dataKey: 'invCreated', label: 'Invoice Created' },
+                                { dataKey: 'invApproved', label: 'Invoice Approved' },
+                                { dataKey: 'pmtCleared', label: 'Payment Cleared' }
                               ]}
                         />
                     </Card>

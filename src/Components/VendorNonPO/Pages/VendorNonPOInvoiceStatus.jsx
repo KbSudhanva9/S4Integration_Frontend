@@ -77,8 +77,24 @@ const VendorNonPOInvoiceStatus = () => {
         handlePostData(url, body);
     }
 
-    useEffect(()=>{
-        handleNonPoStatus();
+    const handleClear = () => {
+
+        var body = {
+            fromDate: "",
+            toDate: "",
+            venInvNum: "",
+            cmpInvNum: ""
+        }
+
+        setFilterData(body);
+        setPostFilterData(body);
+
+        var url = '/sap/nonpo/status';
+        handlePostData(url, body);
+    };
+
+    useEffect(() => {
+        handleClear();
     }, [])
 
     return (
@@ -124,7 +140,7 @@ const VendorNonPOInvoiceStatus = () => {
                     size='small'
                     variant="outlined"
                     value={filterData.venInvNum}
-                    onChange={(e) => { setFilterData(prev => ({ ...prev, venInvNum: e.target.value })) }}
+                    onChange={(e) => { (setFilterData(prev => ({ ...prev, venInvNum: e.target.value }))), (setPostFilterData(prevd => ({ ...prevd, venInvNum: (e.target.value) }))) }}
                 />
             </div>
             <div style={{ margin: '15px 5px 5px 5px' }}>
@@ -135,7 +151,7 @@ const VendorNonPOInvoiceStatus = () => {
                     size='small'
                     variant="outlined"
                     value={filterData.cmpInvNum}
-                    onChange={(e) => { setFilterData(prev => ({ ...prev, cmpInvNum: e.target.value })) }}
+                    onChange={(e) => { (setFilterData(prev => ({ ...prev, cmpInvNum: e.target.value }))), (setPostFilterData(prevd => ({ ...prevd, cmpInvNum: (e.target.value) }))) }}
                 />
             </div>
             <div style={{ margin: '10px 0px' }}>
@@ -156,9 +172,9 @@ const VendorNonPOInvoiceStatus = () => {
                     variant="contained"
                     color='warning'
                     startIcon={<RiArrowGoBackFill />}
-                // onClick={handleStatusSearch}
+                    onClick={handleClear}
                 >
-                    Search
+                    Clear
                 </Button>
             </div>
             <div >
