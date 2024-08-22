@@ -1,4 +1,4 @@
-import { Button, MenuItem, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import api from "../../../Utils/ApiCalls/Api";
@@ -23,6 +23,12 @@ const VendorNonPOInvoiceUpload = () => {
     const [selectedRows, setSelectedRows] = useState([]);
     const [invdate, setinvdate] = useState('');
     const [pdfna, setpdfna] = useState('');
+
+    const [openSubmit, setOpenSubmit] = useState(false);
+    const [openError, setOpenError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState([]);
+    
+
 
 
     const [verifyData, setVerifyData] = useState({
@@ -229,18 +235,13 @@ const VendorNonPOInvoiceUpload = () => {
         setLineItems([...lineItems, newRow]);
     };
 
-
-    // const handleSelectionChange = (selection) => {
-    //     setSelectedRows(selection);
-    //     calculateTotal(selection);
-    // };
     const handleSelectionChange = (selection) => {
+        const calcRowData = selection;
         const selectedRowsData = selection.map(id => lineItems.find(row => row.id === id));
-        // console.log("Selected Rows Data:", selectedRowsData); // Log selected rows data
-        setSelectedRows(selectedRowsData);
-        calculateTotal(selectedRowsData);
+        setSelectedRows(selectedRowsData);  // Update the selected rows state
+        calculateTotal(calcRowData);   // Calculate the total based on the selected rows
     };
-
+    
     const handleDeleteSelected = () => {
         setLineItems(prev => prev.filter(item => !selectedRows.includes(item.id)));
         setSelectedRows([]);
@@ -255,43 +256,16 @@ const VendorNonPOInvoiceUpload = () => {
         }
     };
 
-    // const calculateTotal = () => {
-    //     const total = selectedRows.reduce((sum, id) => {
-    //         const item = lineItems.find(row => row.id === id);
-    //         return sum + parseFloat(item.TaxableAmt || 0);
-    //     }, 0);
-    //     console.log(total);
-    //     setVerifyData(prev => ({ ...prev, TotalAmt: total }));
-    // };
-
     const calculateTotal = (selectedRowIds) => {
         const total = selectedRowIds.reduce((sum, id) => {
             const item = lineItems.find(row => row.id === id);
-            return (sum + parseFloat(item?.TaxableAmt || 0)) * (sum + parseFloat(item?.Quantity || 0));
+            const taxableAmount = parseFloat(item?.TaxableAmt || 0);
+            const quantity = parseFloat(item?.Quantity || 0);
+            return sum + (taxableAmount * quantity);
         }, 0);
 
         setVerifyData(prev => ({ ...prev, TotalAmt: total.toFixed(2) }));
     };
-
-    // const handleSubmit = () => {
-    //     setVerifyData(prev => ({
-    //         ...prev,
-    //         nonpoLineItemsValidationSet: { results: lineItems }
-    //     }));
-    //     console.log(verifyData);
-    // };
-
-    // const handleSubmit = () => {
-    //     const cleanedLineItems = selectedRows.map(({ id, ...rest }) => rest);
-    //     setVerifyData(prev => ({
-    //         ...prev,
-    //         nonpoLineItemsValidationSet: { results: cleanedLineItems }
-    //     }));
-    //     console.log({
-    //         ...verifyData,
-    //         nonpoLineItemsValidationSet: { results: cleanedLineItems }
-    //     });
-    // };
 
     const handleSubmit = () => {
         const cleanedLineItems = selectedRows.map(({ id, ...rest }) => rest);
@@ -302,14 +276,21 @@ const VendorNonPOInvoiceUpload = () => {
                 ...prev,
                 nonpoLineItemsValidationSet: { results: cleanedLineItems }
             };
-
-            // Log the updated data
             console.log(updatedData);
+
+            handleVerifyData(updatedData);
+
             return updatedData;
         });
     };
 
+    const handleCloseSubmitDiolog = () => {
+        setOpenSubmit(false);
+    };
 
+    const handleCloseErrorDiolog = () => {
+        setOpenError(false);
+    };
 
 
 
@@ -337,20 +318,36 @@ const VendorNonPOInvoiceUpload = () => {
             const response = await api.post(currentURL, body, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            // console.log(response);
             if (url.includes('bpValues')) {
                 setBussinessPlace(response.data.data.businessPlacesSet.results);
             } else if (url.includes('costCenter')) {
                 setcCenter(response.data.data.results);
+            } else if (url.includes('defaultCurrency')) {
+                setVerifyData(prev => ({ ...prev, Currency: response.data.data.currencyCode }));
             } else if (url.includes('glAcc')) {
                 setglAcc(response.data.data.results);
             } else if (url.includes('taxCodes')) {
                 setTaxCode(response.data.data.results);
             } else if (url.includes('hsn')) {
                 setHSN(response.data.data.hsnSacCodesSet.results);
+            } else if (url.includes('validation')) {
+                console.log(response.data.message);
+                setOpenSubmit(true);
             }
+            // else if(!response.status === 200){
+            //     console.log(response);
+            // }
         } catch (error) {
             console.error('unable to get the response', error);
+            if (url.includes('validation')) {
+                // setErrorMessage(response.data);
+                var ee = error.response.data.message;
+                // console.log(error.response.data);
+                // console.log(error.response.data.message);
+                setErrorMessage(ee);
+                // setErrorMessage(response.data.message);
+                setOpenError(true);
+            }
         }
     };
 
@@ -401,6 +398,18 @@ const VendorNonPOInvoiceUpload = () => {
         const body = {
             "companyCode": `${companyCode}`
         }
+        handlePostData(url, body);
+    }
+    const handleDefaultCurrency = (companyCode) => {
+        const url = '/sap/nonpo/defaultCurrency';
+        const body = {
+            "companyCode": `${companyCode}`
+        }
+        handlePostData(url, body);
+    }
+    const handleVerifyData = (postBody) =>{
+        const url = '/sap/nonpo/validation';
+        const body = postBody;
         handlePostData(url, body);
     }
 
@@ -482,6 +491,7 @@ const VendorNonPOInvoiceUpload = () => {
                                         handleGLac(selectedValue);
                                         handleTaxCode(selectedValue);
                                         handleHSNCode(selectedValue);
+                                        handleDefaultCurrency(selectedValue);
                                         // handleCurrency(selectedValue);
                                         // handleRegion(selectedValue);
                                         // handleTermOfPaymnets(selectedValue);
@@ -604,6 +614,10 @@ const VendorNonPOInvoiceUpload = () => {
                         pageSizeOptions={[5, 10]}
                         checkboxSelection
                         onRowSelectionModelChange={(newSelection) => { handleSelectionChange(newSelection) }}
+                        // onRowSelectionModelChange={(newSelection) => {
+                        //     setSelectedRows(newSelection);  // Update the selected rows
+                        //     calculateTotal(newSelection);   // Recalculate the total
+                        // }}
                     />
                 </div>
                 <div style={{ padding: '10px 0px 0px 0px', marginTop: '10px' }}>
@@ -636,9 +650,49 @@ const VendorNonPOInvoiceUpload = () => {
                 </div>
             </div>
 
-            <div className="maincomponent">
+            <div className="maincomponent" style={{ display: 'flex', justifyContent: 'end' }}>
+                <Button color="warning" >Clear</Button>
                 <Button onClick={handleSubmit}>Submit</Button>
             </div>
+
+
+
+
+
+
+
+
+
+            <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
+                <DialogTitle>Please enter all mandetry Details</DialogTitle>
+                <DialogContent dividers>
+                    <p>Error : {errorMessage}</p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseErrorDiolog} color="error">
+                        Cancel
+                    </Button>
+                    {/* <Button onClick={handleSubmit} color="primary">
+                        Submit
+                    </Button> */}
+                </DialogActions>
+            </Dialog>
+
+
+            <Dialog fullWidth={true} maxWidth={'xs'} open={openSubmit} onClose={handleCloseSubmitDiolog}>
+                <DialogTitle>Confirm to Submit</DialogTitle>
+                <DialogContent dividers>
+                    <p>Do you want to submit Invoice number : {verifyData.InvNum} ??</p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseSubmitDiolog} color="error">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSubmit} color="primary">
+                        Submit
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
