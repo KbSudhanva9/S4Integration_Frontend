@@ -1,9 +1,11 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from "@mui/material";
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import api from "../../../Utils/ApiCalls/Api";
 import { DataGrid } from "@mui/x-data-grid";
 import { MdOutlineCopyAll, MdOutlineDeleteOutline, MdOutlinePostAdd } from "react-icons/md";
+import Snackbar from '@mui/material/Snackbar';
+import { GoUpload } from "react-icons/go";
 
 const VendorNonPOInvoiceUpload = () => {
 
@@ -27,7 +29,14 @@ const VendorNonPOInvoiceUpload = () => {
     const [openSubmit, setOpenSubmit] = useState(false);
     const [openError, setOpenError] = useState(false);
     const [errorMessage, setErrorMessage] = useState([]);
-    
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbarOpen(false);
+    };
 
 
 
@@ -62,6 +71,28 @@ const VendorNonPOInvoiceUpload = () => {
             ]
         }
     });
+
+    const handleClearAll = () => {
+        handleDeleteAll();
+        setinvdate('');
+        setVerifyData({
+            "RefNum": "",
+            "VenMail": email,
+            "InvNum": "",
+            "InvDate": "",
+            "CompCode": "",
+            "CostCenter": "",
+            "GlAcc": "",
+            "BussPlace": "",
+            "BookConfNum": "",
+            "TotalAmt": "",
+            "Currency": "",
+            "PdfName": "",
+            "nonpoLineItemsValidationSet": {
+                "results": []
+            }
+        });
+    }
 
     const columns = [
         {
@@ -241,10 +272,15 @@ const VendorNonPOInvoiceUpload = () => {
         setSelectedRows(selectedRowsData);  // Update the selected rows state
         calculateTotal(calcRowData);   // Calculate the total based on the selected rows
     };
-    
+
     const handleDeleteSelected = () => {
         setLineItems(prev => prev.filter(item => !selectedRows.includes(item.id)));
         setSelectedRows([]);
+    };
+
+    const handleDeleteAll = () => {
+        setLineItems([]);  // Clear all items
+        setSelectedRows([]);  // Also clear any selected rows, if applicable
     };
 
     const handleCellChange = (e, params) => {
@@ -292,6 +328,23 @@ const VendorNonPOInvoiceUpload = () => {
         setOpenError(false);
     };
 
+    const handleMainPost = () => {
+        const vdata = verifyData;
+        const postdata = { ...vdata, nonpoPostingsNav: vdata.nonpoLineItemsValidationSet };
+        delete postdata.nonpoLineItemsValidationSet;
+        delete postdata.PdfName;
+
+        console.log(postdata);
+
+        const url = '/sap/nonpo/parking';
+        const body = postdata;
+        handlePostData(url, body);
+
+        handleCloseSubmitDiolog();
+        setSnackbarOpen(true);
+
+        handleClearAll();
+    }
 
 
     const handleGetData = async (url) => {
@@ -333,9 +386,12 @@ const VendorNonPOInvoiceUpload = () => {
             } else if (url.includes('validation')) {
                 console.log(response.data.message);
                 setOpenSubmit(true);
+            } else if (url.includes('parking')) {
+                console.log(response);
             }
+
             // else if(!response.status === 200){
-            //     console.log(response);
+            // console.log(response);
             // }
         } catch (error) {
             console.error('unable to get the response', error);
@@ -407,7 +463,7 @@ const VendorNonPOInvoiceUpload = () => {
         }
         handlePostData(url, body);
     }
-    const handleVerifyData = (postBody) =>{
+    const handleVerifyData = (postBody) => {
         const url = '/sap/nonpo/validation';
         const body = postBody;
         handlePostData(url, body);
@@ -614,10 +670,10 @@ const VendorNonPOInvoiceUpload = () => {
                         pageSizeOptions={[5, 10]}
                         checkboxSelection
                         onRowSelectionModelChange={(newSelection) => { handleSelectionChange(newSelection) }}
-                        // onRowSelectionModelChange={(newSelection) => {
-                        //     setSelectedRows(newSelection);  // Update the selected rows
-                        //     calculateTotal(newSelection);   // Recalculate the total
-                        // }}
+                    // onRowSelectionModelChange={(newSelection) => {
+                    //     setSelectedRows(newSelection);  // Update the selected rows
+                    //     calculateTotal(newSelection);   // Recalculate the total
+                    // }}
                     />
                 </div>
                 <div style={{ padding: '10px 0px 0px 0px', marginTop: '10px' }}>
@@ -651,7 +707,7 @@ const VendorNonPOInvoiceUpload = () => {
             </div>
 
             <div className="maincomponent" style={{ display: 'flex', justifyContent: 'end' }}>
-                <Button color="warning" >Clear</Button>
+                <Button color="warning" onClick={handleClearAll}>Clear</Button>
                 <Button onClick={handleSubmit}>Submit</Button>
             </div>
 
@@ -666,7 +722,7 @@ const VendorNonPOInvoiceUpload = () => {
             <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
                 <DialogTitle>Please enter all mandetry Details</DialogTitle>
                 <DialogContent dividers>
-                    <p>Error : {errorMessage}</p>
+                    <p>Fields to be Filled : {errorMessage}</p>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseErrorDiolog} color="error">
@@ -688,11 +744,22 @@ const VendorNonPOInvoiceUpload = () => {
                     <Button onClick={handleCloseSubmitDiolog} color="error">
                         Cancel
                     </Button>
-                    <Button onClick={handleSubmit} color="primary">
+                    <Button onClick={handleMainPost} color="primary">
                         Submit
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert icon={<GoUpload />} onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+                    Your invoice <b> {verifyData.InvNum} </b> has been submitted.
+                </Alert>
+            </Snackbar>
         </div>
     );
 }

@@ -9,8 +9,12 @@ import api from "../../../Utils/ApiCalls/Api";
 
 const ASNVendorDetails = () => {
 
-    const [lineItems, setLineItems] = useState([]);
+
     const nav = useNavigate();
+
+    const [lineItems, setLineItems] = useState([]);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [asdData, setasnDate] = useState('');
     // const [lineItems, setLineItems] = useState([
     //     {
     //         id: 1,
@@ -50,6 +54,16 @@ const ASNVendorDetails = () => {
         "ShippingAddr": ""
     });
 
+    const [createASN, setCreateASN] = useState({
+        "PoNumber": po,
+        "PortalRefNum": "",
+        "Status": "",
+        "asnLineitemsNav": {
+            "results": selectedRows
+        }
+    });
+
+
     // const columns = [
     //     { field: 'LineNo', headerName: 'Item No', width: 90 },
     //     { field: 'Matnr', headerName: 'Material', width: 90 },
@@ -72,9 +86,9 @@ const ASNVendorDetails = () => {
         { field: 'Maktx', headerName: 'Material Desc', width: 140 },
         { field: 'Menge', headerName: 'Order Qty.', width: 90 },
         { field: 'DeliveryDate', headerName: 'Delivery Date', width: 110 },
-        { field: 'AsnQtyFrom', headerName: 'Asn Submitted Qty', width: 130 },
+        { field: 'AsnQty', headerName: 'Asn Submitted Qty', width: 130 },
         {
-            field: 'AsnQtyTo',
+            field: 'asnSubmittedQty',
             headerName: 'Asn Qty',
             width: 130,
             renderCell: (params) => (
@@ -84,7 +98,7 @@ const ASNVendorDetails = () => {
                     onChange={(e) => handleCellChange(e, params)}
                     size="small"
                     fullWidth
-                    style={{top: '5px'}}
+                    style={{ top: '5px' }}
                 />
             ),
         },
@@ -99,7 +113,7 @@ const ASNVendorDetails = () => {
                     onChange={(e) => handleCellChange(e, params)}
                     size="small"
                     fullWidth
-                    style={{top: '5px'}}
+                    style={{ top: '5px' }}
                 />
             ),
         },
@@ -113,7 +127,7 @@ const ASNVendorDetails = () => {
                     onChange={(e) => handleCellChange(e, params)}
                     size="small"
                     fullWidth
-                    style={{top: '5px'}}
+                    style={{ top: '5px' }}
                 />
             ),
         },
@@ -127,7 +141,7 @@ const ASNVendorDetails = () => {
                     onChange={(e) => handleCellChange(e, params)}
                     size="small"
                     fullWidth
-                    style={{top: '5px'}}
+                    style={{ top: '5px' }}
                 />
             ),
         },
@@ -141,7 +155,7 @@ const ASNVendorDetails = () => {
                     onChange={(e) => handleCellChange(e, params)}
                     size="small"
                     fullWidth
-                    style={{top: '5px'}}
+                    style={{ top: '5px' }}
                 />
             ),
         },
@@ -157,6 +171,7 @@ const ASNVendorDetails = () => {
                 item.id === id ? { ...item, [field]: value } : item
             )
         );
+        // setLineItems(prev =>({...prev, hello: 'adsf'}))
     };
 
     const handlePostData = async (url, body) => {
@@ -166,18 +181,20 @@ const ASNVendorDetails = () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             console.log(response);
-            setCardData(preCardData => ({ ...preCardData, PoNumber: response.data.data.PoNumber, PoType: response.data.data.PoType, Currency: response.data.data.Currency, CreatedOn: response.data.data.CreatedOn, ShippingAddr: response.data.data.ShippingAddr}));
+            setCardData(preCardData => ({ ...preCardData, PoNumber: response.data.data.PoNumber, PoType: response.data.data.PoType, Currency: response.data.data.Currency, CreatedOn: response.data.data.CreatedOn, ShippingAddr: response.data.data.ShippingAddr }));
 
             if (url.includes('details')) {
                 const formattedLineItems = response.data.data.asnLineitemsNav.results.map((item, index) => ({
                     id: index + 1,
+                    PoNumber: item.PoNumber,
+                    PortalRefNum: item.PortalRefNum,
                     LineNo: item.LineNo,
                     Matnr: item.Matnr,
                     Maktx: item.Maktx,
                     Menge: item.Menge,
                     DeliveryDate: item.DeliveryDate,
-                    AsnQtyFrom: item.AsnQty,
-                    AsnQtyTo: item.AsnQty,
+                    AsnQty: item.AsnQty,
+                    asnSubmittedQty: item.AsnQty,
                     AsnDeliveryDate: item.AsnDeliveryDate,
                     ShippingInstruction: item.ShippingInstruction,
                     PackageInformation: item.PackageInformation,
@@ -202,13 +219,27 @@ const ASNVendorDetails = () => {
 
     const handleSelectionChange = (selection) => {
         // Map selected row IDs to actual row data
+        // lineItems(prev=>({...prev, hello: ''}))
         const selectedData = selection.map(id => lineItems.find(row => row.id === id));
-        console.log(selectedData);
+        
+        // console.log(selectedData);
+
+        const cleanedLineItems = selectedData.map(({ id, ...rest }) => rest);
+        // setSelectedRows(cleanedLineItems);
+        setCreateASN(prev => ({
+            ...prev,
+            asnLineitemsNav: {
+                results: cleanedLineItems
+            }
+        }));
+
+        // console.log(createASN);
+        // setSelectedRows(selectedData);
         // Calculate total amount for the selected rows
         // const totalAmount = selectedData.reduce((total, item) => {
         //     return total + parseFloat(item.Netwr);
         // }, 0);
-
+        // console.log(createASN);
         // Update total amount
         // setTotalAmt(totalAmount);
 
@@ -223,7 +254,39 @@ const ASNVendorDetails = () => {
         // }));
     };
 
-    useEffect(()=>{
+    // const handleCreateAsn = () => {
+
+    //     const cleanedLineItems = selectedRows.map(({ id, ...rest }) => rest);
+
+    // setCreateASN(prev => ({
+    //     ...prev,
+    //     asnLineitemsNav: {
+    //         results: cleanedLineItems
+    //     }
+    // }));
+
+    //     console.log(cleanedLineItems);
+    //     console.log(createASN);
+
+    // };
+    const handleCreateAsn = () => {
+        // Clean up selected rows by removing unnecessary fields
+        // const cleanedLineItems = selectedRows.map(({ id, ...rest }) => rest);
+
+        // Update createASN state with cleanedLineItems
+        // setCreateASN(prev => ({
+        //     ...prev,
+        //     asnLineitemsNav: {
+        //         results: cleanedLineItems
+        //     }
+        // }));
+
+        // Log the cleaned line items and updated createASN
+        // console.log(cleanedLineItems);
+        console.log(createASN);
+    };
+
+    useEffect(() => {
         handlePOdetailsAndLineItems();
     }, [])
 
@@ -265,7 +328,7 @@ const ASNVendorDetails = () => {
                     </Box>
                 </Card>
             </div>
-            <div style={{margin: '5px', backgroundColor: '#fff', padding: '10px', borderRadius: '5px' }}>
+            <div style={{ margin: '5px', backgroundColor: '#fff', padding: '10px', borderRadius: '5px' }}>
                 <b>Details</b>
                 <DataGrid
                     rows={lineItems}
@@ -275,7 +338,7 @@ const ASNVendorDetails = () => {
                             paginationModel: { page: 0, pageSize: 5 },
                         },
                     }}
-                    style={{padding: '5px'}}
+                    style={{ padding: '5px' }}
                     pageSizeOptions={[5, 10]}
                     checkboxSelection
                     onRowSelectionModelChange={(newSelection) => handleSelectionChange(newSelection)}
@@ -283,8 +346,8 @@ const ASNVendorDetails = () => {
             </div>
 
             <div style={{ margin: '15px 5px 5px 5px', backgroundColor: '#fff', padding: '10px', borderRadius: '5px', display: 'flex', justifyContent: 'end' }}>
-                    <Button onClick={()=>{nav(-1);}} style={{ margin: '0px 5px'}} size='small' color="error" variant="outlined">Close</Button>
-                    <Button onClick={()=>{handleSelectionChange();}} style={{ margin: '0px 5px'}} size='small' color="success" variant="outlined" >Create ASN</Button>
+                <Button onClick={() => { nav(-1); }} style={{ margin: '0px 5px' }} size='small' color="error" variant="outlined">Close</Button>
+                <Button onClick={handleCreateAsn} style={{ margin: '0px 5px' }} size='small' color="success" variant="outlined" >Create ASN</Button>
             </div>
         </div>
     );
