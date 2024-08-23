@@ -1,4 +1,4 @@
-import { Button, MenuItem, Select, TextField } from "@mui/material";
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Snackbar, TextField } from "@mui/material";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import * as Yup from 'yup';
@@ -6,7 +6,7 @@ import './VendorInvoicing.css'
 import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
 import api from "../../../Utils/ApiCalls/Api";
-import { FaRegHandPointRight } from "react-icons/fa6";
+import { FaCheck, FaRegHandPointRight } from "react-icons/fa6";
 import { LuArrowRightFromLine } from "react-icons/lu";
 import { PiArrowDownRightLight } from "react-icons/pi";
 import { FaAngleDoubleRight } from "react-icons/fa";
@@ -28,8 +28,11 @@ const VendorInvoicingNewInvoice = () => {
     // const [tdata, setTData] = useState([]);
 
     const [poList, setPOList] = useState([]);           //getting from api po numbers
-
     const [lineItems, setLineItems] = useState([]);
+
+
+    const [openError, setOpenError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState([]);
 
     const [payload, setPayload] = useState({
         "VenderNo": `${user}`,//has to fill
@@ -37,6 +40,7 @@ const VendorInvoicingNewInvoice = () => {
         "PortalNo": "",
         "InvoiceNo": "",//fill
         "InvoiceDate": "",//fill in yyyymmdd format
+        "InvioceDocu": "",
         "Email": localStorage.getItem('email'),
         "TotalSubAmt": "",//fill without commas
         "po_lineitemSet": {
@@ -44,14 +48,43 @@ const VendorInvoicingNewInvoice = () => {
         }
     });
 
-    useEffect(() => {
-        handlePODataLineItemsData();
-    }, []);
+    const handleClear = () => {
+        setPayload({
+            "VenderNo": `${user}`,//has to fill
+            "PoNo": "",//fill
+            "PortalNo": "",
+            "InvoiceNo": "",//fill
+            "InvoiceDate": "",//fill in yyyymmdd format
+            "InvioceDocu": "",
+            "Email": localStorage.getItem('email'),
+            "TotalSubAmt": "",//fill without commas
+            "po_lineitemSet": {
+                "results": []
+            }
+        })
 
-    useEffect(() => {
-        // console.log(poList);
-        // console.log(lineItems);
-    }, [poList, lineItems]);
+        setPodata({
+            "POTYPE": "",
+            "CRET_DATE": "",
+            "PAYMENT_TERM": "",
+            "PMNT_TM_DESCP": "",
+            "address": "",
+
+        })
+
+        setLineItems([]);
+    }
+    const handleCloseErrorDiolog = () => {
+        setOpenError(false);
+    };
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbarOpen(false);
+    };
 
     const handleGetData = async (url) => {
         const statusSearchURL = `${import.meta.env.VITE_BASE_URL}` + url;
@@ -86,15 +119,28 @@ const VendorInvoicingNewInvoice = () => {
                     DeliverQuantity: item.DeliverQuantity,
                     InvoiceQty: item.InvoiceQty,
                     Taxcode: item.Taxcode,
+                    Taxamt: item.Taxamt,
                     Netpr: item.Netpr,
                     Netwr: item.Netwr,
+                    PoNo: item.PoNo,
+                    PortalNo: item.PortalNo,
+                    Uom: item.Uom,
                     InvoiceSubmittedQty: item.InvoiceSubmittedQty
                 }));
-
                 setLineItems(formattedLineItems);
+            } else if (url.includes('poInvSubmit')) {
+                console.log(response);
+                setSnackbarOpen(true);
+                handleClear();
             }
         } catch (error) {
             console.log('Search failed', error);
+            if (url.includes('poInvSubmit')) {
+                console.log(error.response);
+                var ee = error.response.data.message;
+                setErrorMessage(ee);
+                setOpenError(true);
+            }
         }
     };
 
@@ -107,6 +153,11 @@ const VendorInvoicingNewInvoice = () => {
         const body = {
             "puchaseOrderNo": `${poNumber}`
         }
+        handlePostData(url, body);
+    }
+    const handlePOInvoiceSubmit = (postBody) => {
+        var url = '/sap/vim/poInvSubmit';
+        const body = postBody
         handlePostData(url, body);
     }
 
@@ -128,7 +179,8 @@ const VendorInvoicingNewInvoice = () => {
     const handleSelectionChange = (selection) => {
         // Map selected row IDs to actual row data
         const selectedData = selection.map(id => lineItems.find(row => row.id === id));
-        console.log(selectedData);
+        const cleanedLineItems = selectedData.map(({ id, ...rest }) => rest);
+        console.log(cleanedLineItems);
         // Calculate total amount for the selected rows
         const totalAmount = selectedData.reduce((total, item) => {
             return total + parseFloat(item.Netwr);
@@ -136,46 +188,19 @@ const VendorInvoicingNewInvoice = () => {
 
         // Update total amount
         setTotalAmt(totalAmount);
-
-        // Update line items and payload
-        // setLineItems(selectedData); // Update lineItems state
         setPayload(prevPayload => ({
             ...prevPayload,
             "TotalSubAmt": totalAmount.toFixed(3), // Update total amount in payload
             "po_lineitemSet": {
-                "results": selectedData // Update results with selected data
+                "results": cleanedLineItems // Update results with selected data
             }
         }));
     };
-    // const handleSelectionChange = (selection) => {
-    //     const selectedData = selection.map(id => tdata.find(row => row.id === id));
-
-    //     // Calculate the total amount for selected rows
-    //     const totalAmount = selectedData.reduce((total, item) => {
-    //         return total + parseFloat(item.Netwr);
-    //     }, 0);
-
-    //     setTotalAmt(totalAmount);
-
-    //     // Update the payload with the selected line items
-    //     setPayload(prevPayload => ({
-    //         ...prevPayload,
-    //         "po_lineitemSet": {
-    //             "results": selectedData
-    //         },
-    //         "TotalSubAmt": totalAmount.toFixed(3) // Format the amount to 3 decimal places
-    //     }));
-    // };
-
-
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        // console.log(value);
-        // console.log(name);
         if (name === 'PoNo') {
-            console.log(value);
+            // console.log(value);
             handlePOdetailsAndLineItems(value);
         }
 
@@ -184,7 +209,6 @@ const VendorInvoicingNewInvoice = () => {
                 ...prevPayload,
                 [name]: value
             };
-            //   console.log(updatedPayload);  // Log the updated payload
             return updatedPayload;
         });
     };
@@ -196,20 +220,31 @@ const VendorInvoicingNewInvoice = () => {
         const day = dateStr.substring(6, 8);
         return `${year}/${month}/${day}`;
     };
-    // ===========================
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setPayload((prevPayload) => ({
-    //       ...prevPayload,
-    //       [name]: value
-    //     }));
 
-    //     console.log(payload);
-    //   };
-    // ===========================
-    // const handlelog = (e) => {
-    //     console.log(e.target.value);
-    // };
+    const poInvSubmit = () => {
+
+        const formattedDate = payload.InvoiceDate.replaceAll('-', '');
+        const fileName = payload.InvioceDocu.split('\\').pop();
+
+        const updatedData = {
+            ...payload,
+            InvoiceDate: formattedDate,
+            InvioceDocu: fileName,
+        };
+        console.log(updatedData);
+
+        handlePOInvoiceSubmit(updatedData);
+    }
+
+    useEffect(() => {
+        handlePODataLineItemsData();
+        handleClear();
+    }, []);
+
+    // useEffect(() => {
+    // console.log(poList);
+    // console.log(lineItems);
+    // }, [poList, lineItems]);
 
     return (
         <div>
@@ -253,8 +288,8 @@ const VendorInvoicingNewInvoice = () => {
                                 <TextField disabled style={{ width: '200px' }} size='small' type="text" value={payload.Email} name="Email" />
                             </div>
                             <div className="df minMargin">
-                                <label style={{ padding: '8px 67px 0px 0px' }} htmlFor="invDoc">Inv Document : </label>
-                                <TextField style={{ width: '200px' }} size='small' type="file" name="invDoc" />
+                                <label style={{ padding: '8px 67px 0px 0px' }} htmlFor="InvioceDocu">Inv Document : </label>
+                                <TextField style={{ width: '200px' }} size='small' type="file" value={payload.InvioceDocu} name="InvioceDocu" onChange={handleChange} />
                             </div>
                         </div>
                     </div>
@@ -264,7 +299,7 @@ const VendorInvoicingNewInvoice = () => {
                             {/* <FaRegHandPointRight /> */}
                             {/* <LuArrowRightFromLine  */}
                             {/* <PiArrowDownRightLight  */}
-                            <FaAngleDoubleRight style={{ padding: '8px 0px 0px 0px', marginLeft: '-33px', marginRight: '15px', fontSize: 'larger' }}/>
+                            <FaAngleDoubleRight style={{ padding: '8px 0px 0px 0px', marginLeft: '-33px', marginRight: '15px', fontSize: 'larger' }} />
                             <label style={{ padding: '8px 70px 0px 0px' }} htmlFor="poType">PO Type : </label>
                             <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.POTYPE} name="poType" />
                         </div>
@@ -321,10 +356,37 @@ const VendorInvoicingNewInvoice = () => {
                 </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '15px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                <Button style={{ margin: '0px 10px' }} color="warning" variant="contained" onClick={() => { console.log('Payload', payload) }}>Clear</Button>
-                <Button style={{ margin: '0px 10px' }} color="success" variant="contained" onClick={() => { console.log('Payload', payload) }}>Submit</Button>
+                <Button style={{ margin: '0px 10px' }} color="warning" variant="outlined" onClick={handleClear}>Clear</Button>
+                <Button style={{ margin: '0px 10px' }} color="success" variant="outlined" onClick={poInvSubmit}>Submit</Button>
             </div>
 
+
+            <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
+                <DialogTitle>Please enter all mandetry Details</DialogTitle>
+                <DialogContent dividers>
+                    <p>{errorMessage}</p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseErrorDiolog} color="error">
+                        Cancel
+                    </Button>
+                    {/* <Button onClick={handleSubmit} color="primary">
+                        Submit
+                    </Button> */}
+                </DialogActions>
+            </Dialog>
+
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert icon={<FaCheck />} onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+                    Your invoice has been submitted.
+                </Alert>
+            </Snackbar>
         </div >
     );
 }

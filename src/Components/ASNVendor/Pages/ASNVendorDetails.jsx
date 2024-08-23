@@ -1,11 +1,13 @@
-import { Avatar, Box, Button, Card, CardContent, CardHeader, TextField, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField, Typography } from "@mui/material";
 import "./ASNVendor.css"
 import { IoFileTrayFull } from "react-icons/io5";
+import { FaCheck } from "react-icons/fa";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useSelector } from "react-redux";
 import api from "../../../Utils/ApiCalls/Api";
+import { GoUpload } from "react-icons/go";
 
 const ASNVendorDetails = () => {
 
@@ -14,7 +16,8 @@ const ASNVendorDetails = () => {
 
     const [lineItems, setLineItems] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
-    const [asdData, setasnDate] = useState('');
+    const [openError, setOpenError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState([]);
     // const [lineItems, setLineItems] = useState([
     //     {
     //         id: 1,
@@ -44,7 +47,7 @@ const ASNVendorDetails = () => {
     //     }
     // ]);
     const { token, user } = useSelector((state) => state.auth);
-    const { po } = useOutletContext();
+    const { po, setSnackbarOpen } = useOutletContext();
 
     const [cardData, setCardData] = useState({
         "PoNumber": "",
@@ -86,9 +89,11 @@ const ASNVendorDetails = () => {
         { field: 'Maktx', headerName: 'Material Desc', width: 140 },
         { field: 'Menge', headerName: 'Order Qty.', width: 90 },
         { field: 'DeliveryDate', headerName: 'Delivery Date', width: 110 },
-        { field: 'AsnQty', headerName: 'Asn Submitted Qty', width: 130 },
+        { field: 'asnSubmittedQty', headerName: 'Asn Submitted Qty', width: 110 },
+        
+        // { field: 'AsnQty', headerName: 'Asn Submitted Qty', width: 130 },
         {
-            field: 'asnSubmittedQty',
+            field: 'AsnQty',
             headerName: 'Asn Qty',
             width: 130,
             renderCell: (params) => (
@@ -102,6 +107,21 @@ const ASNVendorDetails = () => {
                 />
             ),
         },
+        // {
+        //     field: 'asnSubmittedQty',
+        //     headerName: 'Asn Qty',
+        //     width: 130,
+        //     renderCell: (params) => (
+        //         <TextField
+        //             type="number"
+        //             value={params.value || ''}
+        //             onChange={(e) => handleCellChange(e, params)}
+        //             size="small"
+        //             fullWidth
+        //             style={{ top: '5px' }}
+        //         />
+        //     ),
+        // },
         {
             field: 'AsnDeliveryDate',
             headerName: 'ASN Delivery Date',
@@ -194,7 +214,7 @@ const ASNVendorDetails = () => {
                     Menge: item.Menge,
                     DeliveryDate: item.DeliveryDate,
                     AsnQty: item.AsnQty,
-                    asnSubmittedQty: item.AsnQty,
+                    asnSubmittedQty: item.asnSubmittedQty,
                     AsnDeliveryDate: item.AsnDeliveryDate,
                     ShippingInstruction: item.ShippingInstruction,
                     PackageInformation: item.PackageInformation,
@@ -203,9 +223,18 @@ const ASNVendorDetails = () => {
                     // remarks: item.remarks,
                 }));
                 setLineItems(formattedLineItems);
+            }else if(url.includes('create')){
+                console.log(response);
+                setSnackbarOpen(true);
+                nav(-1);
             }
         } catch (error) {
             console.log('Search failed', error);
+            if (url.includes('create')) {
+                var ee = error.response.data.message;
+                setErrorMessage(ee);
+                setOpenError(true);
+            }
         }
     };
 
@@ -216,74 +245,41 @@ const ASNVendorDetails = () => {
         }
         handlePostData(url, body);
     }
+    const handleCreateASN = (modifiedBody) => {
+        var url = '/sap/asn/create';
+        const body = modifiedBody;
+        handlePostData(url, body);
+    }
+
 
     const handleSelectionChange = (selection) => {
-        // Map selected row IDs to actual row data
-        // lineItems(prev=>({...prev, hello: ''}))
         const selectedData = selection.map(id => lineItems.find(row => row.id === id));
-        
-        // console.log(selectedData);
-
         const cleanedLineItems = selectedData.map(({ id, ...rest }) => rest);
-        // setSelectedRows(cleanedLineItems);
         setCreateASN(prev => ({
             ...prev,
             asnLineitemsNav: {
                 results: cleanedLineItems
             }
         }));
-
-        // console.log(createASN);
-        // setSelectedRows(selectedData);
-        // Calculate total amount for the selected rows
-        // const totalAmount = selectedData.reduce((total, item) => {
-        //     return total + parseFloat(item.Netwr);
-        // }, 0);
-        // console.log(createASN);
-        // Update total amount
-        // setTotalAmt(totalAmount);
-
-        // Update line items and payload
-        // setLineItems(selectedData); // Update lineItems state
-        // setPayload(prevPayload => ({
-        //     ...prevPayload,
-        //     "TotalSubAmt": totalAmount.toFixed(3), // Update total amount in payload
-        //     "po_lineitemSet": {
-        //         "results": selectedData // Update results with selected data
-        //     }
-        // }));
     };
 
-    // const handleCreateAsn = () => {
-
-    //     const cleanedLineItems = selectedRows.map(({ id, ...rest }) => rest);
-
-    // setCreateASN(prev => ({
-    //     ...prev,
-    //     asnLineitemsNav: {
-    //         results: cleanedLineItems
-    //     }
-    // }));
-
-    //     console.log(cleanedLineItems);
-    //     console.log(createASN);
-
-    // };
     const handleCreateAsn = () => {
-        // Clean up selected rows by removing unnecessary fields
-        // const cleanedLineItems = selectedRows.map(({ id, ...rest }) => rest);
 
-        // Update createASN state with cleanedLineItems
-        // setCreateASN(prev => ({
-        //     ...prev,
-        //     asnLineitemsNav: {
-        //         results: cleanedLineItems
-        //     }
-        // }));
+        setCreateASN(prevData => {
+            const newData = { ...prevData };
+            newData.asnLineitemsNav.results = newData.asnLineitemsNav.results.map(item => ({
+                ...item,
+                AsnDeliveryDate: item.AsnDeliveryDate.replaceAll('-', '')
+            }));
+            // console.log(newData);
 
-        // Log the cleaned line items and updated createASN
-        // console.log(cleanedLineItems);
-        console.log(createASN);
+            handleCreateASN(newData);
+            return newData;
+        });
+    };
+
+    const handleCloseErrorDiolog = () => {
+        setOpenError(false);
     };
 
     useEffect(() => {
@@ -349,6 +345,23 @@ const ASNVendorDetails = () => {
                 <Button onClick={() => { nav(-1); }} style={{ margin: '0px 5px' }} size='small' color="error" variant="outlined">Close</Button>
                 <Button onClick={handleCreateAsn} style={{ margin: '0px 5px' }} size='small' color="success" variant="outlined" >Create ASN</Button>
             </div>
+
+
+            <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
+                <DialogTitle>Please enter all mandetry Details</DialogTitle>
+                <DialogContent dividers>
+                    <p>{errorMessage}</p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseErrorDiolog} color="error">
+                        Cancel
+                    </Button>
+                    {/* <Button onClick={handleSubmit} color="primary">
+                        Submit
+                    </Button> */}
+                </DialogActions>
+            </Dialog>
+
         </div>
     );
 }

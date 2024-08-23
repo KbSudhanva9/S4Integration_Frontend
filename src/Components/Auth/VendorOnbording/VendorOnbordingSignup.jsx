@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { MenuItem, Select } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select } from '@mui/material';
 import * as Yup from 'yup';
 import { FiSave } from "react-icons/fi";
 import api from '../../../Utils/ApiCalls/Api'
@@ -33,18 +33,52 @@ const VendorOnbordingSignup = () => {
     const [bankName, setBankName] = useState([]);
     const [currency, setCurrency] = useState("");
 
+    const [openSubmit, setOpenSubmit] = useState(false);
+    const [successMessage, setSuccessMessage] = useState([]);
+    const [refNo, setRefNo] = useState([]);
+    const [openError, setOpenError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState([]);
+    // const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+    const handleCloseErrorDiolog = () => {
+        setOpenError(false);
+    };
+    const handleCloseSubmitDiolog = () => {
+        nav(-1);
+        setOpenSubmit(false);
+    };
+    
+    const copyRefNo = () => {
+        // const ids = sRows.map(item => `${item.id}`).join(', ');
+        const copyRefNo = refNo;
+        navigator.clipboard.writeText(copyRefNo).then(() => {
+            console.log('Copied to clipboard:', copyRefNo);
+            // setSnackbarOpen(true);
+            nav(-1);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+        });
+    };
+
+    // const handleSnackbarClose = (event, reason) => {
+    //     if (reason === 'clickaway') {
+    //         return;
+    //     }
+    //     setSnackbarOpen(false);
+    // };
+
     const getCalling = async (url) => {
         setCurrency('');
         // var currentURL = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + url;
         var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
         try {
-            const response = await api.get(currentURL );
+            const response = await api.get(currentURL);
             if (url.includes('countrySet')) {
                 // console.log(response.data.data.results);
                 setCountry(response.data.data.results);
                 // setCountry(response.data.d.results);
             }
-            else if(url.includes('industries')){
+            else if (url.includes('industries')) {
                 setIndustrySet(response.data.data.results);
             }
             // else if(url.includes('CurrencySet')){
@@ -63,16 +97,32 @@ const VendorOnbordingSignup = () => {
             const response = await api.post(currentURL, body);
             if (url.includes('currency')) {
                 setCurrency(response.data.data.Waers);
-            }else if(url.includes('regionSet')){
+            } else if (url.includes('regionSet')) {
                 setRegion(response.data.data.results);
-            }else if(url.includes('venTermOfPaymnets')){
+            } else if (url.includes('venTermOfPaymnets')) {
                 setTerms(response.data.data.results);
-            }else if(url.includes('bankName')){
+            } else if (url.includes('bankName')) {
                 // console.log(response.data.data.results);
                 setBankName(response.data.data.results);
+            } else if(url.includes('createVen')){
+                console.log(response);
+                console.log(response.data.data.TempVend);
+                console.log(response.data.data.Message);
+                setOpenSubmit(true);
+                setRefNo(response.data.data.TempVend);
+                setSuccessMessage(response.data.data.Message);
             }
         } catch (error) {
             console.error('unable to get the response', error);
+            if (url.includes('createVen')) {
+                // setErrorMessage(response.data);
+                var ee = error.response.data.message;
+                // console.log(error.response.data);
+                // console.log(error.response.data.message);
+                setErrorMessage(ee);
+                // setErrorMessage(response.data.message);
+                setOpenError(true);
+            }
         }
     };
 
@@ -110,6 +160,11 @@ const VendorOnbordingSignup = () => {
         const body = {
             "countryCode": `${cCode}`
         }
+        postCalling(url, body);
+    }
+    const handleCreateVendor = (postBody) => {
+        const url = '/sap/createVen';
+        const body = postBody;
         postCalling(url, body);
     }
 
@@ -176,7 +231,7 @@ const VendorOnbordingSignup = () => {
                         "Bankl": '',    //bank name--->drop down
                         "Bankn": '',    //bank account no--->number
                         "Waers": '', //currency,    //order currency--->drop down
-                        "Minbw": '',    //min order value
+                        "Minbw": '0.00',    //min order value
                         "Message": "",
                         "Ifsc": "",     //ifsccode
                         "PaymentTerms": "", //payment terms
@@ -191,7 +246,7 @@ const VendorOnbordingSignup = () => {
                         values.Pstl2 = values.Pstlz;
                         console.log(values);
                         // console.log(currency);
-                        // handleSignUpClick(values);
+                        handleCreateVendor(values);
                     }}
                 >
                     {({ errors, touched, isSubmitting, setFieldValue }) => (
@@ -430,6 +485,36 @@ const VendorOnbordingSignup = () => {
                 </Formik>
                 {/* </div> */}
             </div>
+
+            <Dialog fullWidth={true} maxWidth={'xs'} open={openSubmit} onClose={handleCloseSubmitDiolog}>
+                <DialogTitle>Confirm to Submit</DialogTitle>
+                <DialogContent dividers>
+                    <p>{successMessage}</p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseSubmitDiolog} variant='outlined' >
+                        Close
+                    </Button>
+                    <Button onClick={copyRefNo} variant='outlined' color="warning">
+                        Copy
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
+                <DialogTitle>Please enter all mandetry Details</DialogTitle>
+                <DialogContent dividers>
+                    <p>{errorMessage}</p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseErrorDiolog} color="error">
+                        Cancel
+                    </Button>
+                    {/* <Button onClick={handleSubmit} color="primary">
+                        Submit
+                    </Button> */}
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
