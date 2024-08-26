@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './Expense.css'
 import { DataGrid } from '@mui/x-data-grid';
 import { MenuItem } from '@mui/material';
@@ -27,6 +27,7 @@ import {
     Snackbar,
     Alert
 } from '@mui/material';
+import api from '../../../Utils/ApiCalls/Api';
 
 const Expense = () => {
 
@@ -51,6 +52,9 @@ const Expense = () => {
     const [openAddExpense, setOpenAddExpense] = useState(false);    //pop-up open/close
     const [errors, setErrors] = useState([]);               //handeling pop-up error
     const [snackbarOpen, setSnackbarOpen] = useState(false);        //for copy display snackbar
+
+    const [cocode, setcocode] = useState([]);
+    const [costce, setcostce] = useState([]);
 
     // on selecting or un-selecting the rows in table live change
     const handleSelectionChange = (selection) => {
@@ -150,23 +154,53 @@ const Expense = () => {
         console.log(tdata);
     }
 
+    const getCalling = async (url) => {
+        var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
+        try {
+            const response = await api.get(currentURL);
+            if (url.includes('costCenter')) {
+                console.log(response);
+                console.log(response.data.data);
+                setcostce(response.data.data);
+            } else if (url.includes('cmpCodes')) {
+                console.log(response.data.data);
+                setcocode(response.data.data);
+            }
+        } catch (error) {
+            console.error('unable to get the response', error);
+        }
+    };
 
-    const cocode = [
-        { value: '1000', label: 'Company Code 1000' },
-        { value: '2000', label: 'Company Code 2000' },
-        { value: '3000', label: 'BestRun USA' },
-    ];
+    const handleCostCenter = () => {
+        const url = '/public/costCenter';
+        getCalling(url);
+    };
+    const handleCompanyCode = () => {
+        const url = '/public/cmpCodes';
+        getCalling(url);
+    };
 
-    const costce = [
-        { value: '1000', label: 'Cost center' },
-        { value: '1100', label: 'Manufacturing 1 (US)' },
-        { value: '2000', label: 'Production Unit Plant 2000' },
-    ];
+    // const cocode = [
+    //     { value: '1000', label: 'Company Code 1000' },
+    //     { value: '2000', label: 'Company Code 2000' },
+    //     { value: '3000', label: 'BestRun USA' },
+    // ];
+
+    // const costce = [
+    //     { value: '1000', label: 'Cost center' },
+    //     { value: '1100', label: 'Manufacturing 1 (US)' },
+    //     { value: '2000', label: 'Production Unit Plant 2000' },
+    // ];
 
     const currency = [
         { value: '₹', label: '₹' },
         { value: '$', label: '$' },
     ]
+
+    useEffect(() => {
+        handleCostCenter();
+        handleCompanyCode();
+    }, [])
 
     return (
         <div className='maincomponent'>
@@ -179,11 +213,15 @@ const Expense = () => {
                         size='small'
                         style={{ width: '221px' }}
                     >
-                        {cocode.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.value} ({option.label})
-                            </MenuItem>
-                        ))}
+                        {cocode.length > 0 ? (
+                            cocode.map((option) => (
+                                <MenuItem key={option.code} value={option.code}>
+                                    {option.code} ({option.companyText})
+                                </MenuItem>
+                            ))
+                        ) : (
+                            <MenuItem disabled>No options available</MenuItem>
+                        )}
                     </TextField>
                 </div>
                 <div className='basic-margin'>
@@ -294,11 +332,15 @@ const Expense = () => {
                                                 size='small'
                                                 style={{ width: '150px' }}
                                             >
-                                                {costce.map((option) => (
-                                                    <MenuItem key={option.value} value={option.value}>
-                                                        {option.value} ({option.label})
-                                                    </MenuItem>
-                                                ))}
+                                                {costce.length > 0 ? (
+                                                    costce.map((option) => (
+                                                        <MenuItem key={option.cost} value={option.cost}>
+                                                            {option.cost} ({option.costCenText})
+                                                        </MenuItem>
+                                                    ))
+                                                ) : (
+                                                    <MenuItem disabled>No options available</MenuItem>
+                                                )}
                                             </TextField>
                                         </TableCell>
                                         <TableCell>
@@ -314,7 +356,7 @@ const Expense = () => {
                                             />
                                         </TableCell>
                                         <TableCell>
-                                        <TextField
+                                            <TextField
                                                 id="currency"
                                                 select
                                                 value={row.currency}
