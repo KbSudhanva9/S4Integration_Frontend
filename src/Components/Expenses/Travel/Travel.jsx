@@ -1,10 +1,12 @@
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import api from "../../../Utils/ApiCalls/Api";
+import { CircularProgress } from "@mui/material";
 
 const Travel = () => {
 
     const [tdata, setTData] = useState([]);
+    const [loading, setLoading] = useState(false);
     const columns = [
         { field: 'Docno', headerName: 'SAPDocument No.', width: 170 },
         { field: 'Bldat', headerName: 'Requested Date', width: 150 },
@@ -19,13 +21,13 @@ const Travel = () => {
     const convertDate = (dateString) => {
         // Extract the timestamp from the date string
         const timestamp = parseInt(dateString.match(/\/Date\((\d+)\)\//)[1], 10);
-    
+
         // Convert the timestamp to a Date object
         const date = new Date(timestamp);
-    
+
         // Format the date as needed (e.g., yyyy-MM-dd)
         const formattedDate = date.toISOString().slice(0, 10);
-    
+
         return formattedDate;
     };
 
@@ -51,6 +53,8 @@ const Travel = () => {
                     // remarks: item.remarks,
                 }));
                 setTData(formattedLineItems);
+
+                setLoading(false);
             }
         } catch (error) {
             console.error('unable to get the response', error);
@@ -58,29 +62,55 @@ const Travel = () => {
     };
 
     const handleTableDate = () => {
+        setLoading(true);
         var url = '/public/tableData';
         handleGetData(url);
     }
 
-    useEffect(()=>{
-        handleTableDate();
+    // useEffect(() => {
+    //     handleTableDate();
+    // }, []);
+
+    useEffect(() => {
+        // Simulate data fetching
+        // setTimeout(() => {
+            // Fetch your data here and set it to tdata
+            // setTdata(yourFetchedData);
+            handleTableDate();
+            // setLoading(false); // Set loading to false when data is ready
+        // }, 200); // Simulate a delay
     }, []);
 
     return (
         <div className="maincomponent" style={{ height: '85vh' }}>
             {/* Travel */}
-            <DataGrid
-                rows={tdata}
-                columns={columns}
-            // initialState={{
-            //     pagination: {
-            //         paginationModel: { page: 0, pageSize: 5 },
-            //     },
-            // }}
-            // pageSizeOptions={[5, 10]}
-            // checkboxSelection
-            // onRowSelectionModelChange={handleSelectionChange}
-            />
+            {loading ? (
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1100
+                }}>
+                    <CircularProgress style={{color: '#ea1214'}} />
+                </div>
+            ) : (
+                <DataGrid
+                    rows={tdata}
+                    columns={columns}
+                // initialState={{
+                //     pagination: {
+                //         paginationModel: { page: 0, pageSize: 5 },
+                //     },
+                // }}
+                // pageSizeOptions={[5, 10]}
+                // checkboxSelection
+                // onRowSelectionModelChange={handleSelectionChange}
+                />
+            )}
         </div>
     );
 }

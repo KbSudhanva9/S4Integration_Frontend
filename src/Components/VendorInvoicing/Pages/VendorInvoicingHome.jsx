@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import api from "../../../Utils/ApiCalls/Api"
 import { setEmail } from '../ReduxAuth';
+import { CircularProgress } from '@mui/material';
 
 const VendorInvoicingHome = () => {
 
@@ -22,6 +23,8 @@ const VendorInvoicingHome = () => {
 
     const [cardData, setCardData] = useState([]);
     const [dataset, setDataset] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     const { token, user } = useSelector((state) => state.auth);
     // const valueFormatter = (value) => `${value}mm`;
 
@@ -46,7 +49,7 @@ const VendorInvoicingHome = () => {
 
     const handleGetData = async (url) => {
 
-        if(localStorage.getItem('email')){
+        if (localStorage.getItem('email')) {
             localStorage.removeItem('email');
         }
 
@@ -68,6 +71,7 @@ const VendorInvoicingHome = () => {
 
             } else if (url.includes('dashboard')) {
                 setDataset(response.data.data.results);
+                setLoading(false);
             }
 
         } catch (error) {
@@ -80,6 +84,7 @@ const VendorInvoicingHome = () => {
         handleGetData(url);
     }
     const handleChartData = () => {
+        setLoading(true);
         var url = '/sap/vim/dashboard';
         handleGetData(url);
     }
@@ -102,130 +107,203 @@ const VendorInvoicingHome = () => {
             <div>
                 <p style={{ margin: '0px' }}>Vendor : {user}</p>
             </div>
-            <div className='df' style={{ width: '100%' }}>
-                <div className='three'>
-                    <div style={{ padding: '20px 0px 0px 0px' }}>
-                        <Card style={{ margin: '15px' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: '#fff1b8', width: 56, height: 56 }} variant="rounded">
-                                            <IoFileTrayFull style={{ color: '#c75f00' }} />
-                                        </Avatar>
-                                    }
-                                    title="Total PO Value"
-                                    subheader={cardData.tot}
-                                />
-                                <Box sx={{ textAlign: 'right', marginRight: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {cardData.total_po}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </Card>
-                        <Card style={{ margin: '15px' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: '#e6caee', width: 56, height: 56 }} variant="rounded">
-                                            <LiaFileInvoiceDollarSolid style={{ color: '#7f2da5' }} />
-                                        </Avatar>
-                                    }
-                                    title="Open PO Balance"
-                                    subheader={cardData.open_amt}
-                                />
-                                <Box sx={{ textAlign: 'right', marginRight: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {cardData.open_po}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </Card>
-                        <Card style={{ margin: '15px' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: '#c6fff9', width: 56, height: 56 }} variant="rounded">
-                                            <TbFileDollar style={{ color: '#007783' }} />
-                                        </Avatar>
-                                    }
-                                    title="Invoice Created"
-                                    subheader={cardData.cret}
-                                />
-                                <Box sx={{ textAlign: 'right', marginRight: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {cardData.inv_created}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </Card>
-                        <Card style={{ margin: '15px' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: '#cbead7', width: 56, height: 56 }} variant="rounded">
-                                            <LuClipboardCheck style={{ color: '#007c49' }} />
-                                        </Avatar>
-                                    }
-                                    title="Payment Cleared"
-                                    subheader={cardData.paid}
-                                />
-                                <Box sx={{ textAlign: 'right', marginRight: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {cardData.po_clrd}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </Card>
 
+            {loading ? (
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    // backgroundColor: '#ccc',
+                    paddingTop: '35vh',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1100
+                }}>
+                    <CircularProgress style={{ color: '#ea1214' }} />
+                </div>
+            ) : (
+
+                <div className='df' style={{ width: '100%' }}>
+                    <div className='three'>
+                        <div style={{ padding: '20px 0px 0px 0px' }}>
+                            <Card style={{ margin: '15px' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <CardHeader
+                                        avatar={
+                                            <Avatar sx={{ bgcolor: '#fff1b8', width: 56, height: 56 }} variant="rounded">
+                                                <IoFileTrayFull style={{ color: '#c75f00' }} />
+                                            </Avatar>
+                                        }
+                                        title="Total PO Value"
+                                        subheader={cardData.tot}
+                                    />
+                                    <Box sx={{ textAlign: 'right', marginRight: 2 }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {cardData.total_po}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </Card>
+                            <Card style={{ margin: '15px' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <CardHeader
+                                        avatar={
+                                            <Avatar sx={{ bgcolor: '#e6caee', width: 56, height: 56 }} variant="rounded">
+                                                <LiaFileInvoiceDollarSolid style={{ color: '#7f2da5' }} />
+                                            </Avatar>
+                                        }
+                                        title="Open PO Balance"
+                                        subheader={cardData.open_amt}
+                                    />
+                                    <Box sx={{ textAlign: 'right', marginRight: 2 }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {cardData.open_po}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </Card>
+                            <Card style={{ margin: '15px' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <CardHeader
+                                        avatar={
+                                            <Avatar sx={{ bgcolor: '#c6fff9', width: 56, height: 56 }} variant="rounded">
+                                                <TbFileDollar style={{ color: '#007783' }} />
+                                            </Avatar>
+                                        }
+                                        title="Invoice Created"
+                                        subheader={cardData.cret}
+                                    />
+                                    <Box sx={{ textAlign: 'right', marginRight: 2 }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {cardData.inv_created}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </Card>
+                            <Card style={{ margin: '15px' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <CardHeader
+                                        avatar={
+                                            <Avatar sx={{ bgcolor: '#cbead7', width: 56, height: 56 }} variant="rounded">
+                                                <LuClipboardCheck style={{ color: '#007c49' }} />
+                                            </Avatar>
+                                        }
+                                        title="Payment Cleared"
+                                        subheader={cardData.paid}
+                                    />
+                                    <Box sx={{ textAlign: 'right', marginRight: 2 }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {cardData.po_clrd}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </Card>
+
+                        </div>
                     </div>
-                </div>
-                <div className='three'>
-                    <Card style={{ margin: '37px 10px 0px 10px', padding: '80px 0px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                        <center><Typography>Monthly Count</Typography></center>
-                        <PieChart
-                            style={{ margin: '15px' }}
-                            series={[
-                                {
-                                    data: transformedData.map((item) => ({
-                                        name: item.name,
-                                        value: item.value,
-                                        // color: item.color,
-                                        label: item.name,
-                                    })),
-                                    innerRadius: 45,
-                                    outerRadius: 90,
-                                    paddingAngle: 0.1,
-                                    cornerRadius: 4,
-                                    startAngle: 0,
-                                    endAngle: 360,
-                                    cx: 110,
-                                    cy: 100,
-                                },
-                            ]}
-                            width={400}
-                            height={200}
-                        />
-                    </Card>
-                </div>
-                <div className='three'>
-                    <Card style={{ margin: '37px 10px 0px 0px', padding: '50px 0px 35px 0px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                        <center><Typography>Monthly Amount</Typography></center>
-                        {/* <BarChart
+                    <div className='three'>
+                        <Card style={{ margin: '37px 10px 0px 10px', padding: '80px 0px', backgroundColor: '#fff', borderRadius: '8px' }}>
+
+                            {loading ? (
+                                <div style={{
+                                    width: '100%',
+                                    height: '40vh',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                    backdropFilter: 'blur(5px)',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    zIndex: 1100
+                                }}>
+                                    <CircularProgress style={{ color: '#ea1214' }} />
+                                </div>
+                            ) : (
+
+                                <div>
+                                    <center><Typography>Monthly Count</Typography></center>
+                                    <PieChart
+                                        style={{ margin: '15px' }}
+                                        series={[
+                                            {
+                                                data: transformedData.map((item) => ({
+                                                    name: item.name,
+                                                    value: item.value,
+                                                    // color: item.color,
+                                                    label: item.name,
+                                                })),
+                                                innerRadius: 45,
+                                                outerRadius: 90,
+                                                paddingAngle: 0.1,
+                                                cornerRadius: 4,
+                                                startAngle: 0,
+                                                endAngle: 360,
+                                                cx: 110,
+                                                cy: 100,
+                                            },
+                                        ]}
+                                        width={400}
+                                        height={200}
+                                    />
+                                </div>
+                            )}
+                        </Card>
+                    </div>
+                    <div className='three'>
+
+                        {/* {loading ? (
+                        <div style={{
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                            backdropFilter: 'blur(5px)',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            zIndex: 1100
+                        }}>
+                            <CircularProgress style={{ color: '#ea1214' }} />
+                        </div>
+                    ) : ( */}
+
+                        <Card style={{ margin: '37px 10px 0px 0px', padding: '50px 0px 35px 0px', backgroundColor: '#fff', borderRadius: '8px' }}>
+                            {loading ? (
+                                <div style={{
+                                    width: '100%',
+                                    height: '51vh',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                    backdropFilter: 'blur(5px)',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    zIndex: 1100
+                                }}>
+                                    <CircularProgress style={{ color: '#ea1214' }} />
+                                </div>
+                            ) : (
+                                <div>
+                                    <center><Typography>Monthly Amount</Typography></center>
+                                    {/* <BarChart
                             dataset={dataset}
                             xAxis={[
                                 { scaleType: 'band', dataKey: 'month' },
                             ]}
                             {...chartSetting}
                         /> */}
-                        <BarChart
-                            dataset={dataset.map(item => ({ ...item, month: monthNames[parseInt(item.month) - 1], }))}
-                            xAxis={[{ scaleType: 'band', dataKey: 'month' },]}
-                            {...chartSetting}
-                        />
-                    </Card>
+                                    <BarChart
+                                        dataset={dataset.map(item => ({ ...item, month: monthNames[parseInt(item.month) - 1], }))}
+                                        xAxis={[{ scaleType: 'band', dataKey: 'month' },]}
+                                        {...chartSetting}
+                                    />
+                                </div>
+                            )}
+                        </Card>
+
+                        {/* // )} */}
+
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

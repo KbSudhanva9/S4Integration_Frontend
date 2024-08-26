@@ -5,12 +5,15 @@ import { IoSearchOutline } from "react-icons/io5";
 import { DataGrid } from '@mui/x-data-grid';
 import api from '../../Utils/ApiCalls/Api';
 import { useNavigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
 
 const VendorTrackStatus = () => {
 
     const nav = useNavigate();
 
     const [tdata, setTData] = useState([]);
+    const [loading, setLoading] = useState(false);
+
     const [refNo, setRefNo] = useState("");
 
     const columns = [
@@ -24,36 +27,36 @@ const VendorTrackStatus = () => {
     ];
 
     const handleStatusSearch = async () => {
-
+        setLoading(true);
         setTData([]);
 
 
         // const statusSearchURL = `${import.meta.env.VITE_CROSS_ORIGIN_URL}${import.meta.env.VITE_VENDOR_ONBORDING_BASE_URL}` + `VendorSet('${refNo}')?$expand=vendorStatusNav`;
 
-        const statusSearchURL = `${import.meta.env.VITE_BASE_URL}`+'/sap/venStatus';
+        const statusSearchURL = `${import.meta.env.VITE_BASE_URL}` + '/sap/venStatus';
 
         try {
-            const response = await api.post(statusSearchURL, 
+            const response = await api.post(statusSearchURL,
                 {
                     "referenceNo": `${refNo}`
-                // }{
-                // headers: {
-                //     'Content-Type': 'application/json',
-                //     'Accept': 'application/json',
-                //     'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
-                //     'X-Requested-With': 'XMLHttpRequest'
-                // }
-            });
+                    // }{
+                    // headers: {
+                    //     'Content-Type': 'application/json',
+                    //     'Accept': 'application/json',
+                    //     'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_SAP_USER_NAME}:${import.meta.env.VITE_SAP_PASSWORD}`),
+                    //     'X-Requested-With': 'XMLHttpRequest'
+                    // }
+                });
             // console.log(response.data.d.vendorStatusNav.results);
             // console.log(response);
             // console.log(response.data);
             // console.log(response.data.data);
             // console.log(response.data.data.results);
-            
-            
+
+
             // const newData = response.data.d.vendorStatusNav.results.map((item, index) => ({
             const newData = response.data.data.results.map((item, index) => ({
-                id: tdata.length + index + 1, 
+                id: tdata.length + index + 1,
                 ref_no: item.ref_no,
                 name: item.name,
                 contact_person: item.contact_person,
@@ -64,6 +67,8 @@ const VendorTrackStatus = () => {
             }));
 
             setTData(prevData => [...prevData, ...newData]);
+
+            setLoading(false);
         } catch (error) {
             console.log('Search failed', error);
         }
@@ -79,7 +84,7 @@ const VendorTrackStatus = () => {
                 />
                 <p style={{ marginRight: '11%' }}><b>Vendor Track Status</b></p>
                 <Button
-                    onClick={()=>{nav('/vendor-onbording-login')}}
+                    onClick={() => { nav('/vendor-onbording-login') }}
                     style={{ margin: '10px', backgroundColor: '#eb0101' }}
                     variant="contained"
                     size='small'
@@ -113,17 +118,35 @@ const VendorTrackStatus = () => {
                 </div>
                 <div className='maincomponent'>
                     <b>Track Status</b>
-                    <DataGrid
-                        rows={tdata}
-                        columns={columns}
-                        style={{ marginTop: '15px' }}
-                        initialState={{
-                            pagination: {
-                                paginationModel: { page: 0, pageSize: 5 },
-                            },
-                        }}
-                        pageSizeOptions={[5, 10]}
-                    />
+
+                    {loading ? (
+                        <div style={{
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                            backdropFilter: 'blur(5px)',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            zIndex: 1100
+                        }}>
+                            <CircularProgress style={{ color: '#ea1214' }} />
+                        </div>
+                    ) : (
+                        <DataGrid
+                            rows={tdata}
+                            columns={columns}
+                            style={{ marginTop: '15px' }}
+                            initialState={{
+                                pagination: {
+                                    paginationModel: { page: 0, pageSize: 5 },
+                                },
+                            }}
+                            pageSizeOptions={[5, 10]}
+                        >
+                            
+                        </DataGrid>
+                    )}
                 </div>
             </div>
         </div>
