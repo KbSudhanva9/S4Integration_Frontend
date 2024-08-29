@@ -78,10 +78,11 @@ const VendorInvoicingMyInv = () => {
             const response = await api.get(statusSearchURL, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            setCardData(preCardData => ({ ...preCardData, submited: response.data.data.submited, verified: response.data.data.verified, blocked: response.data.data.blocked, cleared: response.data.data.cleared}));
-
+            setCardData(preCardData => ({ ...preCardData, submited: response.data.data.submited, verified: response.data.data.verified, blocked: response.data.data.blocked, cleared: response.data.data.cleared }));
+            setLoading(false);
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
     };
 
@@ -113,19 +114,23 @@ const VendorInvoicingMyInv = () => {
             }));
 
             setTData(formattedLineItems);
+            setLoading(false);
             // }
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         } finally {
             setLoading(false); // Stop loading
         }
     };
 
     const handleCardData = () => {
+        setLoading(true);
         var url = '/sap/vim/poValues';
         handleGetData(url);
     }
     const handlePostService = (keyValue) => {
+        setLoading(true);
         console.log('adf==>' + keyValue + '<==adf');
         var url = '/sap/vim/totalInvoices';
         const body = {
@@ -231,19 +236,37 @@ const VendorInvoicingMyInv = () => {
             <div style={{ padding: '10px', margin: '10px', width: '96%', backgroundColor: '#fff', borderRadius: '8px' }}>
                 <div style={{ marginTop: '10px' }}>
                     <div style={{ height: 400, width: '100%' }}>
-                        {/* table data from use state automatically updated from usestate => tdata */}
-                        <DataGrid
-                            rows={tdata}
-                            columns={columns}
-                            initialState={{
-                                pagination: {
-                                    paginationModel: { page: 0, pageSize: 5 },
-                                },
-                            }}
-                            pageSizeOptions={[5, 10]}
-                        // checkboxSelection
-                        // onRowSelectionModelChange={handleSelectionChange}
-                        />
+
+                        {loading ? (
+                            <div style={{
+                                width: '100%',
+                                height: '100%',
+                                // backgroundColor: '#ccc',
+                                // paddingTop: '35vh',
+                                backdropFilter: 'blur(5px)',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                zIndex: 1100
+                            }}>
+                                <CircularProgress style={{ color: '#ea1214' }} />
+                            </div>
+                        ) : (
+                            <DataGrid
+                                rows={tdata}
+                                columns={columns}
+                                initialState={{
+                                    pagination: {
+                                        paginationModel: { page: 0, pageSize: 5 },
+                                    },
+                                }}
+                                pageSizeOptions={[5, 10]}
+                            // checkboxSelection
+                            // onRowSelectionModelChange={handleSelectionChange}
+                            />
+                        )}
+
+
                     </div>
                 </div>
             </div>

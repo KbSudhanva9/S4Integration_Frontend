@@ -18,7 +18,7 @@ import { BiErrorAlt } from "react-icons/bi";
 
 import Box from '@mui/material/Box'; import { useSelector } from "react-redux";
 import './VendorInvoicing.css'
-import { Button, TextField } from '@mui/material';
+import { Button, CircularProgress, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import api from '../../../Utils/ApiCalls/Api';
@@ -26,6 +26,7 @@ import api from '../../../Utils/ApiCalls/Api';
 const VendorInvoicingPaymentRecived = () => {
 
     const { token, user } = useSelector((state) => state.auth);
+    const [loading, setLoading] = useState(true);
 
     // const [tdata, setTData] = useState([]);                 //table data
     // const [submitExp, setSubmitExp] = useState([]);         //store selected row id's tdata
@@ -45,7 +46,7 @@ const VendorInvoicingPaymentRecived = () => {
     //     Netwr: "350.000",
     // }];
 
-    useEffect(()=>{
+    useEffect(() => {
         // console.log('hello');
         handlePostService('');
     }, [])
@@ -83,35 +84,38 @@ const VendorInvoicingPaymentRecived = () => {
             });
             // console.log(response);
             // console.log(response.data.data);
-            setCardData(preCardData => ({...preCardData, Total_due: response.data.data.Total_due, Over_due: response.data.data.Over_due, Due_30: response.data.data.Due_30 }));
-            
-            // if (url.includes('getPoDetails')) {
-                const formattedLineItems = response.data.data.po_duelineitemSet.results.map((item, index) => ({
-                    id: index + 1,
-                    PortalNo: item.PortalNo,
-                    PoNo: item.PoNo,
-                    InvoiceNo: item.InvoiceNo,
-                    Ebelp: item.Ebelp,
-                    Item: item.Item,
-                    ItemDesc: item.ItemDesc,
-                    baselin: item.baselin,
-                    Netpr: item.Netpr,
-                    // Netwr: item.Netwr,
-                    // InvoiceSubmittedQty: item.InvoiceSubmittedQty
-                }));
+            setCardData(preCardData => ({ ...preCardData, Total_due: response.data.data.Total_due, Over_due: response.data.data.Over_due, Due_30: response.data.data.Due_30 }));
 
-                setTData(formattedLineItems);
+            // if (url.includes('getPoDetails')) {
+            const formattedLineItems = response.data.data.po_duelineitemSet.results.map((item, index) => ({
+                id: index + 1,
+                PortalNo: item.PortalNo,
+                PoNo: item.PoNo,
+                InvoiceNo: item.InvoiceNo,
+                Ebelp: item.Ebelp,
+                Item: item.Item,
+                ItemDesc: item.ItemDesc,
+                baselin: item.baselin,
+                Netpr: item.Netpr,
+                // Netwr: item.Netwr,
+                // InvoiceSubmittedQty: item.InvoiceSubmittedQty
+            }));
+
+            setTData(formattedLineItems);
+            setLoading(false);
             // }
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
     };
 
     const handlePostService = (keyValue) => {
-        console.log('adf==>'+ keyValue +'<==adf');
+        setLoading(true);
+        console.log('adf==>' + keyValue + '<==adf');
         var url = '/sap/vim/totalPaymentReceived';
         const body = {
-            "key" : `${keyValue}`
+            "key": `${keyValue}`
         }
         handlePostData(url, body);
     }
@@ -135,7 +139,7 @@ const VendorInvoicingPaymentRecived = () => {
                                         <IoFileTrayFull style={{ color: '#c75f00' }} />
                                     </Avatar>
                                 }
-                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={()=>{handlePostService('')}} >Total Due </Typography>}
+                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={() => { handlePostService('') }} >Total Due </Typography>}
                                 subheader={cardData.Total_due}
                             />
                         </Box>
@@ -150,7 +154,7 @@ const VendorInvoicingPaymentRecived = () => {
                                         <LuAlertTriangle style={{ color: '#d20000' }} />
                                     </Avatar>
                                 }
-                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={()=>{handlePostService('o')}} >Over Due </Typography>}
+                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={() => { handlePostService('o') }} >Over Due </Typography>}
                                 subheader={cardData.Over_due}
                             />
                         </Box>
@@ -165,15 +169,15 @@ const VendorInvoicingPaymentRecived = () => {
                                         <BiErrorAlt style={{ color: '#007783' }} />
                                     </Avatar>
                                 }
-                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={()=>{handlePostService('w')}} >Due Next 30 Days</Typography>}
+                                title={<Typography style={{ color: 'blue', cursor: 'pointer' }} onClick={() => { handlePostService('w') }} >Due Next 30 Days</Typography>}
                                 subheader={cardData.Due_30}
                             />
                         </Box>
                     </Card>
                 </div>
-                
+
             </div>
-            <div className='df' style={{padding: '10px', margin: '10px', width: '96%', left: '1%', backgroundColor: '#fff', borderRadius: '8px' }}>
+            <div className='df' style={{ padding: '10px', margin: '10px', width: '96%', left: '1%', backgroundColor: '#fff', borderRadius: '8px' }}>
                 <label style={{ padding: '10px 0px 0px 0px' }}>Portal No</label>
                 <TextField style={{ margin: '0px 0px 0px 10px', width: '180px' }} size='small' variant="outlined" type='text' />
                 {/* <label style={{ padding: '10px 0px 0px 15px' }}>Invoice Date</label>
@@ -185,18 +189,35 @@ const VendorInvoicingPaymentRecived = () => {
                 <div style={{ marginTop: '10px' }}>
                     <div style={{ height: 400, width: '100%' }}>
                         {/* table data from use state automatically updated from usestate => tdata */}
-                        <DataGrid
-                            rows={tdata}
-                            columns={columns}
-                            initialState={{
-                                pagination: {
-                                    paginationModel: { page: 0, pageSize: 5 },
-                                },
-                            }}
-                            pageSizeOptions={[5, 10]}
+                        {loading ? (
+                            <div style={{
+                                width: '100%',
+                                height: '100%',
+                                // backgroundColor: '#ccc',
+                                // paddingTop: '35vh',
+                                backdropFilter: 'blur(5px)',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                zIndex: 1100
+                            }}>
+                                <CircularProgress style={{ color: '#ea1214' }} />
+                            </div>
+                        ) : (
+                            <DataGrid
+                                rows={tdata}
+                                columns={columns}
+                                initialState={{
+                                    pagination: {
+                                        paginationModel: { page: 0, pageSize: 5 },
+                                    },
+                                }}
+                                pageSizeOptions={[5, 10]}
                             // checkboxSelection
                             // onRowSelectionModelChange={handleSelectionChange}
-                        />
+                            />
+
+                        )}
                     </div>
                 </div>
             </div>

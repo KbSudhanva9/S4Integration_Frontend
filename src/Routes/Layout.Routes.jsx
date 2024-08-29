@@ -31,6 +31,10 @@ import VendorNonPOMainPage from "../Components/VendorNonPO/VendorNonPOMainPage";
 import VendorNonPOHome from "../Components/VendorNonPO/Pages/VendorNonPOHome";
 import VendorNonPOInvoiceUpload from "../Components/VendorNonPO/Pages/VendorNonPOInvoiceUpload";
 import VendorNonPOInvoiceStatus from "../Components/VendorNonPO/Pages/VendorNonPOInvoiceStatus";
+import OrderToCashLogin from "../Components/Auth/OrderToCash/OrderToCashLogin";
+import OrderToCashMainLayout from "../Components/OrderToCash/OrderToCashMainLayout";
+import Display from "../Components/OrderToCash/Pages/Display";
+import Create from "../Components/OrderToCash/Pages/Create";
 
 export const LayoutRouting = [
 
@@ -43,6 +47,19 @@ export const LayoutRouting = [
             {path: "travel", element: <ProtectedRoute element={<Travel />} />},
         ]
     },
+
+    // Order to Cash 
+    {path: "order-to-cash-login", element: <OrderToCashLogin />,},
+    {path: "order-to-cash", element: <OrderToCashMainLayout />,
+        children: [
+            {path: "create", element: <Create />},
+            {path: "display", element: <Display />},
+            // {path: "invoice-status", element: <VendorNonPOInvoiceStatus />},
+        ]
+    },
+
+
+
     // {path: "home", element: <ProtectedRoute element={<div>User</div>} allowedRole={['user']} />},
 
     // vendor onbording

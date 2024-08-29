@@ -68,7 +68,7 @@ const VendorInvoicingHome = () => {
                 // dispatch(setEmail({
                 //     email: response.data.email
                 // }));
-
+                setLoading(false);
             } else if (url.includes('dashboard')) {
                 setDataset(response.data.data.results);
                 setLoading(false);
@@ -76,10 +76,12 @@ const VendorInvoicingHome = () => {
 
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
     };
 
     const handleCardData = () => {
+        setLoading(true);
         var url = '/sap/vim/poValues';
         handleGetData(url);
     }

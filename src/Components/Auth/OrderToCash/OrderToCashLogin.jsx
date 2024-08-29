@@ -3,28 +3,33 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import api from '../../../Utils/ApiCalls/Api';
+// import api from '../../../Utils/ApiCalls/Api';
 import { useDispatch } from 'react-redux';
 import { clearAuth, setAuth } from '../../../Redux/AuthSlice';
+import api from '../../../Utils/ApiCalls/Api';
 
 
 const SigninSchema = Yup.object().shape({
-  vid: Yup.string('Invalid Vendor ID').required('Required'),
+  email: Yup.string('Invalid Vendor ID').required('Required'),
   password: Yup.string().min(6, 'Too Short!').max(50, 'Too Long!').required('Required'),
 });
 
-const ASNVendorLogin = () => {
+const OrderToCashLogin = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const handleVendorLogin = async (values) => {
-    var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
+
+    // const response = await api.post(`${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`, values);
+
+    var loginurl = `${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`;
+    // var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
     try {
       const response = await api.post(loginurl,
         {
-          "username": `${values.vid}`,
+          "email": `${values.email}`,
           "password": `${values.password}`
         }
       );
@@ -36,7 +41,7 @@ const ASNVendorLogin = () => {
         user: response.data.user.Username
       }));
 
-      navigate('/asn-vendor/home');
+      navigate('/order-to-cash/create');
     } catch (error) {
       console.error('Login failed', error);
     }
@@ -67,7 +72,7 @@ const ASNVendorLogin = () => {
     <div className='sign-in-div'>
       <Formik
         initialValues={{
-          vid: '',
+          email: '',
           password: '',
         }}
         validationSchema={SigninSchema}
@@ -80,11 +85,11 @@ const ASNVendorLogin = () => {
       >
         {({ errors, touched, isSubmitting }) => (
           <Form>
-            <p className='center-items'><b>ASN Vendor Login</b></p>
+            <p className='center-items'><b>Order to Cash Login</b></p>
             <div>
-              <label htmlFor="vid">Vendor ID <span style={{ color: 'red' }}>*</span></label>
-              <Field type="string" name="vid" className={touched.vid && errors.vid ? 'error' : ''} />
-              {/* <ErrorMessage name="vid" component="div" className="error-message" /> */}
+              <label htmlFor="email">Vendor ID <span style={{ color: 'red' }}>*</span></label>
+              <Field type="string" name="email" className={touched.email && errors.email ? 'error' : ''} />
+              {/* <ErrorMessage name="email" component="div" className="error-message" /> */}
             </div>
             <div>
               <label htmlFor="password">Password <span style={{ color: 'red' }}>*</span></label>
@@ -119,4 +124,4 @@ const ASNVendorLogin = () => {
   );
 };
 
-export default ASNVendorLogin;
+export default OrderToCashLogin;

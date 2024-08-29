@@ -41,6 +41,7 @@ const VendorOnbording = () => {
 
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
         console.log(vdata);
     };

@@ -91,48 +91,48 @@ const SignupForm = () => {
             <p className='title'>Sign-up</p>
             <div className='button-container'>
               <div>
-                <label htmlFor='firstName'>First Name</label>
+                <label htmlFor='firstName'>First Name <span style={{ color: 'red' }}>*</span></label>
                 <Field type='text' name='firstName' className={touched.firstName && errors.firstName ? 'error' : ''} />
                 {/* <ErrorMessage name='firstName' component='div' className='error-message' /> */}
               </div>
               <div>
-                <label htmlFor='lastName'>Last Name</label>
+                <label htmlFor='lastName'>Last Name <span style={{ color: 'red' }}>*</span></label>
                 <Field type='text' name='lastName' className={touched.lastName && errors.lastName ? 'error' : ''} />
                 {/* <ErrorMessage name='lastName' component='div' className='error-message' /> */}
               </div>
             </div>
             <div>
-              <label htmlFor='email'>Email</label>
+              <label htmlFor='email'>Email <span style={{ color: 'red' }}>*</span></label>
               <Field type='email' name='email' className={touched.email && errors.email ? 'error' : ''} />
               {/* <ErrorMessage name='email' component='div' className='error-message' /> */}
             </div>
             <div>
-              <label htmlFor='mobile'>Mobile</label>
+              <label htmlFor='mobile'>Mobile <span style={{ color: 'red' }}>*</span></label>
               <Field type='text' name='mobile' className={touched.mobile && errors.mobile ? 'error' : ''} />
               {/* <ErrorMessage name='mobile' component='div' className='error-message' /> */}
             </div>
             <div>
-              <label htmlFor='dob'>Date of Birth</label>
+              <label htmlFor='dob'>Date of Birth <span style={{ color: 'red' }}>*</span></label>
               <Field type='date' name='dob' className={touched.dob && errors.dob ? 'error' : ''} />
               {/* <ErrorMessage name='dob' component='div' className='error-message' /> */}
             </div>
             <div>
-              <label htmlFor='address_line1'>Address Line 1</label>
+              <label htmlFor='address_line1'>Address Line 1 <span style={{ color: 'red' }}>*</span></label>
               <Field type='text' name='address_line1' className={touched.address_line1 && errors.address_line1 ? 'error' : ''} />
               {/* <ErrorMessage name='address_line1' component='div' className='error-message' /> */}
             </div>
             <div>
-              <label htmlFor='address_line2'>Address Line 2</label>
+              <label htmlFor='address_line2'>Address Line 2 <span style={{ color: 'red' }}>*</span></label>
               <Field type='text' name='address_line2' className={touched.address_line2 && errors.address_line2 ? 'error' : ''} />
               {/* <ErrorMessage name='address_line2' component='div' className='error-message' /> */}
             </div>
             <div>
-              <label htmlFor='pincode'>Pincode</label>
+              <label htmlFor='pincode'>Pincode <span style={{ color: 'red' }}>*</span></label>
               <Field type='text' name='pincode' className={touched.pincode && errors.pincode ? 'error' : ''} />
               {/* <ErrorMessage name='pincode' component='div' className='error-message' /> */}
             </div>
             <div>
-              <label htmlFor='password'>Password</label>
+              <label htmlFor='password'>Password <span style={{ color: 'red' }}>*</span></label>
               <Field type={showPassword ? 'text' : 'password'} name='password' className={touched.password && errors.password ? 'error' : ''} />
               <span className='toggle-password' onClick={togglePasswordVisibility}>
                 {showPassword ? <FiEyeOff /> : <FiEye />}
@@ -140,7 +140,7 @@ const SignupForm = () => {
               <ErrorMessage name='password' component='div' className='error-message' />
             </div>
             <div>
-              <label htmlFor='confpass'>Confirm Password</label>
+              <label htmlFor='confpass'>Confirm Password <span style={{ color: 'red' }}>*</span></label>
               <Field type={showConfPassword ? 'text' : 'password'} name='confpass' className={touched.confpass && errors.confpass ? 'error' : ''} />
               <span className='toggle-password' onClick={toggleConfPasswordVisibility}>
                 {showConfPassword ? <FiEyeOff /> : <FiEye />}

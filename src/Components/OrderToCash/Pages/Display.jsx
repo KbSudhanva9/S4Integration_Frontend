@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import api from "../../../Utils/ApiCalls/Api";
 import { CircularProgress } from "@mui/material";
 
-const Travel = () => {
+const Display = () => {
 
     const [tdata, setTData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -116,4 +116,4 @@ const Travel = () => {
     );
 }
 
-export default Travel;
+export default Display;

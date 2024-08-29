@@ -91,12 +91,12 @@ const VendorOnbordingLogin = () => {
           <Form>
             <p className='center-items'><b>Vendor On-Bording Login</b></p>
             <div>
-              <label htmlFor="vid">Vendor ID</label>
+              <label htmlFor="vid">Vendor ID <span style={{ color: 'red' }}>*</span></label>
               <Field type="string" name="vid" className={touched.vid && errors.vid ? 'error' : ''} />
-              <ErrorMessage name="vid" component="div" className="error-message" />
+              {/* <ErrorMessage name="vid" component="div" className="error-message" /> */}
             </div>
             <div>
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Password <span style={{ color: 'red' }}>*</span></label>
               <div className="password-field">
                 <Field
                   type={showPassword ? 'text' : 'password'}
@@ -107,7 +107,7 @@ const VendorOnbordingLogin = () => {
                   {showPassword ? <FiEyeOff /> : <FiEye />}
                 </span>
               </div>
-              <ErrorMessage name="password" component="div" className="error-message" />
+              {/* <ErrorMessage name="password" component="div" className="error-message" /> */}
             </div>
             <div className='button-container'>
               <button className='register' type="button" onClick={handleSignInClick}>

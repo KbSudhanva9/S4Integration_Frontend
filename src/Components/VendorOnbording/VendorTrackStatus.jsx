@@ -71,6 +71,7 @@ const VendorTrackStatus = () => {
             setLoading(false);
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
     };
 

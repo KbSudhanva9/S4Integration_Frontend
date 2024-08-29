@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import './Sign.css';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -75,12 +75,12 @@ const SigninForm = () => {
           <Form>
             <p className='title'>Sign-in</p>
             <div>
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">Email <span style={{ color: 'red' }}>*</span></label>
               <Field type="email" name="email" className={touched.email && errors.email ? 'error' : ''} />
-              <ErrorMessage name="email" component="div" className="error-message" />
+              {/* <ErrorMessage name="email" component="div" className="error-message" /> */}
             </div>
             <div>
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Password <span style={{ color: 'red' }}>*</span></label>
               <div className="password-field">
                 <Field
                   type={showPassword ? 'text' : 'password'}
@@ -109,6 +109,10 @@ const SigninForm = () => {
             <div className='button-container'>
               <NavLink to={"asn-vendor-login"}>ASN Vendor</NavLink>
               <NavLink to={"vendor-non-po-login"}>Vendor NON-PO</NavLink>
+            </div>
+            <div className='button-container'>
+              <NavLink to={"order-to-cash-login"}>Order to Cash</NavLink>
+              {/* <NavLink to={"vendor-non-po-login"}>Vendor NON-PO</NavLink> */}
             </div>
           </Form>
         )}
