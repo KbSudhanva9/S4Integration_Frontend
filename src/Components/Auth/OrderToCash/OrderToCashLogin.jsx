@@ -87,7 +87,7 @@ const OrderToCashLogin = () => {
           <Form>
             <p className='center-items'><b>Order to Cash Login</b></p>
             <div>
-              <label htmlFor="email">Vendor ID <span style={{ color: 'red' }}>*</span></label>
+              <label htmlFor="email">Email ID <span style={{ color: 'red' }}>*</span></label>
               <Field type="string" name="email" className={touched.email && errors.email ? 'error' : ''} />
               {/* <ErrorMessage name="email" component="div" className="error-message" /> */}
             </div>

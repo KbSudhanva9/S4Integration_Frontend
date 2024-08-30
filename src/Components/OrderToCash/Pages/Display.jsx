@@ -18,6 +18,19 @@ const Display = () => {
         { field: 'Remarks', headerName: 'Remarks', width: 140 },
     ];
 
+    const [cdata, setCData] = useState([]);
+    const columnsDisplay = [
+        { field: 'createddate', headerName: 'Created Date', width: 150 },
+        { field: 'sapsono', headerName: 'SAP SO no.', width: 130 },
+        { field: 'itemno', headerName: 'Item no.', width: 130 },
+        { field: 'material', headerName: 'Material', width: 150 },
+        { field: 'MATDescription', headerName: 'MAT Description', width: 170 },
+        { field: 'quantity', headerName: 'Qty', width: 120 },
+        { field: 'uom', headerName: 'UOM', width: 120 },
+        { field: 'price', headerName: 'Price', width: 120 },
+        { field: 'totalsoval', headerName: 'Total SO Value', width: 140 },
+    ];
+
     const convertDate = (dateString) => {
         // Extract the timestamp from the date string
         const timestamp = parseInt(dateString.match(/\/Date\((\d+)\)\//)[1], 10);
@@ -73,11 +86,14 @@ const Display = () => {
     // }, []);
 
     useEffect(() => {
+        // handleTableDate();
+
+
         // Simulate data fetching
         // setTimeout(() => {
             // Fetch your data here and set it to tdata
             // setTdata(yourFetchedData);
-            handleTableDate();
+            // handleTableDate();
             // setLoading(false); // Set loading to false when data is ready
         // }, 200); // Simulate a delay
     }, []);
@@ -100,8 +116,8 @@ const Display = () => {
                 </div>
             ) : (
                 <DataGrid
-                    rows={tdata}
-                    columns={columns}
+                    rows={cdata}
+                    columns={columnsDisplay}
                 // initialState={{
                 //     pagination: {
                 //         paginationModel: { page: 0, pageSize: 5 },

@@ -47,7 +47,14 @@ const Create = () => {
 
     const [tdata, setTData] = useState([]);                 //table data
     const [submitExp, setSubmitExp] = useState([]);         //store selected row id's tdata
-    // const [sRows, setSRows] = useState([]);                 //store selected data in table tdata
+
+    const [postData, setPostData] = useState({
+        customernumber: '',
+        customername: '',
+        date: '',
+        tabelData: []
+    })
+    const [sRows, setSRows] = useState([]);                 //store selected data in table tdata
     // const [id, setId] = useState(1);                        //auto increment for id in tdata
     // const [formData, setFormData] = useState([]);           //pop-up table row data
     // const [openAddExpense, setOpenAddExpense] = useState(false);    //pop-up open/close
@@ -61,8 +68,14 @@ const Create = () => {
     const handleSelectionChange = (selection) => {
         setSubmitExp(selection);
         const selectedData = selection.map(id => tdata.find(row => row.id === id));
-        // console.log(selectedData);
-        // setSRows(selectedData);
+        console.log(selectedData);
+        setSRows(selectedData);
+
+        setPostData(prev => ({
+            ...prev,
+            tabelData: selectedData.map(({ id, ...rest }) => rest)
+        }));
+
     };
 
     // open add expense pop-up
@@ -76,7 +89,7 @@ const Create = () => {
         {
             field: 'Material',
             headerName: 'Material',
-            width: 170,
+            width: 250,
             renderCell: (params) => (
                 <TextField
                     value={params.value || ''}
@@ -90,7 +103,7 @@ const Create = () => {
         {
             field: 'Quantity',
             headerName: 'Qty',
-            width: 90,
+            width: 150,
             renderCell: (params) => (
                 <TextField
                     type="number"
@@ -108,7 +121,7 @@ const Create = () => {
         {
             field: 'Uom',
             headerName: 'UOM',
-            width: 110,
+            width: 190,
             renderCell: (params) => (
                 <TextField
                     select
@@ -161,9 +174,18 @@ const Create = () => {
 
     const submitExpense = () => {
 
-        const cleanedLineItems = tdata.map(({ id, ...rest }) => rest);
+        // const cleanedLineItems = sRows.map(({ id, ...rest }) => rest);
 
-        console.log(cleanedLineItems);
+        // console.log(cleanedLineItems);
+
+        // setPostData=>(prev, ({...prev, tabelData: cleanedLineItems}));
+        // setPostData(prev => ({
+        //     ...prev,
+        //     tabelData: cleanedLineItems
+        // }));
+
+        console.log(postData);
+
     }
 
     const getCalling = async (url) => {
@@ -203,6 +225,7 @@ const Create = () => {
                         // select
                         size='small'
                         style={{ width: '221px' }}
+                        type='number'
                     >
                         {/* {cocode.length > 0 ? (
                             cocode.map((option) => (
