@@ -102,15 +102,15 @@ const SigninForm = () => {
                 Sign-in
               </button>
             </div>
-            <div className='button-container mr-13'>
+            <div className='button-container'>
               <NavLink to={"vendor-onbording-login"}>Vendor On-Bording</NavLink>
               <NavLink to={"vendor-invoicing-login"}>Vendor Invoicing</NavLink>
             </div>
-            <div className='button-container mr-13'>
+            <div className='button-container'>
               <NavLink to={"asn-vendor-login"}>ASN Vendor</NavLink>
               <NavLink to={"vendor-non-po-login"}>Vendor NON-PO</NavLink>
             </div>
-            <div className='button-container mr-13'>
+            <div className='button-container'>
               <NavLink to={"order-to-cash-login"}>Order to Cash</NavLink>
               {/* <NavLink to={"vendor-non-po-login"}>Vendor NON-PO</NavLink> */}
             </div>
