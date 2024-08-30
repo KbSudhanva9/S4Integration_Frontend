@@ -1,4 +1,4 @@
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Snackbar, TextField } from "@mui/material";
+import { Alert, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Snackbar, TextField } from "@mui/material";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import * as Yup from 'yup';
@@ -14,6 +14,9 @@ import { FaAngleDoubleRight } from "react-icons/fa";
 const VendorInvoicingNewInvoice = () => {
 
     const { token, user } = useSelector((state) => state.auth);
+    const [loading, setLoading] = useState(true);
+    const [sideLoading, setSideLoading] = useState(false);
+
 
 
     const [podata, setPodata] = useState({
@@ -78,7 +81,7 @@ const VendorInvoicingNewInvoice = () => {
         setOpenError(false);
     };
     const [snackbarOpen, setSnackbarOpen] = useState(false);
-    
+
     const handleSnackbarClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -94,9 +97,11 @@ const VendorInvoicingNewInvoice = () => {
             });
             if (url.includes('getPoList')) {
                 setPOList(response.data.data.results);
+                setLoading(false);
             }
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
     };
     const handlePostData = async (url, body) => {
@@ -128,6 +133,7 @@ const VendorInvoicingNewInvoice = () => {
                     InvoiceSubmittedQty: item.InvoiceSubmittedQty
                 }));
                 setLineItems(formattedLineItems);
+                setSideLoading(false);
             } else if (url.includes('poInvSubmit')) {
                 console.log(response);
                 setSnackbarOpen(true);
@@ -145,10 +151,12 @@ const VendorInvoicingNewInvoice = () => {
     };
 
     const handlePODataLineItemsData = () => {
+        setLoading(true);
         var url = '/sap/vim/getPoList';
         handleGetData(url);
     }
     const handlePOdetailsAndLineItems = (poNumber) => {
+        setSideLoading(true);
         var url = '/sap/vim/getPoDetails';
         const body = {
             "puchaseOrderNo": `${poNumber}`
@@ -201,6 +209,7 @@ const VendorInvoicingNewInvoice = () => {
         const { name, value } = e.target;
         if (name === 'PoNo') {
             // console.log(value);
+            setSideLoading(true);
             handlePOdetailsAndLineItems(value);
         }
 
@@ -248,80 +257,126 @@ const VendorInvoicingNewInvoice = () => {
 
     return (
         <div>
-            <div style={{ padding: '10px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                <b>Invoice Details</b>
-                <div className='df'>
-                    <div className="three" >
-                        <div className="minMargin">
-                            <div className="df minMargin">
-                                <label style={{ padding: '8px 95px 0px 0px' }} htmlFor="VenderNo">VenderNo : </label>
-                                <TextField disabled style={{ width: '200px' }} size='small' type="text" name="VenderNo" value={payload.VenderNo} />
-                            </div>
-                            <div className="df minMargin">
-                                <label style={{ padding: '8px 103px 0px 0px' }} htmlFor="PoNo">PO. No : <span style={{ color: 'red' }}>*</span></label>
-                                <Select
-                                    size="small"
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={payload.PoNo}
-                                    name="PoNo"
-                                    style={{ width: '200px' }}
-                                    onChange={handleChange}
-                                >
-                                    {poList.map((option) => (
-                                        <MenuItem key={option.po_no} value={option.po_no}>
-                                            {option.po_no}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </div>
-                            <div className="df minMargin">
-                                <label style={{ padding: '8px 25px 0px 0px' }} htmlFor="InvoiceNo">Vendor Invoice No : <span style={{ color: 'red' }}>*</span></label>
-                                <TextField style={{ width: '200px' }} size='small' type="text" value={payload.InvoiceNo} name="InvoiceNo" onChange={handleChange} />
-                            </div>
-                            <div className="df minMargin">
-                                <label style={{ padding: '8px 66px 0px 0px' }} htmlFor="InvoiceDate">Invoice Date : <span style={{ color: 'red' }}>*</span></label>
-                                <TextField style={{ width: '200px' }} size='small' type="Date" value={payload.InvoiceDate} name="InvoiceDate" onChange={handleChange} />
-                            </div>
-                            <div className="df minMargin">
-                                <label style={{ padding: '8px 121px 0px 0px' }} htmlFor="Email">E-mail : </label>
-                                <TextField disabled style={{ width: '200px' }} size='small' type="text" value={payload.Email} name="Email" />
-                            </div>
-                            <div className="df minMargin">
-                                <label style={{ padding: '8px 67px 0px 0px' }} htmlFor="InvioceDocu">Inv Document : </label>
-                                <TextField style={{ width: '200px' }} size='small' type="file" value={payload.InvioceDocu} name="InvioceDocu" onChange={handleChange} />
-                            </div>
-                        </div>
-                    </div>
-                    <div style={{ marginTop: '50px', marginLeft: '15px', }}>
-                        {/* border: '1px solid #ccc', borderRadius: '8px', padding: '5px'}}> */}
-                        <div className="df minMargin">
-                            {/* <FaRegHandPointRight /> */}
-                            {/* <LuArrowRightFromLine  */}
-                            {/* <PiArrowDownRightLight  */}
-                            <FaAngleDoubleRight style={{ padding: '8px 0px 0px 0px', marginLeft: '-33px', marginRight: '15px', fontSize: 'larger' }} />
-                            <label style={{ padding: '8px 70px 0px 0px' }} htmlFor="poType">PO Type : </label>
-                            <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.POTYPE} name="poType" />
-                        </div>
-                        <div className="df minMargin">
-                            <label style={{ padding: '8px 39px 0px 0px' }} htmlFor="createdDate">Created Date : </label>
-                            <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.CRET_DATE} name="createdDate" />
-                        </div>
-                        <div className="df minMargin">
-                            <label style={{ padding: '8px 24px 0px 0px' }} htmlFor="paymentTerms">Payment Terms : </label>
-                            <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.PAYMENT_TERM + ", " + podata.PMNT_TM_DESCP} name="paymentTerms" />
-                        </div>
-                        <div className="df minMargin">
-                            <label style={{ padding: '8px 15px 0px 0px' }} htmlFor="deliveryAdd">Delivery Address : </label>
-                            <TextField disabled style={{ width: '240px' }} multiline maxRows={4} size='small' type="text" value={podata.address} name="deliveryAdd" />
-                        </div>
-                    </div>
+            {loading ? (
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    // backgroundColor: '#ccc',
+                    paddingTop: '35vh',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1100
+                }}>
+                    <CircularProgress style={{ color: '#ea1214' }} />
                 </div>
-            </div>
-            <div style={{ padding: '10px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                <div style={{ marginTop: '10px' }}>
-                    <div style={{ height: 200, width: '100%' }}>
-                        {/* <DataGrid
+            ) : (
+                <div>
+                    <div style={{ padding: '10px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
+                        <b>Invoice Details</b>
+                        <div className='df'>
+                            <div className="three" >
+                                <div className="minMargin">
+                                    <div className="df minMargin">
+                                        <label style={{ padding: '8px 95px 0px 0px' }} htmlFor="VenderNo">VenderNo : </label>
+                                        <TextField disabled style={{ width: '200px' }} size='small' type="text" name="VenderNo" value={payload.VenderNo} />
+                                    </div>
+                                    <div className="df minMargin">
+                                        <label style={{ padding: '8px 103px 0px 0px' }} htmlFor="PoNo">PO. No : <span style={{ color: 'red' }}>*</span></label>
+                                        <Select
+                                            size="small"
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={payload.PoNo}
+                                            name="PoNo"
+                                            style={{ width: '200px' }}
+                                            onChange={handleChange}
+                                        >
+                                            {poList.map((option) => (
+                                                <MenuItem key={option.po_no} value={option.po_no}>
+                                                    {option.po_no}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                    <div className="df minMargin">
+                                        <label style={{ padding: '8px 25px 0px 0px' }} htmlFor="InvoiceNo">Vendor Invoice No : <span style={{ color: 'red' }}>*</span></label>
+                                        <TextField style={{ width: '200px' }} size='small' type="text" value={payload.InvoiceNo} name="InvoiceNo" onChange={handleChange} />
+                                    </div>
+                                    <div className="df minMargin">
+                                        <label style={{ padding: '8px 66px 0px 0px' }} htmlFor="InvoiceDate">Invoice Date : <span style={{ color: 'red' }}>*</span></label>
+                                        <TextField style={{ width: '200px' }} size='small' type="Date" value={payload.InvoiceDate} name="InvoiceDate" onChange={handleChange} />
+                                    </div>
+                                    <div className="df minMargin">
+                                        <label style={{ padding: '8px 121px 0px 0px' }} htmlFor="Email">E-mail : </label>
+                                        <TextField disabled style={{ width: '200px' }} size='small' type="text" value={payload.Email} name="Email" />
+                                    </div>
+                                    <div className="df minMargin">
+                                        <label style={{ padding: '8px 67px 0px 0px' }} htmlFor="InvioceDocu">Inv Document : </label>
+                                        <TextField style={{ width: '200px' }} size='small' type="file" value={payload.InvioceDocu} name="InvioceDocu" onChange={handleChange} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '50px', marginLeft: '15px', }}>
+                                {/* border: '1px solid #ccc', borderRadius: '8px', padding: '5px'}}> */}
+                                <div className="df minMargin">
+                                    {/* <FaRegHandPointRight /> */}
+                                    {/* <LuArrowRightFromLine  */}
+                                    {/* <PiArrowDownRightLight  */}
+
+
+                                    {sideLoading ? (
+                                        <div style={{ margin: '8px 15px 0px -34px' }}>
+                                            <CircularProgress style={{ color: '#ea1214' }} size={20} />
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <FaAngleDoubleRight style={{ color: '#ea1214', padding: '8px 0px 0px 0px', marginLeft: '-33px', marginRight: '15px', fontSize: 'larger' }} />
+                                        </div>
+                                    )}
+
+                                    {/* <FaAngleDoubleRight style={{ padding: '8px 0px 0px 0px', marginLeft: '-33px', marginRight: '15px', fontSize: 'larger' }} /> */}
+                                    <label style={{ padding: '8px 70px 0px 0px' }} htmlFor="poType">PO Type : </label>
+                                    <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.POTYPE} name="poType" />
+                                </div>
+                                <div className="df minMargin">
+                                    <label style={{ padding: '8px 39px 0px 0px' }} htmlFor="createdDate">Created Date : </label>
+                                    <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.CRET_DATE} name="createdDate" />
+                                </div>
+                                <div className="df minMargin">
+                                    <label style={{ padding: '8px 24px 0px 0px' }} htmlFor="paymentTerms">Payment Terms : </label>
+                                    <TextField disabled style={{ width: '240px' }} size='small' type="text" value={podata.PAYMENT_TERM + ", " + podata.PMNT_TM_DESCP} name="paymentTerms" />
+                                </div>
+                                <div className="df minMargin">
+                                    <label style={{ padding: '8px 15px 0px 0px' }} htmlFor="deliveryAdd">Delivery Address : </label>
+                                    <TextField disabled style={{ width: '240px' }} multiline maxRows={4} size='small' type="text" value={podata.address} name="deliveryAdd" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style={{ padding: '10px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
+
+                            {sideLoading ? (
+                                <div style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    backgroundColor: '#fff',
+                                    // paddingTop: '35vh',
+                                    backdropFilter: 'blur(5px)',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    zIndex: 1100
+                                }}>
+                                    <CircularProgress style={{ color: '#ea1214' }} />
+                                </div>
+                            ) : (
+                                // <div style={{ padding: '10px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
+                                <div style={{ marginTop: '10px' }}>
+                                    <div style={{ height: 200, width: '100%' }}>
+                                        {/* <DataGrid
                             rows={lineItems}
                             columns={columns}
                             initialState={{
@@ -333,61 +388,66 @@ const VendorInvoicingNewInvoice = () => {
                             checkboxSelection
                             onRowSelectionModelChange={handleSelectionChange}
                         /> */}
-                        <DataGrid
-                            rows={lineItems}
-                            columns={columns}
-                            initialState={{
-                                pagination: {
-                                    paginationModel: { page: 0, pageSize: 5 },
-                                },
-                            }}
-                            pageSizeOptions={[5, 10]}
-                            checkboxSelection
-                            onRowSelectionModelChange={(newSelection) => handleSelectionChange(newSelection)}
-                        />
+                                        <DataGrid
+                                            rows={lineItems}
+                                            columns={columns}
+                                            initialState={{
+                                                pagination: {
+                                                    paginationModel: { page: 0, pageSize: 5 },
+                                                },
+                                            }}
+                                            pageSizeOptions={[5, 10]}
+                                            checkboxSelection
+                                            onRowSelectionModelChange={(newSelection) => handleSelectionChange(newSelection)}
+                                        />
 
+                                    </div>
+                                </div>
+                                // </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div style={{ padding: '5px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                <div className="df minMargin">
-                    <label style={{ padding: '8px 15px 0px 0px' }} htmlFor="totalAmt">Total Amount : </label>
-                    <TextField disabled style={{ width: '200px' }} size='small' type="text" value={totalAmt} name="totalAmt" />
-                </div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '15px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                <Button style={{ margin: '0px 10px' }} color="warning" variant="outlined" onClick={handleClear}>Clear</Button>
-                <Button style={{ margin: '0px 10px' }} color="success" variant="outlined" onClick={poInvSubmit}>Submit</Button>
-            </div>
+                    <div style={{ padding: '5px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
+                        <div className="df minMargin">
+                            <label style={{ padding: '8px 15px 0px 0px' }} htmlFor="totalAmt">Total Amount : </label>
+                            <TextField disabled style={{ width: '200px' }} size='small' type="text" value={totalAmt} name="totalAmt" />
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '15px', margin: '10px', backgroundColor: '#fff', borderRadius: '8px' }}>
+                        <Button style={{ margin: '0px 10px' }} color="warning" variant="outlined" onClick={handleClear}>Clear</Button>
+                        <Button style={{ margin: '0px 10px' }} color="success" variant="outlined" onClick={poInvSubmit}>Submit</Button>
+                    </div>
 
 
-            <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
-                <DialogTitle>Please enter all mandetry Details</DialogTitle>
-                <DialogContent dividers>
-                    <p>{errorMessage}</p>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseErrorDiolog} color="error">
-                        Cancel
-                    </Button>
-                    {/* <Button onClick={handleSubmit} color="primary">
+                    <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
+                        <DialogTitle>Please enter all mandetry Details</DialogTitle>
+                        <DialogContent dividers>
+                            <p>{errorMessage}</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseErrorDiolog} color="error">
+                                Cancel
+                            </Button>
+                            {/* <Button onClick={handleSubmit} color="primary">
                         Submit
                     </Button> */}
-                </DialogActions>
-            </Dialog>
+                        </DialogActions>
+                    </Dialog>
 
 
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={3000}
-                onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert icon={<FaCheck />} onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
-                    Your invoice has been submitted.
-                </Alert>
-            </Snackbar>
-        </div >
+                    <Snackbar
+                        open={snackbarOpen}
+                        autoHideDuration={3000}
+                        onClose={handleSnackbarClose}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    >
+                        <Alert icon={<FaCheck />} onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+                            Your invoice has been submitted.
+                        </Alert>
+                    </Snackbar>
+                </div >
+            )}
+        </div>
     );
 }
 

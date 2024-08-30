@@ -1,4 +1,4 @@
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import { IoSearchOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { FiFilter } from "react-icons/fi";
@@ -11,6 +11,8 @@ import api from "../../../Utils/ApiCalls/Api";
 const VendorNonPOInvoiceStatus = () => {
 
     const { token, user } = useSelector((state) => state.auth);
+    const [loading, setLoading] = useState(true);
+    
 
     const [tdata, setTData] = useState([]);
     const columns = [
@@ -64,13 +66,16 @@ const VendorNonPOInvoiceStatus = () => {
                     Remarks: item.Remarks,
                 }));
                 setTData(formattedLineItems);
+                setLoading(false);
             }
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
     };
 
     const handleNonPoStatus = () => {
+        setLoading(true);
         var url = '/sap/nonpo/status';
         const body = postFilterData;
         console.log(postFilterData);
@@ -178,10 +183,26 @@ const VendorNonPOInvoiceStatus = () => {
                 </Button>
             </div>
             <div >
-                <DataGrid
-                    rows={tdata}
-                    columns={columns}
-                />
+                {loading ? (
+                    <div style={{
+                        width: '100%',
+                        height: '100%',
+                        // backgroundColor: '#ccc',
+                        paddingTop: '35vh',
+                        backdropFilter: 'blur(5px)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1100
+                    }}>
+                        <CircularProgress style={{ color: '#ea1214' }} />
+                    </div>
+                ) : (
+                    <DataGrid
+                        rows={tdata}
+                        columns={columns}
+                    />
+                )}
             </div>
         </div >
     );

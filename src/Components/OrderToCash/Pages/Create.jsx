@@ -226,6 +226,7 @@ const Create = () => {
                         size='small'
                         style={{ width: '221px' }}
                         type='number'
+                        onChange={(e)=>{setPostData(prev => ({...prev, customernumber: e.target.value}))}}
                     >
                         {/* {cocode.length > 0 ? (
                             cocode.map((option) => (
@@ -240,11 +241,11 @@ const Create = () => {
                 </div>
                 <div className='basic-margin'>
                     <p>Customer Name</p>
-                    <TextField size='small' />
+                    <TextField size='small' onChange={(e)=>{setPostData(prev => ({...prev, customername: e.target.value}))}} />
                 </div>
                 <div className='basic-margin'>
                     <p>Date</p>
-                    <input className='date' type='date' style={{ width: '221px' }} />
+                    <input className='date'  onChange={(e)=>{setPostData(prev => ({...prev, date: e.target.value}))}}  type='date' style={{ width: '221px' }} />
                 </div>
             </div>
             {/* <div className='df'>

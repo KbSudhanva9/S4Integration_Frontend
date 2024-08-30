@@ -1,4 +1,4 @@
-import { Alert, Avatar, Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, CardContent, CardHeader, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField, Typography } from "@mui/material";
 import "./ASNVendor.css"
 import { IoFileTrayFull } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa";
@@ -18,6 +18,7 @@ const ASNVendorDetails = () => {
     const [selectedRows, setSelectedRows] = useState([]);
     const [openError, setOpenError] = useState(false);
     const [errorMessage, setErrorMessage] = useState([]);
+    const [loading, setLoading] = useState(true);
     // const [lineItems, setLineItems] = useState([
     //     {
     //         id: 1,
@@ -90,7 +91,7 @@ const ASNVendorDetails = () => {
         { field: 'Menge', headerName: 'Order Qty.', width: 90 },
         { field: 'DeliveryDate', headerName: 'Delivery Date', width: 110 },
         { field: 'asnSubmittedQty', headerName: 'Asn Submitted Qty', width: 110 },
-        
+
         // { field: 'AsnQty', headerName: 'Asn Submitted Qty', width: 130 },
         {
             field: 'AsnQty',
@@ -223,9 +224,11 @@ const ASNVendorDetails = () => {
                     // remarks: item.remarks,
                 }));
                 setLineItems(formattedLineItems);
-            }else if(url.includes('create')){
+                setLoading(false);
+            } else if (url.includes('create')) {
                 console.log(response);
                 setSnackbarOpen(true);
+                // setLoading(false);
                 nav(-1);
             }
         } catch (error) {
@@ -234,11 +237,13 @@ const ASNVendorDetails = () => {
                 var ee = error.response.data.message;
                 setErrorMessage(ee);
                 setOpenError(true);
+                // setLoading(false);
             }
         }
     };
 
     const handlePOdetailsAndLineItems = () => {
+        setLoading(true);
         var url = '/sap/asn/details';
         const body = {
             "po_no": `${po}`
@@ -246,6 +251,7 @@ const ASNVendorDetails = () => {
         handlePostData(url, body);
     }
     const handleCreateASN = (modifiedBody) => {
+        // setLoading(true);
         var url = '/sap/asn/create';
         const body = modifiedBody;
         handlePostData(url, body);
@@ -288,80 +294,97 @@ const ASNVendorDetails = () => {
 
     return (
         <div>
-            <div style={{ display: 'flex' }}>
-                <Card style={{ margin: '15px', width: '345px' }}>
-                    <Box >
-                        <CardHeader title={<Typography ><b>Purchase Order Details</b></Typography>} />
-                        <CardContent style={{ padding: '0px 0px 16px 25px' }}>
-                            <div style={{ display: 'flex' }}>
-                                <p style={{ margin: '5px 10px 5px 0px' }}>Purchase Name</p>
-                                <p style={{ margin: '5px' }}>{cardData.PoNumber}</p>
-                            </div>
-                            <div style={{ display: 'flex' }}>
-                                <p style={{ margin: '5px 18px 5px 0px' }}>Purchase Type</p>
-                                <p style={{ margin: '5px' }}>{cardData.PoType}</p>
-                            </div>
-                            <div style={{ display: 'flex' }}>
-                                <p style={{ margin: '5px 60px 5px 0px' }}>Currency</p>
-                                <p style={{ margin: '5px' }}>{cardData.Currency}</p>
-                            </div>
-                            <div style={{ display: 'flex' }}>
-                                <p style={{ margin: '5px 47px 5px 0px' }}>Created on</p>
-                                <p style={{ margin: '5px' }}>{cardData.CreatedOn}</p>
-                            </div>
-                        </CardContent>
-                    </Box>
-                </Card>
-                <Card style={{ margin: '15px', width: '345px' }}>
-                    <Box >
-                        <CardHeader title={<Typography ><b>Shipping Details</b></Typography>} />
-                        <CardContent style={{ padding: '0px 0px 16px 25px' }}>
-                            <div style={{ display: 'flex' }}>
-                                {/* <p style={{margin: '5px 10px 5px 0px'}}>Purchase Name</p> */}
-                                <p style={{ margin: '5px' }}>{cardData.ShippingAddr}</p>
-                            </div>
-                        </CardContent>
-                    </Box>
-                </Card>
-            </div>
-            <div style={{ margin: '5px', backgroundColor: '#fff', padding: '10px', borderRadius: '5px' }}>
-                <b>Details</b>
-                <DataGrid
-                    rows={lineItems}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: { page: 0, pageSize: 5 },
-                        },
-                    }}
-                    style={{ padding: '5px' }}
-                    pageSizeOptions={[5, 10]}
-                    checkboxSelection
-                    onRowSelectionModelChange={(newSelection) => handleSelectionChange(newSelection)}
-                />
-            </div>
+            {loading ? (
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    // backgroundColor: '#ccc',
+                    paddingTop: '35vh',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1100
+                }}>
+                    <CircularProgress style={{ color: '#ea1214' }} />
+                </div>
+            ) : (
+                <div>
+                    <div style={{ display: 'flex' }}>
+                        <Card style={{ margin: '15px', width: '345px' }}>
+                            <Box >
+                                <CardHeader title={<Typography ><b>Purchase Order Details</b></Typography>} />
+                                <CardContent style={{ padding: '0px 0px 16px 25px' }}>
+                                    <div style={{ display: 'flex' }}>
+                                        <p style={{ margin: '5px 10px 5px 0px' }}>Purchase Name</p>
+                                        <p style={{ margin: '5px' }}>{cardData.PoNumber}</p>
+                                    </div>
+                                    <div style={{ display: 'flex' }}>
+                                        <p style={{ margin: '5px 18px 5px 0px' }}>Purchase Type</p>
+                                        <p style={{ margin: '5px' }}>{cardData.PoType}</p>
+                                    </div>
+                                    <div style={{ display: 'flex' }}>
+                                        <p style={{ margin: '5px 60px 5px 0px' }}>Currency</p>
+                                        <p style={{ margin: '5px' }}>{cardData.Currency}</p>
+                                    </div>
+                                    <div style={{ display: 'flex' }}>
+                                        <p style={{ margin: '5px 47px 5px 0px' }}>Created on</p>
+                                        <p style={{ margin: '5px' }}>{cardData.CreatedOn}</p>
+                                    </div>
+                                </CardContent>
+                            </Box>
+                        </Card>
+                        <Card style={{ margin: '15px', width: '345px' }}>
+                            <Box >
+                                <CardHeader title={<Typography ><b>Shipping Details</b></Typography>} />
+                                <CardContent style={{ padding: '0px 0px 16px 25px' }}>
+                                    <div style={{ display: 'flex' }}>
+                                        {/* <p style={{margin: '5px 10px 5px 0px'}}>Purchase Name</p> */}
+                                        <p style={{ margin: '5px' }}>{cardData.ShippingAddr}</p>
+                                    </div>
+                                </CardContent>
+                            </Box>
+                        </Card>
+                    </div>
+                    <div style={{ margin: '5px', backgroundColor: '#fff', padding: '10px', borderRadius: '5px' }}>
+                        <b>Details</b>
+                        <DataGrid
+                            rows={lineItems}
+                            columns={columns}
+                            initialState={{
+                                pagination: {
+                                    paginationModel: { page: 0, pageSize: 5 },
+                                },
+                            }}
+                            style={{ padding: '5px' }}
+                            pageSizeOptions={[5, 10]}
+                            checkboxSelection
+                            onRowSelectionModelChange={(newSelection) => handleSelectionChange(newSelection)}
+                        />
+                    </div>
 
-            <div style={{ margin: '15px 5px 5px 5px', backgroundColor: '#fff', padding: '10px', borderRadius: '5px', display: 'flex', justifyContent: 'end' }}>
-                <Button onClick={() => { nav(-1); }} style={{ margin: '0px 5px' }} size='small' color="error" variant="outlined">Close</Button>
-                <Button onClick={handleCreateAsn} style={{ margin: '0px 5px' }} size='small' color="success" variant="outlined" >Create ASN</Button>
-            </div>
+                    <div style={{ margin: '15px 5px 5px 5px', backgroundColor: '#fff', padding: '10px', borderRadius: '5px', display: 'flex', justifyContent: 'end' }}>
+                        <Button onClick={() => { nav(-1); }} style={{ margin: '0px 5px' }} size='small' color="error" variant="outlined">Close</Button>
+                        <Button onClick={handleCreateAsn} style={{ margin: '0px 5px' }} size='small' color="success" variant="outlined" >Create ASN</Button>
+                    </div>
 
 
-            <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
-                <DialogTitle>Please enter all mandetry Details</DialogTitle>
-                <DialogContent dividers>
-                    <p>{errorMessage}</p>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseErrorDiolog} color="error">
-                        Cancel
-                    </Button>
-                    {/* <Button onClick={handleSubmit} color="primary">
+                    <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
+                        <DialogTitle>Please enter all mandetry Details</DialogTitle>
+                        <DialogContent dividers>
+                            <p>{errorMessage}</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseErrorDiolog} color="error">
+                                Cancel
+                            </Button>
+                            {/* <Button onClick={handleSubmit} color="primary">
                         Submit
                     </Button> */}
-                </DialogActions>
-            </Dialog>
-
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            )}
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import { Avatar, Box, Card, CardHeader, Typography } from "@mui/material";
+import { Avatar, Box, Card, CardHeader, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { IoFileTrayFull } from "react-icons/io5";
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
@@ -15,6 +15,7 @@ const VendorNonPOHome = () => {
     const [cardData, setCardData] = useState([]);
     const [dataset, setDataset] = useState([]);
     const { token, user } = useSelector((state) => state.auth);
+    const [loading, setLoading] = useState(true);
 
     const handleGetData = async (url) => {
 
@@ -32,21 +33,25 @@ const VendorNonPOHome = () => {
                 setCardData(response.data.data);
 
                 localStorage.setItem('email', response.data.data.mail)
-
+                setLoading(false);
             } else if (url.includes('dashboardGraph')) {
                 setDataset(response.data.data.results);
                 // console.log(response.data.data);
+                setLoading(false);
             }
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
     };
 
     const handleCardData = () => {
+        setLoading(true);
         var url = '/sap/nonpo/headData';
         handleGetData(url);
     }
     const handleGraphData = () => {
+        setLoading(true);
         var url = '/sap/nonpo/dashboardGraph';
         handleGetData(url);
     }
@@ -79,84 +84,99 @@ const VendorNonPOHome = () => {
             <div>
                 <p style={{ margin: '0px' }}>Vendor : {user}</p>
             </div>
-            <div className='df' style={{ width: '100%' }}>
-                <div className='three'>
-                    <div style={{ padding: '20px 0px 0px 0px' }}>
-                        <Card style={{ margin: '15px' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: '#fff1b8', width: 56, height: 56 }} variant="rounded">
-                                            <TbDeviceIpadCheck style={{ color: '#c75f00' }} />
-                                        </Avatar>
-                                    }
-                                    title="Invoice Created"
-                                    subheader={cardData.created_amt}
-                                />
-                                <Box sx={{ textAlign: 'right', marginRight: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {cardData.inv_created}
-                                    </Typography>
+            {loading ? (
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    // backgroundColor: '#ccc',
+                    paddingTop: '35vh',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1100
+                }}>
+                    <CircularProgress style={{ color: '#ea1214' }} />
+                </div>
+            ) : (
+                <div className='df' style={{ width: '100%' }}>
+                    <div className='three'>
+                        <div style={{ padding: '20px 0px 0px 0px' }}>
+                            <Card style={{ margin: '15px' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <CardHeader
+                                        avatar={
+                                            <Avatar sx={{ bgcolor: '#fff1b8', width: 56, height: 56 }} variant="rounded">
+                                                <TbDeviceIpadCheck style={{ color: '#c75f00' }} />
+                                            </Avatar>
+                                        }
+                                        title="Invoice Created"
+                                        subheader={cardData.created_amt}
+                                    />
+                                    <Box sx={{ textAlign: 'right', marginRight: 2 }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {cardData.inv_created}
+                                        </Typography>
+                                    </Box>
                                 </Box>
-                            </Box>
-                        </Card>
-                        <Card style={{ margin: '15px' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: '#e6caee', width: 56, height: 56 }} variant="rounded">
-                                            <LiaFileInvoiceDollarSolid style={{ color: '#7f2da5' }} />
-                                        </Avatar>
-                                    }
-                                    title="Invoice Approved"
-                                    subheader={cardData.approved_amt}
-                                />
-                                <Box sx={{ textAlign: 'right', marginRight: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {cardData.inv_approved}
-                                    </Typography>
+                            </Card>
+                            <Card style={{ margin: '15px' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <CardHeader
+                                        avatar={
+                                            <Avatar sx={{ bgcolor: '#e6caee', width: 56, height: 56 }} variant="rounded">
+                                                <LiaFileInvoiceDollarSolid style={{ color: '#7f2da5' }} />
+                                            </Avatar>
+                                        }
+                                        title="Invoice Approved"
+                                        subheader={cardData.approved_amt}
+                                    />
+                                    <Box sx={{ textAlign: 'right', marginRight: 2 }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {cardData.inv_approved}
+                                        </Typography>
+                                    </Box>
                                 </Box>
-                            </Box>
-                        </Card>
-                        <Card style={{ margin: '15px' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: '#cbead7', width: 56, height: 56 }} variant="rounded">
-                                            <LuClipboardCheck style={{ color: '#007c49' }} />
-                                        </Avatar>
-                                    }
-                                    title="Payment Cleared"
-                                    subheader={cardData.payment_clrd}
-                                />
-                                <Box sx={{ textAlign: 'right', marginRight: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {cardData.CLEARED_AMT}
-                                    </Typography>
+                            </Card>
+                            <Card style={{ margin: '15px' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <CardHeader
+                                        avatar={
+                                            <Avatar sx={{ bgcolor: '#cbead7', width: 56, height: 56 }} variant="rounded">
+                                                <LuClipboardCheck style={{ color: '#007c49' }} />
+                                            </Avatar>
+                                        }
+                                        title="Payment Cleared"
+                                        subheader={cardData.payment_clrd}
+                                    />
+                                    <Box sx={{ textAlign: 'right', marginRight: 2 }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {cardData.CLEARED_AMT}
+                                        </Typography>
+                                    </Box>
                                 </Box>
-                            </Box>
-                        </Card>
+                            </Card>
 
+                        </div>
+                    </div>
+
+                    <div style={{ width: '70%' }}>
+                        <Card style={{ margin: '37px 10px 0px 0px', padding: '50px 0px 35px 0px', backgroundColor: '#fff', borderRadius: '8px' }}>
+                            <center><Typography>Non-PO Monthly Amount</Typography></center>
+                            <BarChart
+                                dataset={dataset.map(item => ({ ...item, month: monthNames[parseInt(item.month) - 1], }))}
+                                xAxis={[{ scaleType: 'band', dataKey: 'month' },]}
+                                {...chartSetting}
+                                series={[
+                                    { dataKey: 'invCreated', label: 'Invoice Created' },
+                                    { dataKey: 'invApproved', label: 'Invoice Approved' },
+                                    { dataKey: 'pmtCleared', label: 'Payment Cleared' }
+                                ]}
+                            />
+                        </Card>
                     </div>
                 </div>
-
-                <div style={{width: '70%'}}>
-                    <Card style={{ margin: '37px 10px 0px 0px', padding: '50px 0px 35px 0px', backgroundColor: '#fff', borderRadius: '8px' }}>
-                        <center><Typography>Non-PO Monthly Amount</Typography></center>
-                        <BarChart
-                            dataset={dataset.map(item => ({ ...item, month: monthNames[parseInt(item.month) - 1], }))}
-                            xAxis={[{ scaleType: 'band', dataKey: 'month' },]}
-                            {...chartSetting}
-                            series={[
-                                { dataKey: 'invCreated', label: 'Invoice Created' },
-                                { dataKey: 'invApproved', label: 'Invoice Approved' },
-                                { dataKey: 'pmtCleared', label: 'Payment Cleared' }
-                              ]}
-                        />
-                    </Card>
-                </div>
-            </div>
-
+            )}
 
         </div>
     );

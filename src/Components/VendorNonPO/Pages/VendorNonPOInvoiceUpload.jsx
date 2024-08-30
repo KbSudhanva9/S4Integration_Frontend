@@ -1,4 +1,4 @@
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from "@mui/material";
+import { Alert, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import api from "../../../Utils/ApiCalls/Api";
@@ -30,6 +30,9 @@ const VendorNonPOInvoiceUpload = () => {
     const [openError, setOpenError] = useState(false);
     const [errorMessage, setErrorMessage] = useState([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [sideLoading, setSideLoading] = useState(false);
+    
 
     const handleSnackbarClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -355,13 +358,17 @@ const VendorNonPOInvoiceUpload = () => {
             });
             if (url.includes('compCode')) {
                 setCompanyCode(response.data.data.results);
+                setLoading(false);
             } else if (url.includes('uom')) {
                 setUOM(response.data.data.results);
+                setLoading(false);
             } else if (url.includes('currency')) {
                 setCurrency(response.data.data.results);
+                setLoading(false);
             }
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
     };
 
@@ -373,16 +380,22 @@ const VendorNonPOInvoiceUpload = () => {
             });
             if (url.includes('bpValues')) {
                 setBussinessPlace(response.data.data.businessPlacesSet.results);
+                setSideLoading(false);
             } else if (url.includes('costCenter')) {
                 setcCenter(response.data.data.results);
+                setSideLoading(false);
             } else if (url.includes('defaultCurrency')) {
                 setVerifyData(prev => ({ ...prev, Currency: response.data.data.currencyCode }));
+                setSideLoading(false);
             } else if (url.includes('glAcc')) {
                 setglAcc(response.data.data.results);
+                setSideLoading(false);
             } else if (url.includes('taxCodes')) {
                 setTaxCode(response.data.data.results);
+                setSideLoading(false);
             } else if (url.includes('hsn')) {
                 setHSN(response.data.data.hsnSacCodesSet.results);
+                setSideLoading(false);
             } else if (url.includes('validation')) {
                 console.log(response.data.message);
                 setOpenSubmit(true);
@@ -403,25 +416,31 @@ const VendorNonPOInvoiceUpload = () => {
                 setErrorMessage(ee);
                 // setErrorMessage(response.data.message);
                 setOpenError(true);
+                setSideLoading(false);
             }
+            setSideLoading(false);
         }
     };
 
     const handleCompanyCodeData = () => {
+        setLoading(true);
         var url = '/sap/nonpo/compCode';
         handleGetData(url);
     }
     const handleUOM = () => {
         var url = '/sap/nonpo/uom';
+        setLoading(true);
         handleGetData(url);
     }
     const handleCurrency = () => {
+        setLoading(true);
         var url = '/sap/nonpo/currency';
         handleGetData(url);
     }
 
 
     const handleBussinessPlace = (companyCode) => {
+        setSideLoading(true);
         const url = '/sap/nonpo/bpValues';
         const body = {
             "companyCode": `${companyCode}`
@@ -429,6 +448,7 @@ const VendorNonPOInvoiceUpload = () => {
         handlePostData(url, body);
     }
     const handleCostCenter = (companyCode) => {
+        setSideLoading(true);
         const url = '/sap/nonpo/costCenter';
         const body = {
             "companyCode": `${companyCode}`
@@ -436,6 +456,7 @@ const VendorNonPOInvoiceUpload = () => {
         handlePostData(url, body);
     }
     const handleGLac = (companyCode) => {
+        setSideLoading(true);
         const url = '/sap/nonpo/glAcc';
         const body = {
             "companyCode": `${companyCode}`
@@ -443,6 +464,7 @@ const VendorNonPOInvoiceUpload = () => {
         handlePostData(url, body);
     }
     const handleTaxCode = (companyCode) => {
+        setSideLoading(true);
         const url = '/sap/nonpo/taxCodes';
         const body = {
             "companyCode": `${companyCode}`
@@ -450,6 +472,7 @@ const VendorNonPOInvoiceUpload = () => {
         handlePostData(url, body);
     }
     const handleHSNCode = (companyCode) => {
+        setSideLoading(true);
         const url = '/sap/nonpo/hsn';
         const body = {
             "companyCode": `${companyCode}`
@@ -457,6 +480,7 @@ const VendorNonPOInvoiceUpload = () => {
         handlePostData(url, body);
     }
     const handleDefaultCurrency = (companyCode) => {
+        setSideLoading(true);
         const url = '/sap/nonpo/defaultCurrency';
         const body = {
             "companyCode": `${companyCode}`
@@ -485,231 +509,253 @@ const VendorNonPOInvoiceUpload = () => {
     return (
 
         <div>
-            <div className="maincomponent">
-                <label><b>Vendor Details</b></label>
-                <div style={{ padding: '10px' }}>
-                    <div className="df" style={{ margin: '0px 0px 15px 0px' }}>
-                        <div>
-                            <label>Vendor No : </label>
-                            <TextField size="small" value={user} disabled style={{ width: '188px', margin: '-8px 50px 0px 50px' }}></TextField>
-                        </div>
-                        <div>
-                            <label><span style={{ color: 'red' }}>*</span> Invoice Date : </label>
-                            <TextField size="small" value={invdate} onChange={(e) => { setinvdate(e.target.value) }} style={{ width: '188px', margin: '-8px 5px 0px 50px' }} type="date"  ></TextField>
-                        </div>
-                    </div>
-                    <div className="df" style={{ margin: '15px 0px 0px 0px' }}>
-                        <div>
-                            <label>Email-id : </label>
-                            <TextField size="small" value={email} disabled style={{ width: '188px', margin: '-8px 50px 0px 68px' }} type="email"></TextField>
-                        </div>
-                        <div>
-                            <label><span style={{ color: 'red' }}>*</span> Invoice Number : </label>
-                            <TextField size="small" value={verifyData.InvNum} onChange={(e) => { setVerifyData(prev => ({ ...prev, InvNum: e.target.value })) }} style={{ width: '188px', margin: '-8px 5px 0px 27px' }}></TextField>
-                        </div>
-                    </div>
-                    <div className="df" style={{ margin: '15px 0px' }}>
-                        <div >
-                            <label>Upload Invoice : </label>
-                            <TextField size="small" style={{ margin: '-8px 5px 0px 20px' }} type="file" value={verifyData.PdfName} onChange={(e) => { setVerifyData(prev => ({ ...prev, PdfName: (e.target.value) })) }}></TextField>
-                        </div>
-                    </div>
-                    {/* <div className="df" style={{ margin: '15px 0px 0px 0px' }}>
+            {loading ? (
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    // backgroundColor: '#ccc',
+                    paddingTop: '35vh',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1100
+                }}>
+                    <CircularProgress style={{ color: '#ea1214' }} />
+                </div>
+            ) : (
+                <div>
+                    <div className="maincomponent">
+                        <label><b>Vendor Details</b></label>
+                        <div style={{ padding: '10px' }}>
+                            <div className="df" style={{ margin: '0px 0px 15px 0px' }}>
+                                <div>
+                                    <label>Vendor No : </label>
+                                    <TextField size="small" value={user} disabled style={{ width: '188px', margin: '-8px 50px 0px 50px' }}></TextField>
+                                </div>
+                                <div>
+                                    <label><span style={{ color: 'red' }}>*</span> Invoice Date : </label>
+                                    <TextField size="small" value={invdate} onChange={(e) => { setinvdate(e.target.value) }} style={{ width: '188px', margin: '-8px 5px 0px 50px' }} type="date"  ></TextField>
+                                </div>
+                            </div>
+                            <div className="df" style={{ margin: '15px 0px 0px 0px' }}>
+                                <div>
+                                    <label>Email-id : </label>
+                                    <TextField size="small" value={email} disabled style={{ width: '188px', margin: '-8px 50px 0px 68px' }} type="email"></TextField>
+                                </div>
+                                <div>
+                                    <label><span style={{ color: 'red' }}>*</span> Invoice Number : </label>
+                                    <TextField size="small" value={verifyData.InvNum} onChange={(e) => { setVerifyData(prev => ({ ...prev, InvNum: e.target.value })) }} style={{ width: '188px', margin: '-8px 5px 0px 27px' }}></TextField>
+                                </div>
+                            </div>
+                            <div className="df" style={{ margin: '15px 0px' }}>
+                                <div >
+                                    <label>Upload Invoice : </label>
+                                    <TextField size="small" style={{ margin: '-8px 5px 0px 20px' }} type="file" value={verifyData.PdfName} onChange={(e) => { setVerifyData(prev => ({ ...prev, PdfName: (e.target.value) })) }}></TextField>
+                                </div>
+                            </div>
+                            {/* <div className="df" style={{ margin: '15px 0px 0px 0px' }}>
                         <div>
                             <label>Digital Signature : </label>
                             <label></label>
                         </div>
                     </div> */}
-                </div>
-            </div>
-            <div className="maincomponent">
-                <label><b>Company Details</b></label>
-                <div style={{ padding: '10px' }}>
-                    <div className="df" style={{ margin: '0px 0px 15px 0px' }}>
-                        <div>
-                            <label><span style={{ color: 'red' }}>*</span> Company Code : </label>
-                            <TextField
-                                id="CompCode"
-                                select
-                                size='small'
-                                style={{ width: '188px', margin: '-8px 48px 0px 10px' }}
-                                value={verifyData.CompCode}
-                                // onChange={(e) => { setVerifyData(prev => ({ ...prev, CompCode: e.target.value })) }}
-                                onChange={(event) => {
-                                    const selectedValue = event.target.value;
-
-                                    setVerifyData(prev => ({ ...prev, CompCode: event.target.value }))
-                                    // setFieldValue('Land1', selectedValue);
-                                    if (!selectedValue) { }
-                                    else {
-                                        handleBussinessPlace(selectedValue);
-                                        handleCostCenter(selectedValue);
-                                        handleGLac(selectedValue);
-                                        handleTaxCode(selectedValue);
-                                        handleHSNCode(selectedValue);
-                                        handleDefaultCurrency(selectedValue);
-                                        // handleCurrency(selectedValue);
-                                        // handleRegion(selectedValue);
-                                        // handleTermOfPaymnets(selectedValue);
-                                        // handleBankName(selectedValue);
-                                    }
-                                }}
-                            >
-                                {companyCode.length > 0 ? (
-                                    companyCode.map((option) => (
-                                        <MenuItem key={option.companyCode} value={option.companyCode}>
-                                            {option.companyCode} ({option.description})
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <MenuItem disabled>No options available</MenuItem>
-                                )}
-                            </TextField>
-                        </div>
-                        <div>
-                            <label>Bussiness Place : </label>
-                            <TextField
-                                id="BussPlace"
-                                select
-                                size='small'
-                                style={{ width: '188px', margin: '-8px 5px 0px 90px' }}
-                                value={verifyData.BussPlace}
-                                onChange={(e) => { setVerifyData(prev => ({ ...prev, BussPlace: e.target.value })) }}
-                            >
-                                {bussinessPlace.length > 0 ? (
-                                    bussinessPlace.map((option) => (
-                                        <MenuItem key={option.businessPlace} value={option.businessPlace}>
-                                            {option.businessPlace}
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <MenuItem disabled>No options available</MenuItem>
-                                )}
-                            </TextField>
                         </div>
                     </div>
-                    <div className="df" style={{ margin: '15px 0px' }}>
-                        <div>
-                            <label><span style={{ color: 'red' }}>*</span> Cost Center : </label>
-                            <TextField
-                                id="CostCenter"
-                                select
-                                size='small'
-                                style={{ width: '188px', margin: '-8px 48px 0px 36px' }}
-                                value={verifyData.CostCenter}
-                                onChange={(e) => { setVerifyData(prev => ({ ...prev, CostCenter: e.target.value })) }}
-                            >
-                                {cCenter.length > 0 ? (
-                                    cCenter.map((option) => (
-                                        <MenuItem key={option.costCenter} value={option.costCenter}>
-                                            {option.costCenter} ({option.description})
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <MenuItem disabled>No options available</MenuItem>
-                                )}
-                            </TextField>
+                    <div className="maincomponent">
+                        <label><b>Company Details</b></label>
+                        <div style={{ padding: '10px' }}>
+                            <div className="df" style={{ margin: '0px 0px 15px 0px' }}>
+                                <div>
+                                    <label><span style={{ color: 'red' }}>*</span> Company Code : </label>
+                                    <TextField
+                                        id="CompCode"
+                                        select
+                                        size='small'
+                                        style={{ width: '188px', margin: '-8px 48px 0px 10px' }}
+                                        value={verifyData.CompCode}
+                                        // onChange={(e) => { setVerifyData(prev => ({ ...prev, CompCode: e.target.value })) }}
+                                        onChange={(event) => {
+                                            const selectedValue = event.target.value;
+
+                                            setVerifyData(prev => ({ ...prev, CompCode: event.target.value }))
+                                            // setFieldValue('Land1', selectedValue);
+                                            if (!selectedValue) { }
+                                            else {
+                                                setSideLoading(true);
+                                                handleBussinessPlace(selectedValue);
+                                                handleCostCenter(selectedValue);
+                                                handleGLac(selectedValue);
+                                                handleTaxCode(selectedValue);
+                                                handleHSNCode(selectedValue);
+                                                handleDefaultCurrency(selectedValue);
+                                                // handleCurrency(selectedValue);
+                                                // handleRegion(selectedValue);
+                                                // handleTermOfPaymnets(selectedValue);
+                                                // handleBankName(selectedValue);
+                                            }
+                                        }}
+                                    >
+                                        {companyCode.length > 0 ? (
+                                            companyCode.map((option) => (
+                                                <MenuItem key={option.companyCode} value={option.companyCode}>
+                                                    {option.companyCode} ({option.description})
+                                                </MenuItem>
+                                            ))
+                                        ) : (
+                                            <MenuItem disabled>No options available</MenuItem>
+                                        )}
+                                    </TextField>
+                                </div>
+                                {sideLoading ? (
+                                    <div style={{margin: '0px 25px 0px -40px'}}>
+                                        <CircularProgress style={{ color: '#ea1214' }} size={15}/>
+                                    </div>
+                                ) : (<div></div>)}
+                                <div>
+                                    <label>Bussiness Place : </label>
+                                    <TextField
+                                        id="BussPlace"
+                                        select
+                                        size='small'
+                                        style={{ width: '188px', margin: '-8px 5px 0px 90px' }}
+                                        value={verifyData.BussPlace}
+                                        onChange={(e) => { setVerifyData(prev => ({ ...prev, BussPlace: e.target.value })) }}
+                                    >
+                                        {bussinessPlace.length > 0 ? (
+                                            bussinessPlace.map((option) => (
+                                                <MenuItem key={option.businessPlace} value={option.businessPlace}>
+                                                    {option.businessPlace}
+                                                </MenuItem>
+                                            ))
+                                        ) : (
+                                            <MenuItem disabled>No options available</MenuItem>
+                                        )}
+                                    </TextField>
+                                </div>
+                            </div>
+                            <div className="df" style={{ margin: '15px 0px' }}>
+                                <div>
+                                    <label><span style={{ color: 'red' }}>*</span> Cost Center : </label>
+                                    <TextField
+                                        id="CostCenter"
+                                        select
+                                        size='small'
+                                        style={{ width: '188px', margin: '-8px 48px 0px 36px' }}
+                                        value={verifyData.CostCenter}
+                                        onChange={(e) => { setVerifyData(prev => ({ ...prev, CostCenter: e.target.value })) }}
+                                    >
+                                        {cCenter.length > 0 ? (
+                                            cCenter.map((option) => (
+                                                <MenuItem key={option.costCenter} value={option.costCenter}>
+                                                    {option.costCenter} ({option.description})
+                                                </MenuItem>
+                                            ))
+                                        ) : (
+                                            <MenuItem disabled>No options available</MenuItem>
+                                        )}
+                                    </TextField>
+                                </div>
+                                <div>
+                                    <label>Booking Confiramation No : </label>
+                                    <TextField
+                                        id="BookConfNum"
+                                        size='small'
+                                        style={{ width: '188px', margin: '-8px 5px 0px 20px' }}
+                                        value={verifyData.BookConfNum}
+                                        onChange={(e) => { setVerifyData(prev => ({ ...prev, BookConfNum: e.target.value })) }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="df" style={{ margin: '15px 0px 0px 0px' }}>
+                                <div>
+                                    <label><span style={{ color: 'red' }}>*</span> GL Account : </label>
+                                    <TextField
+                                        id="GlAcc"
+                                        select
+                                        size='small'
+                                        style={{ width: '188px', margin: '-8px 5px 0px 40px' }}
+                                        value={verifyData.GlAcc}
+                                        onChange={(e) => { setVerifyData(prev => ({ ...prev, GlAcc: e.target.value })) }}
+                                    >
+                                        {glAcc.length > 0 ? (
+                                            glAcc.map((option) => (
+                                                <MenuItem key={option.glAccount} value={option.glAccount}>
+                                                    {option.glAccount} ({option.glDescription})
+                                                </MenuItem>
+                                            ))
+                                        ) : (
+                                            <MenuItem disabled>No options available</MenuItem>
+                                        )}
+                                    </TextField>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="maincomponent">
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <div>
+                                <label><b>Vendor Details</b></label>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
+                                <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlinePostAdd />} onClick={handleAddRow}>Add</Button>
+                                <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineDeleteOutline />} color="error" onClick={handleDeleteSelected}>Delete Selected</Button>
+                            </div>
                         </div>
                         <div>
-                            <label>Booking Confiramation No : </label>
-                            <TextField
-                                id="BookConfNum"
-                                size='small'
-                                style={{ width: '188px', margin: '-8px 5px 0px 20px' }}
-                                value={verifyData.BookConfNum}
-                                onChange={(e) => { setVerifyData(prev => ({ ...prev, BookConfNum: e.target.value })) }}
+                            <DataGrid
+                                rows={lineItems}
+                                columns={columns}
+                                initialState={{
+                                    pagination: {
+                                        paginationModel: { page: 0, pageSize: 5 },
+                                    },
+                                }}
+                                style={{ padding: '5px' }}
+                                pageSizeOptions={[5, 10]}
+                                checkboxSelection
+                                onRowSelectionModelChange={(newSelection) => { handleSelectionChange(newSelection) }}
+                            // onRowSelectionModelChange={(newSelection) => {
+                            //     setSelectedRows(newSelection);  // Update the selected rows
+                            //     calculateTotal(newSelection);   // Recalculate the total
+                            // }}
                             />
                         </div>
-                    </div>
-                    <div className="df" style={{ margin: '15px 0px 0px 0px' }}>
-                        <div>
-                            <label><span style={{ color: 'red' }}>*</span> GL Account : </label>
-                            <TextField
-                                id="GlAcc"
-                                select
-                                size='small'
-                                style={{ width: '188px', margin: '-8px 5px 0px 40px' }}
-                                value={verifyData.GlAcc}
-                                onChange={(e) => { setVerifyData(prev => ({ ...prev, GlAcc: e.target.value })) }}
-                            >
-                                {glAcc.length > 0 ? (
-                                    glAcc.map((option) => (
-                                        <MenuItem key={option.glAccount} value={option.glAccount}>
-                                            {option.glAccount} ({option.glDescription})
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <MenuItem disabled>No options available</MenuItem>
-                                )}
-                            </TextField>
+                        <div style={{ padding: '10px 0px 0px 0px', marginTop: '10px' }}>
+                            <div className="df" style={{ margin: '0px 0px 15px 0px' }}>
+                                <div>
+                                    <label>Total Value : </label>
+                                    <TextField size="small" value={verifyData.TotalAmt} disabled style={{ width: '188px', margin: '-8px 20px 0px 20px' }} />
+                                </div>
+                                <div>
+                                    <label>Currency : </label>
+                                    <TextField
+                                        select
+                                        size="small"
+                                        value={verifyData.Currency}
+                                        style={{ width: '188px', margin: '-8px 5px 0px 20px' }}
+                                        onChange={(e) => { setVerifyData(prev => ({ ...prev, Currency: e.target.value })) }}
+                                    >
+                                        {currency.length > 0 ? (
+                                            currency.map((option) => (
+                                                <MenuItem key={option.currencyCode} value={option.currencyCode}>
+                                                    {option.currencyCode} ({option.Description})
+                                                </MenuItem>
+                                            ))
+                                        ) : (
+                                            <MenuItem disabled>No options available</MenuItem>
+                                        )}
+                                    </TextField>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div className="maincomponent">
 
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>
-                        <label><b>Vendor Details</b></label>
+                    <div className="maincomponent" style={{ display: 'flex', justifyContent: 'end' }}>
+                        <Button color="warning" onClick={handleClearAll}>Clear</Button>
+                        <Button onClick={handleSubmit}>Submit</Button>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
-                        <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlinePostAdd />} onClick={handleAddRow}>Add</Button>
-                        <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineDeleteOutline />} color="error" onClick={handleDeleteSelected}>Delete Selected</Button>
-                    </div>
-                </div>
-                <div>
-                    <DataGrid
-                        rows={lineItems}
-                        columns={columns}
-                        initialState={{
-                            pagination: {
-                                paginationModel: { page: 0, pageSize: 5 },
-                            },
-                        }}
-                        style={{ padding: '5px' }}
-                        pageSizeOptions={[5, 10]}
-                        checkboxSelection
-                        onRowSelectionModelChange={(newSelection) => { handleSelectionChange(newSelection) }}
-                    // onRowSelectionModelChange={(newSelection) => {
-                    //     setSelectedRows(newSelection);  // Update the selected rows
-                    //     calculateTotal(newSelection);   // Recalculate the total
-                    // }}
-                    />
-                </div>
-                <div style={{ padding: '10px 0px 0px 0px', marginTop: '10px' }}>
-                    <div className="df" style={{ margin: '0px 0px 15px 0px' }}>
-                        <div>
-                            <label>Total Value : </label>
-                            <TextField size="small" value={verifyData.TotalAmt} disabled style={{ width: '188px', margin: '-8px 20px 0px 20px' }} />
-                        </div>
-                        <div>
-                            <label>Currency : </label>
-                            <TextField
-                                select
-                                size="small"
-                                value={verifyData.Currency}
-                                style={{ width: '188px', margin: '-8px 5px 0px 20px' }}
-                                onChange={(e) => { setVerifyData(prev => ({ ...prev, Currency: e.target.value })) }}
-                            >
-                                {currency.length > 0 ? (
-                                    currency.map((option) => (
-                                        <MenuItem key={option.currencyCode} value={option.currencyCode}>
-                                            {option.currencyCode} ({option.Description})
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <MenuItem disabled>No options available</MenuItem>
-                                )}
-                            </TextField>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="maincomponent" style={{ display: 'flex', justifyContent: 'end' }}>
-                <Button color="warning" onClick={handleClearAll}>Clear</Button>
-                <Button onClick={handleSubmit}>Submit</Button>
-            </div>
 
 
 
@@ -719,47 +765,49 @@ const VendorNonPOInvoiceUpload = () => {
 
 
 
-            <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
-                <DialogTitle>Please enter all mandetry Details</DialogTitle>
-                <DialogContent dividers>
-                    <p>Fields to be Filled : {errorMessage}</p>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseErrorDiolog} color="error">
-                        Cancel
-                    </Button>
-                    {/* <Button onClick={handleSubmit} color="primary">
+                    <Dialog fullWidth={true} maxWidth={'xs'} open={openError} onClose={handleCloseErrorDiolog}>
+                        <DialogTitle>Please enter all mandetry Details</DialogTitle>
+                        <DialogContent dividers>
+                            <p>Fields to be Filled : {errorMessage}</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseErrorDiolog} color="error">
+                                Cancel
+                            </Button>
+                            {/* <Button onClick={handleSubmit} color="primary">
                         Submit
                     </Button> */}
-                </DialogActions>
-            </Dialog>
+                        </DialogActions>
+                    </Dialog>
 
 
-            <Dialog fullWidth={true} maxWidth={'xs'} open={openSubmit} onClose={handleCloseSubmitDiolog}>
-                <DialogTitle>Confirm to Submit</DialogTitle>
-                <DialogContent dividers>
-                    <p>Do you want to submit Invoice number : {verifyData.InvNum} ??</p>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseSubmitDiolog} color="error">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleMainPost} color="primary">
-                        Submit
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                    <Dialog fullWidth={true} maxWidth={'xs'} open={openSubmit} onClose={handleCloseSubmitDiolog}>
+                        <DialogTitle>Confirm to Submit</DialogTitle>
+                        <DialogContent dividers>
+                            <p>Do you want to submit Invoice number : {verifyData.InvNum} ??</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseSubmitDiolog} color="error">
+                                Cancel
+                            </Button>
+                            <Button onClick={handleMainPost} color="primary">
+                                Submit
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={3000}
-                onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert icon={<GoUpload />} onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
-                    Your invoice <b> {verifyData.InvNum} </b> has been submitted.
-                </Alert>
-            </Snackbar>
+                    <Snackbar
+                        open={snackbarOpen}
+                        autoHideDuration={3000}
+                        onClose={handleSnackbarClose}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    >
+                        <Alert icon={<GoUpload />} onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+                            Your invoice <b> {verifyData.InvNum} </b> has been submitted.
+                        </Alert>
+                    </Snackbar>
+                </div>
+            )}
         </div>
     );
 }

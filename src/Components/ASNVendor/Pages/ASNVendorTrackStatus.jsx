@@ -1,4 +1,4 @@
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -11,6 +11,7 @@ const ASNVendorTrackStatus = () => {
 
     const [asnno, setasnno] = useState('');
     const [pono, setpono] = useState('');
+    const [loading, setLoading] = useState(true);
 
     const [tdata, setTData] = useState([]);
     const { token, user } = useSelector((state) => state.auth);
@@ -55,9 +56,11 @@ const ASNVendorTrackStatus = () => {
                     remarks: item.remarks,
                 }));
                 setTData(formattedLineItems);
+                setLoading(false);
             }
         } catch (error) {
             console.log('Search failed', error);
+            setLoading(false);
         }
     };
 
@@ -66,21 +69,22 @@ const ASNVendorTrackStatus = () => {
     // }
 
     const handlePOdetailsAndLineItems = () => {
+        setLoading(true);
         var url = '/sap/asn/status';
         const body = {
-            "po_no" : `${pono}`,
-            "portal_ref" : `${asnno}`,
+            "po_no": `${pono}`,
+            "portal_ref": `${asnno}`,
         }
         handlePostData(url, body);
     }
 
-    const clear =()=>{
+    const clear = () => {
         setasnno("");
         setpono("");
         handlePOdetailsAndLineItems();
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         clear();
     }, [])
 
@@ -95,11 +99,11 @@ const ASNVendorTrackStatus = () => {
                 </div>
                 <div className="df">
                     <p>ASN Number :</p>
-                    <TextField size="small" value={asnno} onChange={(e)=>{setasnno(e.target.value)}} style={{ width: '188px', margin: '7px 15px 7px 15px' }}></TextField>
+                    <TextField size="small" value={asnno} onChange={(e) => { setasnno(e.target.value) }} style={{ width: '188px', margin: '7px 15px 7px 15px' }}></TextField>
                 </div>
                 <div className="df">
                     <p>PO Number :</p>
-                    <TextField size="small" value={pono} onChange={(e)=>{setpono(e.target.value)}} style={{ width: '188px', margin: '7px 15px 7px 15px' }}></TextField>
+                    <TextField size="small" value={pono} onChange={(e) => { setpono(e.target.value) }} style={{ width: '188px', margin: '7px 15px 7px 15px' }}></TextField>
                 </div>
                 <div className="df" style={{ margin: '9px 15px 9px 15px' }}>
                     <Button startIcon={<IoSearch />} variant="contained" onClick={handlePOdetailsAndLineItems} size="small">Search</Button>
@@ -109,20 +113,39 @@ const ASNVendorTrackStatus = () => {
                 </div>
             </div>
 
-            <div style={{height: '73vh'}}>
-                <DataGrid
-                    rows={tdata}
-                    columns={columns}
-                // height='80%'
-                // initialState={{
-                //     pagination: {
-                //         paginationModel: { page: 0, pageSize: 5 },
-                //     },
-                // }}
-                // pageSizeOptions={[5, 10]}
-                // checkboxSelection
-                // onRowSelectionModelChange={handleSelectionChange}
-                />
+            <div style={{ height: '73vh' }}>
+
+                {loading ? (
+                    <div style={{
+                        width: '100%',
+                        height: '100%',
+                        // backgroundColor: '#ccc',
+                        // paddingTop: '35vh',
+                        backdropFilter: 'blur(5px)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1100
+                    }}>
+                        <CircularProgress style={{ color: '#ea1214' }} />
+                    </div>
+                ) : (
+
+                    <DataGrid
+                        rows={tdata}
+                        columns={columns}
+                    // height='80%'
+                    // initialState={{
+                    //     pagination: {
+                    //         paginationModel: { page: 0, pageSize: 5 },
+                    //     },
+                    // }}
+                    // pageSizeOptions={[5, 10]}
+                    // checkboxSelection
+                    // onRowSelectionModelChange={handleSelectionChange}
+                    />
+
+                )}
             </div>
         </div>
     );
