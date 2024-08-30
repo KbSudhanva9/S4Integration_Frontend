@@ -277,6 +277,7 @@ const Create = () => {
                         pageSizeOptions={[5, 10]}
                         checkboxSelection
                         onRowSelectionModelChange={handleSelectionChange}
+                        disableRowSelectionOnClick
                     />
                 </div>
             </div>
