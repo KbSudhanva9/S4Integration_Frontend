@@ -9,6 +9,7 @@ import api from '../../../Utils/ApiCalls/Api'
 import './VendorOnbording.css'
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { IoPowerOutline } from 'react-icons/io5';
 
 const VendorOnbordingSignup = () => {
 
@@ -196,7 +197,7 @@ const VendorOnbordingSignup = () => {
 
                 <p style={{ marginRight: '11%' }}><b >Vendor OnBording</b></p>
 
-                <Button onClick={() => { nav('/vendor-onbording-login') }} style={{ margin: '10px', backgroundColor: '#eb0101' }} variant="contained" size='small' color='error' >Login</Button>
+                <Button onClick={() => { nav('/vendor-onbording-login') }} style={{ fontSize: '20px', height: '70%', marginTop: '8px', marginRight: '10px' }} size='small' color='error' ><IoPowerOutline /></Button>
 
             </header>
             <div className='maincomponent'>

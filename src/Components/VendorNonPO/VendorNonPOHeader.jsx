@@ -5,6 +5,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
 import { useDispatch } from "react-redux";
 import { clearAuth } from "../../Redux/AuthSlice";
+import { IoPowerOutline } from "react-icons/io5";
 
 const VendorNonPOHeader = () => {
   // const [dropdownVisible, setDropdownVisible] = useState(true);
@@ -68,7 +69,7 @@ const VendorNonPOHeader = () => {
         >
           Invoice Status
         </NavLink>
-        <Button variant="contained" size='small' color='error' onClick={signout}>Sign out</Button>
+        <Button  style={{fontSize: '20px' }} size='small' color='error' onClick={signout}><IoPowerOutline /></Button>
       </nav>
     </header>
   );

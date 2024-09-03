@@ -3,6 +3,7 @@ import "./Header.css";
 import { FaSortDown } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
+import { IoPowerOutline } from "react-icons/io5";
 
 const Header = () => {
   // const [dropdownVisible, setDropdownVisible] = useState(true);
@@ -53,7 +54,7 @@ const Header = () => {
           Travel
         </NavLink>
 
-        <Button variant="contained" size='small' color='error' onClick={signout}>Sign out</Button>
+        <Button size='small' color='error' style={{fontSize: '20px'}} onClick={signout}><IoPowerOutline /></Button>
         
         {/* <button
                 onMouseEnter={handleMouseEnter}

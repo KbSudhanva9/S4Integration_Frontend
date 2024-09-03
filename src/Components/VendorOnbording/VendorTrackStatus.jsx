@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { IoSearchOutline } from "react-icons/io5";
+import { IoPowerOutline, IoSearchOutline } from "react-icons/io5";
 import { DataGrid } from '@mui/x-data-grid';
 import api from '../../Utils/ApiCalls/Api';
 import { useNavigate } from 'react-router-dom';
@@ -86,12 +86,11 @@ const VendorTrackStatus = () => {
                 <p style={{ marginRight: '11%' }}><b>Vendor Track Status</b></p>
                 <Button
                     onClick={() => { nav('/vendor-onbording-login') }}
-                    style={{ margin: '10px', backgroundColor: '#eb0101' }}
-                    variant="contained"
+                    style={{ fontSize: '20px', height: '70%', marginTop: '8px', marginRight: '10px' }}
                     size='small'
                     color='error'
                 >
-                    Login
+                    <IoPowerOutline />
                 </Button>
             </header>
             <div className='maincomponent'>

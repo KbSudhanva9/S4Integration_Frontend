@@ -5,6 +5,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
 import { useDispatch } from "react-redux";
 import { clearAuth } from "../../Redux/AuthSlice";
+import { IoPowerOutline } from "react-icons/io5";
 
 const VendorInvoicingHeader = () => {
   // const [dropdownVisible, setDropdownVisible] = useState(true);
@@ -93,7 +94,7 @@ const VendorInvoicingHeader = () => {
           Debit/Credit
         </NavLink>
         
-        <Button variant="contained" size='small' color='error' onClick={signout}>Sign out</Button>
+        <Button size='small' style={{fontSize: '20px' }} color='error' onClick={signout}><IoPowerOutline /></Button>
       </nav>
     </header>
   );

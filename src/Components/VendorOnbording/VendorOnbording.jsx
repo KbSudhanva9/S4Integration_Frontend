@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../Utils/ApiCalls/Api';
 import { useEffect, useState } from 'react';
 import { CircularProgress } from '@mui/material';
+import { IoPowerOutline } from 'react-icons/io5';
 
 const VendorOnbording = () => {
 
@@ -55,8 +56,10 @@ const VendorOnbording = () => {
                 />
 
                 <p style={{ marginRight: '11%' }}><b >Vendor Details</b></p>
-
-                <Button onClick={() => { nav('/vendor-onbording-login'); localStorage.clear(); }} style={{ margin: '10px', backgroundColor: '#eb0101' }} variant="contained" size='small' color='error' >Login</Button>
+                
+                {/* <Button size='small' color='error' style={{fontSize: '20px'}} onClick={() => { nav('/vendor-onbording-login'); localStorage.clear(); }}><IoPowerOutline /></Button> */}
+                <Button onClick={() => { nav('/vendor-onbording-login'); localStorage.clear(); }} style={{ fontSize: '20px', height: '70%', marginTop: '8px', marginRight: '10px' }} size='small' color='error' ><IoPowerOutline /></Button>
+                {/* <Button onClick={() => { nav('/vendor-onbording-login'); localStorage.clear(); }} style={{ margin: '10px', backgroundColor: '#eb0101' }} variant="contained" size='small' color='error' >Login</Button> */}
 
             </header>
             <div className='maincomponent'>
