@@ -7,6 +7,7 @@ import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
 import { clearAuth, setAuth } from '../../../Redux/AuthSlice';
 import api from '../../../Utils/ApiCalls/Api';
+import FullScreenLoader from '../../../Utils/Loading/FullScreenLoader';
 
 
 const SigninSchema = Yup.object().shape({
@@ -19,6 +20,7 @@ const OrderToCashLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleVendorLogin = async (values) => {
 
@@ -42,8 +44,10 @@ const OrderToCashLogin = () => {
       }));
 
       navigate('/order-to-cash/create');
+      setLoading(false);
     } catch (error) {
       console.error('Login failed', error);
+      setLoading(false);
     }
   };
 
@@ -69,58 +73,62 @@ const OrderToCashLogin = () => {
   // }, [navigate]);
 
   return (
-    <div className='sign-in-div'>
-      <Formik
-        initialValues={{
-          email: '',
-          password: '',
-        }}
-        validationSchema={SigninSchema}
-        onSubmit={(values) => {
-          // Handle form submission
-          //   console.log(values);
+    <>
+      {loading && <FullScreenLoader />}
+      <div className='sign-in-div'>
+        <Formik
+          initialValues={{
+            email: '',
+            password: '',
+          }}
+          validationSchema={SigninSchema}
+          onSubmit={(values) => {
+            setLoading(true);
+            // Handle form submission
+            //   console.log(values);
 
-          handleVendorLogin(values);
-        }}
-      >
-        {({ errors, touched, isSubmitting }) => (
-          <Form>
-            <p className='center-items'><b>Order to Cash Login</b></p>
-            <div>
-              <label htmlFor="email">Email ID <span style={{ color: 'red' }}>*</span></label>
-              <Field type="string" name="email" className={touched.email && errors.email ? 'error' : ''} />
-              {/* <ErrorMessage name="email" component="div" className="error-message" /> */}
-            </div>
-            <div>
-              <label htmlFor="password">Password <span style={{ color: 'red' }}>*</span></label>
-              <div className="password-field">
-                <Field
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  className={touched.password && errors.password ? 'error' : ''}
-                />
-                <span className="toggle-password" onClick={togglePasswordVisibility}>
-                  {showPassword ? <FiEyeOff /> : <FiEye />}
-                </span>
+            handleVendorLogin(values);
+          }}
+        >
+          {({ errors, touched, isSubmitting }) => (
+            <Form>
+              <p className='center-items'><b>Order to Cash Login</b></p>
+              <div>
+                <label htmlFor="email">Email ID <span style={{ color: 'red' }}>*</span></label>
+                <Field type="string" name="email" className={touched.email && errors.email ? 'error' : ''} />
+                {/* <ErrorMessage name="email" component="div" className="error-message" /> */}
               </div>
-              {/* <ErrorMessage name="password" component="div" className="error-message" /> */}
-            </div>
-            <div className='button-container'>
-              <button className='register' type="button" onClick={handleSignInClick}>
-                Expense Sign-in
-              </button>
-              <button className='submit center-items' type="submit" >
-                Login
-              </button>
-            </div>
-            {/* <p className='center-items'>
+              <div>
+                <label htmlFor="password">Password <span style={{ color: 'red' }}>*</span></label>
+                <div className="password-field">
+                  <Field
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    className={touched.password && errors.password ? 'error' : ''}
+                  />
+                  <span className="toggle-password" onClick={togglePasswordVisibility}>
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                  </span>
+                </div>
+                {/* <ErrorMessage name="password" component="div" className="error-message" /> */}
+              </div>
+              <div className='button-container'>
+                <button className='register' type="button" onClick={handleSignInClick}>
+                  Expense Sign-in
+                </button>
+                <button className='submit center-items' type="submit" >
+                  Login
+                </button>
+              </div>
+              {/* <p className='center-items'>
               <b>Don't have an Account ? &nbsp;</b> <NavLink to={'/vendor-onbording-sign-up'}>Register Here</NavLink>
             </p>
             <NavLink className='center-items' to={'/vendor-track-status'}>Track Status</NavLink> */}
-          </Form>
-        )}
-      </Formik>
-    </div>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </>
   );
 };
 

@@ -1,8 +1,16 @@
 body {
     height: 100vh;
     margin: 0;
-    background-color: #f0f2f5;
+    /* background-color: #0b64e9; */
+    /* background-color: #f0f2f5; */
+    /* background-image: "https://t3.ftcdn.net/jpg/03/91/46/10/240_F_391461057_5P0BOWl4lY442Zoo9rzEeJU0S2c1WDZR.jpg"; */
+    /* background-image: url('https://t3.ftcdn.net/jpg/03/91/46/10/240_F_391461057_5P0BOWl4lY442Zoo9rzEeJU0S2c1WDZR.jpg'); */
+    background-image: url('https://cdn.dribbble.com/users/2156796/screenshots/19992280/media/7d2ee3a4d15d1f335419059066067694.gif');
+    /* background-image: url('https://images.squarespace-cdn.com/content/v1/548b4df8e4b0ff832640ca48/64bf2903-d38b-4e77-be52-0e75619459e4/Website-Background.gif?format=1500w'); */
+    /* background-opacity: 0.7 */
     font-family: "Roboto Condensed", sans-serif;
+    opacity: 0.99;
+    /* z-index: -1; */
 }
 .maincomponent{
   margin: 10px;

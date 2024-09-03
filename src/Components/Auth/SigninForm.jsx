@@ -7,6 +7,7 @@ import { FiEye, FiEyeOff } from 'react-icons/fi'; // Assuming you are using reac
 import api from '../../Utils/ApiCalls/Api';
 import { clearAuth } from '../../Redux/AuthSlice';
 import { useDispatch } from 'react-redux';
+import FullScreenLoader from '../../Utils/Loading/FullScreenLoader';
 
 const SigninSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -17,6 +18,7 @@ const SigninForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [loading, setLoading] = useState(false);
 
   const handleSignUpClick = async (values) => {
     try {
@@ -29,8 +31,10 @@ const SigninForm = () => {
 
       // Redirect to a protected route after successful login
       navigate('/admin/expense');
+      setLoading(false);
     } catch (error) {
       console.error('Login failed', error);
+      setLoading(false);
     }
   };
 
@@ -56,69 +60,74 @@ const SigninForm = () => {
   //   }
   // }, [navigate]);
 
-  return (<div className='container' >
-    <div className='sign-in-div'>
-      <Formik
-        initialValues={{
-          email: '',
-          password: '',
-        }}
-        validationSchema={SigninSchema}
-        onSubmit={(values) => {
-          // Handle form submission
-          console.log(values);
+  return (
+    <>
+      {loading && <FullScreenLoader />}
+      <div className='container' >
+        <div className='sign-in-div'>
+          <Formik
+            initialValues={{
+              email: '',
+              password: '',
+            }}
+            validationSchema={SigninSchema}
+            onSubmit={(values) => {
+              setLoading(true);
+              // Handle form submission
+              console.log(values);
 
-          handleSignUpClick(values);
-        }}
-      >
-        {({ errors, touched, isSubmitting }) => (
-          <Form>
-            <p className='title'>Sign-in</p>
-            <div>
-              <label htmlFor="email">Email <span style={{ color: 'red' }}>*</span></label>
-              <Field type="email" name="email" className={touched.email && errors.email ? 'error' : ''} />
-              {/* <ErrorMessage name="email" component="div" className="error-message" /> */}
-            </div>
-            <div>
-              <label htmlFor="password">Password <span style={{ color: 'red' }}>*</span></label>
-              <div className="password-field">
-                <Field
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  className={touched.password && errors.password ? 'error' : ''}
-                />
-                <span className="toggle-password" onClick={togglePasswordVisibility}>
-                  {showPassword ? <FiEyeOff /> : <FiEye />}
-                </span>
-              </div>
-              {/* <ErrorMessage name="password" component="div" className="error-message" /> */}
-            </div>
-            <div className='button-container'>
-              <button className='register' type="button" onClick={handleSignInClick}>
-                Sign-up
-              </button>
-              {/* disabled={isSubmitting} */}
-              <button className='submit' type="submit" >
-                Sign-in
-              </button>
-            </div>
-            <div className='button-container mr-13'>
-              <NavLink to={"vendor-onbording-login"}>Vendor On-Bording</NavLink>
-              <NavLink to={"vendor-invoicing-login"}>Vendor Invoicing</NavLink>
-            </div>
-            <div className='button-container mr-13'>
-              <NavLink to={"asn-vendor-login"}>ASN Vendor</NavLink>
-              <NavLink to={"vendor-non-po-login"}>Vendor NON-PO</NavLink>
-            </div>
-            <div className='button-container mr-13'>
-              <NavLink to={"order-to-cash-login"}>Order to Cash</NavLink>
-              {/* <NavLink to={"vendor-non-po-login"}>Vendor NON-PO</NavLink> */}
-            </div>
-          </Form>
-        )}
-      </Formik>
-    </div>
-  </div>
+              handleSignUpClick(values);
+            }}
+          >
+            {({ errors, touched, isSubmitting }) => (
+              <Form>
+                <p className='title'>Sign-in</p>
+                <div>
+                  <label htmlFor="email">Email <span style={{ color: 'red' }}>*</span></label>
+                  <Field type="email" name="email" className={touched.email && errors.email ? 'error' : ''} />
+                  {/* <ErrorMessage name="email" component="div" className="error-message" /> */}
+                </div>
+                <div>
+                  <label htmlFor="password">Password <span style={{ color: 'red' }}>*</span></label>
+                  <div className="password-field">
+                    <Field
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      className={touched.password && errors.password ? 'error' : ''}
+                    />
+                    <span className="toggle-password" onClick={togglePasswordVisibility}>
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                    </span>
+                  </div>
+                  {/* <ErrorMessage name="password" component="div" className="error-message" /> */}
+                </div>
+                <div className='button-container'>
+                  <button className='register' type="button" onClick={handleSignInClick}>
+                    Sign-up
+                  </button>
+                  {/* disabled={isSubmitting} */}
+                  <button className='submit' type="submit" >
+                    Sign-in
+                  </button>
+                </div>
+                <div className='button-container mr-13'>
+                  <NavLink to={"vendor-onbording-login"}>Vendor On-Bording</NavLink>
+                  <NavLink to={"vendor-invoicing-login"}>Vendor Invoicing</NavLink>
+                </div>
+                <div className='button-container mr-13'>
+                  <NavLink to={"asn-vendor-login"}>ASN Vendor</NavLink>
+                  <NavLink to={"vendor-non-po-login"}>Vendor NON-PO</NavLink>
+                </div>
+                <div className='button-container mr-13'>
+                  <NavLink to={"order-to-cash-login"}>Order to Cash</NavLink>
+                  {/* <NavLink to={"vendor-non-po-login"}>Vendor NON-PO</NavLink> */}
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </div>
+    </>
   );
 };
 
