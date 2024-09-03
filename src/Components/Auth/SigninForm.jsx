@@ -3,11 +3,13 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import './Sign.css';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FiEye, FiEyeOff } from 'react-icons/fi'; // Assuming you are using react-icons for eye icons
+import { FiEye, FiEyeOff, FiUser } from 'react-icons/fi'; // Assuming you are using react-icons for eye icons
 import api from '../../Utils/ApiCalls/Api';
 import { clearAuth } from '../../Redux/AuthSlice';
 import { useDispatch } from 'react-redux';
 import FullScreenLoader from '../../Utils/Loading/FullScreenLoader';
+import { Alert, Snackbar } from '@mui/material';
+import { MdOutlineCopyAll } from 'react-icons/md';
 
 const SigninSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -19,6 +21,8 @@ const SigninForm = () => {
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);        //for copy display snackbar
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSignUpClick = async (values) => {
     try {
@@ -33,8 +37,11 @@ const SigninForm = () => {
       navigate('/admin/expense');
       setLoading(false);
     } catch (error) {
-      console.error('Login failed', error);
+      // console.error('Login failed', error);
+      setErrorMessage(error.response.data.message);
+      setSnackbarOpen(true);
       setLoading(false);
+      // console.log(error.response.data.message);
     }
   };
 
@@ -44,6 +51,13 @@ const SigninForm = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   useEffect(() => {
@@ -73,6 +87,7 @@ const SigninForm = () => {
             validationSchema={SigninSchema}
             onSubmit={(values) => {
               setLoading(true);
+              setErrorMessage('');
               // Handle form submission
               console.log(values);
 
@@ -126,6 +141,16 @@ const SigninForm = () => {
             )}
           </Formik>
         </div>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert icon={<FiUser />} severity="error" sx={{ width: '100%' }}>
+            {errorMessage}
+          </Alert>
+        </Snackbar>
       </div>
     </>
   );

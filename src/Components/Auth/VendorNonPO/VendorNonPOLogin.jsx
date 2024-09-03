@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiUser } from 'react-icons/fi';
 import api from '../../../Utils/ApiCalls/Api';
 import { useDispatch } from 'react-redux';
 import { clearAuth, setAuth } from '../../../Redux/AuthSlice';
 import FullScreenLoader from '../../../Utils/Loading/FullScreenLoader';
+import { Alert, Snackbar } from '@mui/material';
 
 const SigninSchema = Yup.object().shape({
   vid: Yup.string('Invalid Vendor ID').required('Required'),
@@ -19,6 +20,8 @@ const VendorNonPOLogin = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);        //for copy display snackbar
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleVendorLogin = async (values) => {
     var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
@@ -40,7 +43,9 @@ const VendorNonPOLogin = () => {
       navigate('/vendor-non-po/home');
       setLoading(false);
     } catch (error) {
-      console.error('Login failed', error);
+      // console.error('Login failed', error);
+      setErrorMessage(error.response.data.message);
+      setSnackbarOpen(true);
       setLoading(false);
     }
   };
@@ -51,6 +56,13 @@ const VendorNonPOLogin = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   useEffect(() => {
@@ -78,6 +90,7 @@ const VendorNonPOLogin = () => {
           validationSchema={SigninSchema}
           onSubmit={(values) => {
             setLoading(true);
+            setErrorMessage('');
             // Handle form submission
             //   console.log(values);
 
@@ -122,6 +135,16 @@ const VendorNonPOLogin = () => {
           )}
         </Formik>
       </div>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert icon={<FiUser />} severity="error" sx={{ width: '100%' }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
