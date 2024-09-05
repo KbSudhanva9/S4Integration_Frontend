@@ -6,6 +6,7 @@ import { RiArrowGoBackFill } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import api from "../../../Utils/ApiCalls/Api";
+import { TbNotesOff } from "react-icons/tb";
 
 
 const VendorNonPOInvoiceStatus = () => {
@@ -97,6 +98,13 @@ const VendorNonPOInvoiceStatus = () => {
         var url = '/sap/nonpo/status';
         handlePostData(url, body);
     };
+
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>No data available</span>
+        </div>
+    );
 
     useEffect(() => {
         handleClear();
@@ -201,6 +209,7 @@ const VendorNonPOInvoiceStatus = () => {
                     <DataGrid
                         rows={tdata}
                         columns={columns}
+                        slots={{ noRowsOverlay: NoRowsOverlay }}
                     />
                 )}
             </div>

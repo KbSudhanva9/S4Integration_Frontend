@@ -8,6 +8,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { useSelector } from "react-redux";
 import api from "../../../Utils/ApiCalls/Api";
 import { GoUpload } from "react-icons/go";
+import { TbNotesOff } from "react-icons/tb";
 
 const ASNVendorDetails = () => {
 
@@ -288,6 +289,13 @@ const ASNVendorDetails = () => {
         setOpenError(false);
     };
 
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>No data available</span>
+        </div>
+    );
+
     useEffect(() => {
         handlePOdetailsAndLineItems();
     }, [])
@@ -351,6 +359,7 @@ const ASNVendorDetails = () => {
                         <DataGrid
                             rows={lineItems}
                             columns={columns}
+                            slots={{ noRowsOverlay: NoRowsOverlay }}
                             initialState={{
                                 pagination: {
                                     paginationModel: { page: 0, pageSize: 5 },

@@ -28,6 +28,7 @@ import {
     Alert
 } from '@mui/material';
 import api from '../../../Utils/ApiCalls/Api';
+import { TbNotesOff } from 'react-icons/tb';
 // import api from '../../../Utils/ApiCalls/Api';
 
 const Create = () => {
@@ -210,6 +211,13 @@ const Create = () => {
         { value: 'D', label: 'Day' },
     ]
 
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>No Rows Added</span>
+        </div>
+    );
+
     // useEffect(() => {
     //     handleCostCenter();
     //     handleCompanyCode();
@@ -270,6 +278,7 @@ const Create = () => {
                     <DataGrid
                         rows={tdata}
                         columns={columns}
+                        slots={{ noRowsOverlay: NoRowsOverlay }}
                         initialState={{
                             pagination: {
                                 paginationModel: { page: 0, pageSize: 5 },

@@ -6,6 +6,8 @@ import { DataGrid } from '@mui/x-data-grid';
 import api from '../../Utils/ApiCalls/Api';
 import { useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
+import { TbNotesOff } from 'react-icons/tb';
+import { LuFolderSearch } from 'react-icons/lu';
 
 const VendorTrackStatus = () => {
 
@@ -75,6 +77,13 @@ const VendorTrackStatus = () => {
         }
     };
 
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <LuFolderSearch size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>Search with Ref.no</span>
+        </div>
+    );
+
     return (
         <div>
             <header>
@@ -133,19 +142,22 @@ const VendorTrackStatus = () => {
                             <CircularProgress style={{ color: '#ea1214' }} />
                         </div>
                     ) : (
-                        <DataGrid
-                            rows={tdata}
-                            columns={columns}
-                            style={{ marginTop: '15px' }}
-                            initialState={{
-                                pagination: {
-                                    paginationModel: { page: 0, pageSize: 5 },
-                                },
-                            }}
-                            pageSizeOptions={[5, 10]}
-                        >
-                            
-                        </DataGrid>
+                        <div style={{height: '20%'}}>
+                            <DataGrid
+                                rows={tdata}
+                                columns={columns}
+                                style={{ marginTop: '15px',height: '300px', width: '100%'  }}
+                                slots={{ noRowsOverlay: NoRowsOverlay }}
+                                initialState={{
+                                    pagination: {
+                                        paginationModel: { page: 0, pageSize: 5 },
+                                    },
+                                }}
+                                pageSizeOptions={[5, 10]}
+                            >
+
+                            </DataGrid>
+                        </div>
                     )}
                 </div>
             </div>

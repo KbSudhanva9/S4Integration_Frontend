@@ -35,6 +35,7 @@ import OrderToCashLogin from "../Components/Auth/OrderToCash/OrderToCashLogin";
 import OrderToCashMainLayout from "../Components/OrderToCash/OrderToCashMainLayout";
 import Display from "../Components/OrderToCash/Pages/Display";
 import Create from "../Components/OrderToCash/Pages/Create";
+import NotFound from "../Utils/NotFound/NotFound";
 
 export const LayoutRouting = [
 
@@ -107,7 +108,7 @@ export const LayoutRouting = [
     
     
     // default wrong path
-    {path: "*", element: <div>wrong url</div>},
+    {path: "*", element: <NotFound />},
 
     // tests/samples
     {path: "hello", element: <CustomizedDialogs />},

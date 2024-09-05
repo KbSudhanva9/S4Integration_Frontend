@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import api from "../../../Utils/ApiCalls/Api";
 import { IoSearch } from "react-icons/io5";
 import { RiArrowGoBackFill } from "react-icons/ri";
+import { TbNotesOff } from "react-icons/tb";
 
 const ASNVendorTrackStatus = () => {
 
@@ -84,6 +85,13 @@ const ASNVendorTrackStatus = () => {
         handlePOdetailsAndLineItems();
     }
 
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>No data available</span>
+        </div>
+    );
+
     useEffect(() => {
         clear();
     }, [])
@@ -134,6 +142,7 @@ const ASNVendorTrackStatus = () => {
                     <DataGrid
                         rows={tdata}
                         columns={columns}
+                        slots={{ noRowsOverlay: NoRowsOverlay }}
                     // height='80%'
                     // initialState={{
                     //     pagination: {

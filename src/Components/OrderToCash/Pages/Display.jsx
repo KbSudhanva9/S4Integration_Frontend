@@ -2,6 +2,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import api from "../../../Utils/ApiCalls/Api";
 import { CircularProgress } from "@mui/material";
+import { TbNotesOff } from "react-icons/tb";
 
 const Display = () => {
 
@@ -85,6 +86,13 @@ const Display = () => {
     //     handleTableDate();
     // }, []);
 
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>No data available</span>
+        </div>
+    );
+
     useEffect(() => {
         // handleTableDate();
 
@@ -118,6 +126,7 @@ const Display = () => {
                 <DataGrid
                     rows={cdata}
                     columns={columnsDisplay}
+                    slots={{ noRowsOverlay: NoRowsOverlay }}
                 // initialState={{
                 //     pagination: {
                 //         paginationModel: { page: 0, pageSize: 5 },

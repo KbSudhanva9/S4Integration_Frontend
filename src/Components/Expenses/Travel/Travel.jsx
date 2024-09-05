@@ -1,7 +1,9 @@
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import api from "../../../Utils/ApiCalls/Api";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress, styled } from "@mui/material";
+import { TbNotesOff } from "react-icons/tb";
+import { FaList, FaTimesCircle } from "react-icons/fa";
 
 const Travel = () => {
 
@@ -68,6 +70,13 @@ const Travel = () => {
         handleGetData(url);
     }
 
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>No data available</span>
+        </div>
+    );
+
     // useEffect(() => {
     //     handleTableDate();
     // }, []);
@@ -75,10 +84,10 @@ const Travel = () => {
     useEffect(() => {
         // Simulate data fetching
         // setTimeout(() => {
-            // Fetch your data here and set it to tdata
-            // setTdata(yourFetchedData);
-            handleTableDate();
-            // setLoading(false); // Set loading to false when data is ready
+        // Fetch your data here and set it to tdata
+        // setTdata(yourFetchedData);
+        handleTableDate();
+        // setLoading(false); // Set loading to false when data is ready
         // }, 200); // Simulate a delay
     }, []);
 
@@ -96,12 +105,13 @@ const Travel = () => {
                     alignItems: 'center',
                     zIndex: 1100
                 }}>
-                    <CircularProgress style={{color: '#ea1214'}} />
+                    <CircularProgress style={{ color: '#ea1214' }} />
                 </div>
             ) : (
                 <DataGrid
                     rows={tdata}
                     columns={columns}
+                    slots={{ noRowsOverlay: NoRowsOverlay }}
                 // initialState={{
                 //     pagination: {
                 //         paginationModel: { page: 0, pageSize: 5 },

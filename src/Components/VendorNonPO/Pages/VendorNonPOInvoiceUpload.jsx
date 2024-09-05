@@ -6,6 +6,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { MdOutlineCopyAll, MdOutlineDeleteOutline, MdOutlinePostAdd } from "react-icons/md";
 import Snackbar from '@mui/material/Snackbar';
 import { GoUpload } from "react-icons/go";
+import { TbNotesOff } from "react-icons/tb";
 
 const VendorNonPOInvoiceUpload = () => {
 
@@ -279,6 +280,16 @@ const VendorNonPOInvoiceUpload = () => {
     const handleDeleteSelected = () => {
         setLineItems(prev => prev.filter(item => !selectedRows.includes(item.id)));
         setSelectedRows([]);
+        // var hello = [prev => prev.filter(item => !selectedRows.includes(item.id))];
+        console.log(lineItems);
+        // console.log(selectedRows);
+
+        // for(var i=0 ; i<=selectedRows.length-1 ; i++){
+        //     // console.log(selectedRows[i].id);
+        // }
+
+        // console.log(hello);
+        // setLineItems([]);
     };
 
     const handleDeleteAll = () => {
@@ -492,6 +503,13 @@ const VendorNonPOInvoiceUpload = () => {
         const body = postBody;
         handlePostData(url, body);
     }
+
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>No rows added</span>
+        </div>
+    );
 
     useEffect(() => {
         handleCompanyCodeData();
@@ -707,12 +725,13 @@ const VendorNonPOInvoiceUpload = () => {
                             <DataGrid
                                 rows={lineItems}
                                 columns={columns}
+                                slots={{ noRowsOverlay: NoRowsOverlay }}
                                 initialState={{
                                     pagination: {
                                         paginationModel: { page: 0, pageSize: 5 },
                                     },
                                 }}
-                                style={{ padding: '5px' }}
+                                style={{ padding: '5px', minHeight: '250px' }}
                                 pageSizeOptions={[5, 10]}
                                 checkboxSelection
                                 onRowSelectionModelChange={(newSelection) => { handleSelectionChange(newSelection) }}

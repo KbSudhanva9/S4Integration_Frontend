@@ -3,7 +3,7 @@ import CardHeader from '@mui/material/CardHeader';
 import Avatar from '@mui/material/Avatar';
 // import Typography from '@mui/material/Typography';
 import { IoFileTrayFull } from "react-icons/io5";
-import { TbFileDollar } from "react-icons/tb";
+import { TbFileDollar, TbNotesOff } from "react-icons/tb";
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
 import { LuClipboardCheck } from "react-icons/lu";
 import { LuAlertTriangle } from "react-icons/lu";
@@ -143,6 +143,13 @@ const VendorInvoicingMyInv = () => {
     //     console.log('adf');
     // }
 
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>No data available</span>
+        </div>
+    );
+
     useEffect(() => {
         handlePostService('S');
         handleCardData();
@@ -255,6 +262,7 @@ const VendorInvoicingMyInv = () => {
                             <DataGrid
                                 rows={tdata}
                                 columns={columns}
+                                slots={{ noRowsOverlay: NoRowsOverlay }}
                                 initialState={{
                                     pagination: {
                                         paginationModel: { page: 0, pageSize: 5 },

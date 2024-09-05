@@ -7,9 +7,10 @@ import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
 import api from "../../../Utils/ApiCalls/Api";
 import { FaCheck, FaRegHandPointRight } from "react-icons/fa6";
-import { LuArrowRightFromLine } from "react-icons/lu";
+import { LuArrowRightFromLine, LuFolderSearch } from "react-icons/lu";
 import { PiArrowDownRightLight } from "react-icons/pi";
 import { FaAngleDoubleRight } from "react-icons/fa";
+import { MdOutlineAdsClick } from "react-icons/md";
 
 const VendorInvoicingNewInvoice = () => {
 
@@ -245,6 +246,13 @@ const VendorInvoicingNewInvoice = () => {
         handlePOInvoiceSubmit(updatedData);
     }
 
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '10px' }}>
+            <MdOutlineAdsClick size={40} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>Select PO</span>
+        </div>
+    );
+
     useEffect(() => {
         handlePODataLineItemsData();
         handleClear();
@@ -391,6 +399,7 @@ const VendorInvoicingNewInvoice = () => {
                                         <DataGrid
                                             rows={lineItems}
                                             columns={columns}
+                                            slots={{ noRowsOverlay: NoRowsOverlay }}
                                             initialState={{
                                                 pagination: {
                                                     paginationModel: { page: 0, pageSize: 5 },

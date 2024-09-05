@@ -3,9 +3,9 @@ import CardHeader from '@mui/material/CardHeader';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { IoFileTrayFull } from "react-icons/io5";
-import { TbFileDollar } from "react-icons/tb";
+import { TbFileDollar, TbNotesOff } from "react-icons/tb";
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
-import { LuClipboardCheck } from "react-icons/lu";
+import { LuClipboardCheck, LuFolderSearch } from "react-icons/lu";
 import { LuAlertTriangle } from "react-icons/lu";
 import { IoSearch } from "react-icons/io5";
 import { IoReturnDownBack } from "react-icons/io5";
@@ -45,11 +45,6 @@ const VendorInvoicingPaymentRecived = () => {
     //     Netpr: "35.000",
     //     Netwr: "350.000",
     // }];
-
-    useEffect(() => {
-        // console.log('hello');
-        handlePostService('');
-    }, [])
 
     // const [lineItems, setLineItems] = useState([]);
     const [tdata, setTData] = useState([]);
@@ -120,9 +115,21 @@ const VendorInvoicingPaymentRecived = () => {
         handlePostData(url, body);
     }
 
+    const NoRowsOverlay = () => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: '8px', color: 'gray' }}>No data available</span>
+        </div>
+    );
+
     // const handleData = (keyValue) => {
     //     console.log('adf==>'+ keyValue +'<==adf');
     // }
+
+    useEffect(() => {
+        // console.log('hello');
+        handlePostService('');
+    }, [])
 
     return (
         <div>
@@ -207,6 +214,7 @@ const VendorInvoicingPaymentRecived = () => {
                             <DataGrid
                                 rows={tdata}
                                 columns={columns}
+                                slots={{ noRowsOverlay: NoRowsOverlay }}
                                 initialState={{
                                     pagination: {
                                         paginationModel: { page: 0, pageSize: 5 },
