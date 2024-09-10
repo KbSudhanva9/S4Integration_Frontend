@@ -12,7 +12,7 @@ import { Alert, Snackbar } from '@mui/material';
 
 
 const SigninSchema = Yup.object().shape({
-  email: Yup.string('Invalid Vendor ID').required('Required'),
+  vid: Yup.string('Invalid Vendor ID').required('Required'),
   password: Yup.string().min(6, 'Too Short!').max(50, 'Too Long!').required('Required'),
 });
 
@@ -29,12 +29,12 @@ const OrderToCashLogin = () => {
 
     // const response = await api.post(`${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`, values);
 
-    var loginurl = `${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`;
-    // var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
+    // var loginurl = `${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`;
+    var loginurl = `${import.meta.env.VITE_BASE_URL}` + '/sap/login';
     try {
       const response = await api.post(loginurl,
         {
-          "email": `${values.email}`,
+          "username": `${values.vid}`,
           "password": `${values.password}`
         }
       );
@@ -90,7 +90,7 @@ const OrderToCashLogin = () => {
       <div className='sign-in-div'>
         <Formik
           initialValues={{
-            email: '',
+            vid: '',
             password: '',
           }}
           validationSchema={SigninSchema}
@@ -107,9 +107,9 @@ const OrderToCashLogin = () => {
             <Form>
               <p className='center-items'><b>Order to Cash Login</b></p>
               <div>
-                <label htmlFor="email">Email ID <span style={{ color: 'red' }}>*</span></label>
-                <Field type="string" name="email" className={touched.email && errors.email ? 'error' : ''} />
-                {/* <ErrorMessage name="email" component="div" className="error-message" /> */}
+                <label htmlFor="vid">Vendor ID <span style={{ color: 'red' }}>*</span></label>
+                <Field type="string" name="vid" className={touched.vid && errors.vid ? 'error' : ''} />
+                {/* <ErrorMessage name="vid" component="div" className="error-message" /> */}
               </div>
               <div>
                 <label htmlFor="password">Password <span style={{ color: 'red' }}>*</span></label>

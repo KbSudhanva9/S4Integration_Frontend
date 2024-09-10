@@ -29,6 +29,8 @@ import {
 } from '@mui/material';
 import api from '../../../Utils/ApiCalls/Api';
 import { TbNotesOff } from 'react-icons/tb';
+import { useSelector } from 'react-redux';
+import FullScreenLoader from '../../../Utils/Loading/FullScreenLoader';
 // import api from '../../../Utils/ApiCalls/Api';
 
 const Create = () => {
@@ -48,14 +50,17 @@ const Create = () => {
 
     const [tdata, setTData] = useState([]);                 //table data
     const [submitExp, setSubmitExp] = useState([]);         //store selected row id's tdata
+    const { token, user } = useSelector((state) => state.auth);
+    const [loading, setLoading] = useState(false);
 
     const [postData, setPostData] = useState({
-        customernumber: '',
-        customername: '',
+        customernumber: user,
+        customername: user,
         date: '',
         tabelData: []
     })
     const [sRows, setSRows] = useState([]);                 //store selected data in table tdata
+    const [materialData, setMaterialData] = useState([]);
     // const [id, setId] = useState(1);                        //auto increment for id in tdata
     // const [formData, setFormData] = useState([]);           //pop-up table row data
     // const [openAddExpense, setOpenAddExpense] = useState(false);    //pop-up open/close
@@ -93,12 +98,30 @@ const Create = () => {
             width: 250,
             renderCell: (params) => (
                 <TextField
+                    select
                     value={params.value || ''}
                     onChange={(e) => handleCellChange(e, params)}
                     size="small"
                     fullWidth
                     style={{ marginTop: '5px' }}
-                />
+                >
+                    {materialData.length > 0 ? (
+                        materialData.map((option) => (
+                            <MenuItem key={option.mat_code} value={option.mat_code}>
+                                {option.mat_code} ({option.mat_desc})
+                            </MenuItem>
+                        ))
+                    ) : (
+                        <MenuItem disabled>No options available</MenuItem>
+                    )}
+                </TextField>
+                // <TextField
+                //     value={params.value || ''}
+                //     onChange={(e) => handleCellChange(e, params)}
+                //     size="small"
+                //     fullWidth
+                //     style={{ marginTop: '5px' }}
+                // />
             ),
         },
         {
@@ -189,22 +212,32 @@ const Create = () => {
 
     }
 
-    const getCalling = async (url) => {
+    const handleGetData = async (url) => {
         var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
         try {
             const response = await api.get(currentURL);
-            // if (url.includes('costCenter')) {
-            //     console.log(response);
-            //     console.log(response.data.data);
-            //     setcostce(response.data.data);
-            // } else if (url.includes('cmpCodes')) {
+            // console.log(response);
+            if (url.includes('cmpMat')) {
+                // console.log(response);
+                // console.log(response.data.data);
+                setMaterialData(response.data.data);
+                setLoading(false);
+            } //else if (url.includes('cmpCodes')) {
             //     console.log(response.data.data);
             //     setcocode(response.data.data);
             // }
+            setLoading(false);
         } catch (error) {
             console.error('unable to get the response', error);
+            setLoading(false);
         }
     };
+
+    const handleMaterialData = () => {
+        setLoading(true);
+        var url = '/public/cmpMat';
+        handleGetData(url);
+    }
 
     const uom = [
         { value: '%', label: 'Percentage' },
@@ -218,25 +251,30 @@ const Create = () => {
         </div>
     );
 
-    // useEffect(() => {
-    //     handleCostCenter();
-    //     handleCompanyCode();
-    // }, [])
+    useEffect(() => {
+        handleMaterialData();
+        // handleCostCenter();
+        // handleCompanyCode();
+    }, [])
 
     return (
-        <div className='maincomponent'>
-            <div className='df'>
-                <div className='basic-margin'>
-                    <p>Customer Number</p>
-                    <TextField
-                        id="companycode"
-                        // select
-                        size='small'
-                        style={{ width: '221px' }}
-                        type='number'
-                        onChange={(e)=>{setPostData(prev => ({...prev, customernumber: e.target.value}))}}
-                    >
-                        {/* {cocode.length > 0 ? (
+        <>
+            {loading && <FullScreenLoader />}
+            <div className='maincomponent'>
+                <div className='df'>
+                    <div className='basic-margin'>
+                        <p>Customer Number</p>
+                        <TextField
+                            id="companycode"
+                            // select
+                            size='small'
+                            style={{ width: '221px' }}
+                            type='number'
+                            // onChange={(e)=>{setPostData(prev => ({...prev, customernumber: e.target.value}))}}
+                            disabled
+                            value={user}
+                        >
+                            {/* {cocode.length > 0 ? (
                             cocode.map((option) => (
                                 <MenuItem key={option.code} value={option.code}>
                                     {option.code} ({option.companyText})
@@ -245,18 +283,22 @@ const Create = () => {
                         ) : (
                             <MenuItem disabled>No options available</MenuItem>
                         )} */}
-                    </TextField>
+                        </TextField>
+                    </div>
+                    <div className='basic-margin'>
+                        <p>Customer Name</p>
+                        <TextField size='small'
+                            disabled
+                            value={user}
+                        // onChange={(e)=>{setPostData(prev => ({...prev, customername: e.target.value}))}} 
+                        />
+                    </div>
+                    <div className='basic-margin'>
+                        <p>Date</p>
+                        <input className='date' onChange={(e) => { setPostData(prev => ({ ...prev, date: e.target.value })) }} type='date' style={{ width: '221px' }} />
+                    </div>
                 </div>
-                <div className='basic-margin'>
-                    <p>Customer Name</p>
-                    <TextField size='small' onChange={(e)=>{setPostData(prev => ({...prev, customername: e.target.value}))}} />
-                </div>
-                <div className='basic-margin'>
-                    <p>Date</p>
-                    <input className='date'  onChange={(e)=>{setPostData(prev => ({...prev, date: e.target.value}))}}  type='date' style={{ width: '221px' }} />
-                </div>
-            </div>
-            {/* <div className='df'>
+                {/* <div className='df'>
                 <div className='basic-margin'>
                     <p>Refrence Number</p>
                     <TextField size='small' />
@@ -266,36 +308,37 @@ const Create = () => {
                     <TextField size='small' />
                 </div>
             </div> */}
-            <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
-                <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlinePostAdd />} onClick={handleAddRow}>Add</Button>
-                {/* <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineCopyAll />} color='warning' onClick={copySeletedRowsIds}>Copy</Button> */}
-                <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineDeleteOutline />} color="error" onClick={deleteSelected}>Delete</Button>
-            </div>
-            {/* table */}
-            <div style={{ marginTop: '10px' }}>
-                <div style={{ height: 400, width: '100%' }}>
-                    {/* table data from use state automatically updated from usestate => tdata */}
-                    <DataGrid
-                        rows={tdata}
-                        columns={columns}
-                        slots={{ noRowsOverlay: NoRowsOverlay }}
-                        initialState={{
-                            pagination: {
-                                paginationModel: { page: 0, pageSize: 5 },
-                            },
-                        }}
-                        pageSizeOptions={[5, 10]}
-                        checkboxSelection
-                        onRowSelectionModelChange={handleSelectionChange}
-                        disableRowSelectionOnClick
-                    />
+                <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
+                    <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlinePostAdd />} onClick={handleAddRow}>Add</Button>
+                    {/* <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineCopyAll />} color='warning' onClick={copySeletedRowsIds}>Copy</Button> */}
+                    <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineDeleteOutline />} color="error" onClick={deleteSelected}>Delete</Button>
+                </div>
+                {/* table */}
+                <div style={{ marginTop: '10px' }}>
+                    <div style={{ height: 400, width: '100%' }}>
+                        {/* table data from use state automatically updated from usestate => tdata */}
+                        <DataGrid
+                            rows={tdata}
+                            columns={columns}
+                            slots={{ noRowsOverlay: NoRowsOverlay }}
+                            initialState={{
+                                pagination: {
+                                    paginationModel: { page: 0, pageSize: 5 },
+                                },
+                            }}
+                            pageSizeOptions={[5, 10]}
+                            checkboxSelection
+                            onRowSelectionModelChange={handleSelectionChange}
+                            disableRowSelectionOnClick
+                        />
+                    </div>
+                </div>
+                {/* table */}
+                <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
+                    <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<RiShare2Fill />} onClick={submitExpense}>Submit Expense</Button>
                 </div>
             </div>
-            {/* table */}
-            <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
-                <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<RiShare2Fill />} onClick={submitExpense}>Submit Expense</Button>
-            </div>
-        </div>
+        </>
     );
 }
 
