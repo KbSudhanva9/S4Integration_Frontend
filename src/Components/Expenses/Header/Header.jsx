@@ -40,7 +40,7 @@ const Header = () => {
             fontWeight: isPending ? "bold" : "normal",
           })}
         >
-          Expenses
+          Post Expenses
         </NavLink>
         <NavLink
           to="travel"
@@ -51,7 +51,7 @@ const Header = () => {
             fontWeight: isPending ? "bold" : "normal",
           })}
         >
-          Travel
+          Expense Status
         </NavLink>
 
         <Button size='small' color='error' style={{fontSize: '20px'}} onClick={signout}><IoPowerOutline /></Button>

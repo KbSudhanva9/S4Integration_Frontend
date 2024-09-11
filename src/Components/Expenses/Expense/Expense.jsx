@@ -56,6 +56,14 @@ const Expense = () => {
 
     const [cocode, setcocode] = useState([]);
     const [costce, setcostce] = useState([]);
+    const [postData, setPostData] = useState({
+        cocode: '',
+        doctype: '',
+        docdate: '',
+        refno: '',
+        docheadertxt: '',
+        tabelData: []
+    })
 
     // on selecting or un-selecting the rows in table live change
     const handleSelectionChange = (selection) => {
@@ -63,6 +71,11 @@ const Expense = () => {
         const selectedData = selection.map(id => tdata.find(row => row.id === id));
         // console.log(selectedData);
         setSRows(selectedData);
+
+        setPostData(prev => ({
+            ...prev,
+            tabelData: selectedData.map(({ id, ...rest }) => rest)
+        }));
     };
 
     // open add expense pop-up
@@ -153,6 +166,7 @@ const Expense = () => {
 
     const submitExpense = () => {
         console.log(tdata);
+        console.log(postData);
     }
 
     const getCalling = async (url) => {
@@ -220,6 +234,7 @@ const Expense = () => {
                         select
                         size='small'
                         style={{ width: '221px' }}
+                        onChange={(e) => { setPostData(prev => ({ ...prev, cocode: e.target.value })) }}
                     >
                         {cocode.length > 0 ? (
                             cocode.map((option) => (
@@ -234,21 +249,21 @@ const Expense = () => {
                 </div>
                 <div className='basic-margin'>
                     <p>Document type</p>
-                    <TextField size='small' />
+                    <TextField onChange={(e) => { setPostData(prev => ({ ...prev, doctype: e.target.value })) }} size='small' />
                 </div>
                 <div className='basic-margin'>
                     <p>Document Date</p>
-                    <input className='date' type='date' style={{ width: '221px' }} />
+                    <input className='date' onChange={(e) => { setPostData(prev => ({ ...prev, docdate: e.target.value })) }} type='date' style={{ width: '221px' }} />
                 </div>
             </div>
             <div className='df'>
                 <div className='basic-margin'>
                     <p>Refrence Number</p>
-                    <TextField size='small' />
+                    <TextField onChange={(e) => { setPostData(prev => ({ ...prev, refno: e.target.value })) }} size='small' />
                 </div>
                 <div className='basic-margin'>
                     <p>Document Header Text</p>
-                    <TextField size='small' />
+                    <TextField onChange={(e) => { setPostData(prev => ({ ...prev, docheadertxt: e.target.value })) }} size='small' />
                 </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
