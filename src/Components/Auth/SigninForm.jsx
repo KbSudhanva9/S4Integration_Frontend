@@ -27,11 +27,12 @@ const SigninForm = () => {
   const handleSignUpClick = async (values) => {
     try {
       const response = await api.post(`${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`, values);
-      const { accessToken, user_role } = response.data.user;
+      const { accessToken, user_role, email } = response.data.user;
 
       // Store token and role in local storage
       localStorage.setItem('token', accessToken);
       localStorage.setItem('role', user_role);
+      localStorage.setItem('email', email);
 
       // Redirect to a protected route after successful login
       navigate('/admin/expense');

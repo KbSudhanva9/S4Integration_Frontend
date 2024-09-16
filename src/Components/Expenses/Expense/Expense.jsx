@@ -33,16 +33,16 @@ import { TbNotesOff } from 'react-icons/tb';
 const Expense = () => {
 
     // const data = [
-    //     { id: 1, costcenter: "234490", expense: "Office & Other Supplies", amount: '$89.09', requested: '89.09' }
+    //     { id: 1, costcenter: "234490", expense: "Office & Other Supplies", Dmbtr: '$89.09', DmbtrR: '89.09' }
     // ]
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 100 },
-        { field: 'costcenter', headerName: 'Cost Center', width: 130 },
+        { field: 'Kostl', headerName: 'Cost Center', width: 130 },
         { field: 'expense', headerName: 'Expense', width: 130 },
-        { field: 'currency', headerName: 'Currency', width: 130 },
-        { field: 'amount', headerName: 'Amount', width: 130 },
-        { field: 'requested', headerName: 'Requested', width: 130 },
+        { field: 'Waers', headerName: 'Currency', width: 130 }, //currency
+        { field: 'Dmbtr', headerName: 'Amount', width: 130 },
+        { field: 'DmbtrR', headerName: 'Requested', width: 130 },
     ];
 
     const [tdata, setTData] = useState([]);                 //table data
@@ -53,6 +53,7 @@ const Expense = () => {
     const [openAddExpense, setOpenAddExpense] = useState(false);    //pop-up open/close
     const [errors, setErrors] = useState([]);               //handeling pop-up error
     const [snackbarOpen, setSnackbarOpen] = useState(false);        //for copy display snackbar
+    const email = localStorage.getItem('email');
 
     const [cocode, setcocode] = useState([]);
     const [costce, setcostce] = useState([]);
@@ -65,17 +66,54 @@ const Expense = () => {
         tabelData: []
     })
 
+    const [mainPost, setMainPost] = useState([]);
+
     // on selecting or un-selecting the rows in table live change
     const handleSelectionChange = (selection) => {
         setSubmitExp(selection);
         const selectedData = selection.map(id => tdata.find(row => row.id === id));
-        // console.log(selectedData);
+        console.log(selectedData);
         setSRows(selectedData);
 
         setPostData(prev => ({
             ...prev,
-            tabelData: selectedData.map(({ id, ...rest }) => rest)
+            tabelData: selectedData.map(({ expense, ...rest }) => rest)
         }));
+
+        // setMainPost(selectedData.map(({ expense, ...rest }) => rest));
+        // setMainPost((prev) => [...prev => (
+        //     Bukrs: postData.cocode, 
+        //     Blart: postData.doctype, 
+        //     Bldat: (postData.docdate).replaceAll('-', '')), 
+        //     Bldat: (postData.docdate).replaceAll('-', '')), 
+        //     Xblnr: postData.refno, 
+        //     Bktxt: postData.docheadertxt, 
+        //     Buzei: postData.tabelData.id ]
+        // )
+        // setMainPost(prev =>(({ id, ...rest }) => rest));
+        // Step 1: Set initial state by mapping through selectedData
+        setMainPost(selectedData.map(({ expense, ...rest }) => ({ ...rest })));
+
+        // Step 2: Update state with additional postData values
+        setMainPost((prev) => prev.map(item => ({
+            ...item,
+            Bukrs: postData.cocode,
+            Blart: postData.doctype,
+            Bldat: postData.docdate.replaceAll('-', ''),
+            Budat: postData.docdate.replaceAll('-', ''),
+            Xblnr: postData.refno,
+            Bktxt: postData.docheadertxt,
+            Buzei: postData.tabelData.id
+        })));
+
+        // Step 3: Remove `id` key from each object in state
+        setMainPost((prev) => prev.map(({ id, ...rest }) => ({ ...rest })));
+
+
+
+        // setMainPost(prev=> ({
+        //     ...prev, 
+        // }))
     };
 
     // open add expense pop-up
@@ -89,9 +127,9 @@ const Expense = () => {
     };
     // add rows in add expense pop-up
     const handleExpenseAddRow = () => {
-        let pData = { id: id, costcenter: '', expense: '', currency: '', amount: '', requested: '' };
+        let pData = { Mandt: "100", Bukrs: "", Blart: '', Bldat: '', Budat: '', Smtpadr: email, Xblnr: '', Bktxt: '', id: id, Kostl: '', expense: '', Waers: '', Dmbtr: '', DmbtrR: '', Hkont: "63006000", Tflag: true, Docno: "", Remarks: "" };
         setFormData((preData) => [...preData, pData]);
-        setErrors([...errors, { costcenter: false, expense: false, currency: '', amount: false, requested: false }]);
+        setErrors([...errors, { Kostl: false, expense: false, Waers: '', Dmbtr: false, DmbtrR: false }]);
         setId(id + 1);
     };
     // delete row in add expense pop-up
@@ -116,11 +154,11 @@ const Expense = () => {
     const handleSubmit = () => {
         const newErrors = formData.map(row => {
             return {
-                costcenter: row.costcenter === '',
+                Kostl: row.Kostl === '',
                 expense: row.expense === '',
-                currency: row.currency === '',
-                amount: row.amount === '',
-                requested: row.requested === '',
+                Waers: row.Waers === '',
+                Dmbtr: row.Dmbtr === '',
+                DmbtrR: row.DmbtrR === '',
             };
         });
 
@@ -130,8 +168,8 @@ const Expense = () => {
             setErrors(newErrors);
         } else {
             setTData([...tdata, ...formData]);
-            setFormData([{ costcenter: '', expense: '', amount: '', requested: '' }]); // Reset formData after submit
-            setErrors([{ costcenter: false, expense: false, amount: false, requested: false }]);
+            setFormData([{ Kostl: '', expense: '', Dmbtr: '', DmbtrR: '' }]); // Reset formData after submit
+            setErrors([{ Kostl: false, expense: false, Dmbtr: false, DmbtrR: false }]);
             handleCloseExpense();
         }
     };
@@ -167,6 +205,7 @@ const Expense = () => {
     const submitExpense = () => {
         console.log(tdata);
         console.log(postData);
+        console.log(mainPost);
     }
 
     const getCalling = async (url) => {
@@ -214,9 +253,9 @@ const Expense = () => {
         </div>
     );
 
-    const currency = [
-        { value: '₹', label: '₹' },
-        { value: '$', label: '$' },
+    const Waers = [
+        { value: 'INR', label: '₹' },
+        { value: 'USD', label: '$' },
     ]
 
     useEffect(() => {
@@ -348,11 +387,11 @@ const Expense = () => {
                                             <TextField
                                                 id="companycode"
                                                 select
-                                                value={row.costcenter}
+                                                value={row.Kostl}
                                                 // placeholder='Cost Center'
                                                 label='Cost Center'
-                                                onChange={(event) => handleChange(index, 'costcenter', event)}
-                                                error={errors[index]?.costcenter}
+                                                onChange={(event) => handleChange(index, 'Kostl', event)}
+                                                error={errors[index]?.Kostl}
                                                 size='small'
                                                 style={{ width: '150px' }}
                                             >
@@ -381,43 +420,43 @@ const Expense = () => {
                                         </TableCell>
                                         <TableCell>
                                             <TextField
-                                                id="currency"
+                                                id="Waers"
                                                 select
-                                                value={row.currency}
+                                                value={row.Waers}
                                                 // placeholder='Currency'
                                                 label='Currency'
-                                                onChange={(event) => handleChange(index, 'currency', event)}
-                                                error={errors[index]?.currency}
+                                                onChange={(event) => handleChange(index, 'Waers', event)}
+                                                error={errors[index]?.Waers}
                                                 size='small'
                                                 style={{ width: '110px' }}
                                             >
-                                                {currency.map((option) => (
+                                                {Waers.map((option) => (
                                                     <MenuItem key={option.value} value={option.value}>
-                                                        {option.label}
+                                                        {option.label} ({option.value})
                                                     </MenuItem>
                                                 ))}
                                             </TextField>
                                         </TableCell>
                                         <TableCell>
                                             <TextField
-                                                value={row.amount}
+                                                value={row.Dmbtr}
                                                 // placeholder='Amount'
                                                 label='Amount'
-                                                onChange={(event) => handleChange(index, 'amount', event)}
-                                                error={errors[index]?.amount}
-                                                // helperText={errors[index]?.amount ? 'Required' : ''}
+                                                onChange={(event) => handleChange(index, 'Dmbtr', event)}
+                                                error={errors[index]?.Dmbtr}
+                                                // helperText={errors[index]?.Dmbtr ? 'Required' : ''}
                                                 size='small'
                                                 type='number'
                                             />
                                         </TableCell>
                                         <TableCell>
                                             <TextField
-                                                value={row.requested}
+                                                value={row.DmbtrR}
                                                 placeholder='Requested'
                                                 label='Requested'
-                                                onChange={(event) => handleChange(index, 'requested', event)}
-                                                error={errors[index]?.requested}
-                                                // helperText={errors[index]?.requested ? 'Required' : ''}
+                                                onChange={(event) => handleChange(index, 'DmbtrR', event)}
+                                                error={errors[index]?.DmbtrR}
+                                                // helperText={errors[index]?.DmbtrR ? 'Required' : ''}
                                                 size='small'
                                                 type='number'
                                             />

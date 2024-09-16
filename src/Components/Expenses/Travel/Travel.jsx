@@ -17,28 +17,43 @@ const Travel = () => {
         { field: 'Bktxt', headerName: 'Request Text', width: 120 },
         { field: 'Dmbtr', headerName: 'Amount', width: 140 },
         { field: 'Tflag', headerName: 'Status', width: 100 },
-        { field: 'Remarks', headerName: 'Remarks', width: 140 },
+        { field: 'Remarks', headerName: 'Remarks', width: 210 },
     ];
 
+    // If date is like /Date(1234567890)/"
+    // const convertDate = (dateString) => {
+    //     // Extract the timestamp from the date string
+    //     const timestamp = parseInt(dateString.match(/\/Date\((\d+)\)\//)[1], 10);
+
+    //     // Convert the timestamp to a Date object
+    //     const date = new Date(timestamp);
+
+    //     // Format the date as needed (e.g., yyyy-MM-dd)
+    //     const formattedDate = date.toISOString().slice(0, 10);
+
+    //     return formattedDate;
+    // };
+
+    // date is like yyyyMMdd to yyyy-mm-dd
     const convertDate = (dateString) => {
-        // Extract the timestamp from the date string
-        const timestamp = parseInt(dateString.match(/\/Date\((\d+)\)\//)[1], 10);
-
-        // Convert the timestamp to a Date object
-        const date = new Date(timestamp);
-
-        // Format the date as needed (e.g., yyyy-MM-dd)
-        const formattedDate = date.toISOString().slice(0, 10);
-
-        return formattedDate;
-    };
+        if (!dateString || dateString.length !== 8) {
+          return ''; // Return an empty string if date is invalid or not in the expected format
+        }
+      
+        // Extract year, month, and day from the string
+        const year = dateString.slice(0, 4);
+        const month = dateString.slice(4, 6);
+        const day = dateString.slice(6, 8);
+      
+        // Return in the format yyyy-MM-dd
+        return `${year}-${month}-${day}`;
+      };
 
     const handleGetData = async (url) => {
         var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
         try {
             const response = await api.get(currentURL);
-            if (url.includes('tableData')) {
-
+            if (url.includes('getAllExpense')) {
                 console.log(response);
 
                 const formattedLineItems = response.data.data.results.map((item, index) => ({
@@ -66,7 +81,7 @@ const Travel = () => {
 
     const handleTableDate = () => {
         setLoading(true);
-        var url = '/public/tableData';
+        var url = '/public/getAllExpense';
         handleGetData(url);
     }
 
