@@ -4,7 +4,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { MenuItem } from '@mui/material';
 import { RiShare2Fill } from "react-icons/ri";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { BiSolidEdit } from "react-icons/bi";
+import { BiSolidEdit, BiSolidError } from "react-icons/bi";
 import { MdOutlinePostAdd } from "react-icons/md";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { MdOutlineCopyAll } from "react-icons/md";
@@ -29,6 +29,8 @@ import {
 } from '@mui/material';
 import api from '../../../Utils/ApiCalls/Api';
 import { TbNotesOff } from 'react-icons/tb';
+import FullScreenLoader from '../../../Utils/Loading/FullScreenLoader';
+import { IoCloudDone } from 'react-icons/io5';
 
 const Expense = () => {
 
@@ -53,6 +55,11 @@ const Expense = () => {
     const [openAddExpense, setOpenAddExpense] = useState(false);    //pop-up open/close
     const [errors, setErrors] = useState([]);               //handeling pop-up error
     const [snackbarOpen, setSnackbarOpen] = useState(false);        //for copy display snackbar
+    const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);        //for success display snackbar
+    const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false);        //for error display snackbar
+    const [loading, setLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState([]);
+    const [errorMessage, setErrorMessage] = useState([]);
     const email = localStorage.getItem('email');
 
     const [cocode, setcocode] = useState([]);
@@ -127,7 +134,8 @@ const Expense = () => {
     };
     // add rows in add expense pop-up
     const handleExpenseAddRow = () => {
-        let pData = { Mandt: "100", Bukrs: "", Blart: '', Bldat: '', Budat: '', Smtpadr: email, Xblnr: '', Bktxt: '', id: id, Kostl: '', expense: '', Waers: '', Dmbtr: '', DmbtrR: '', Hkont: "63006000", Tflag: true, Docno: "", Remarks: "" };
+        // Mandt: "100", 
+        let pData = { Bukrs: "", Blart: '', Bldat: '', Budat: '', Smtpadr: email, Xblnr: '', Bktxt: '', id: id, Kostl: '', expense: '', Waers: '', Dmbtr: '', DmbtrR: '', Hkont: "63006000", Tflag: true, Docno: "", Remarks: "" };
         setFormData((preData) => [...preData, pData]);
         setErrors([...errors, { Kostl: false, expense: false, Waers: '', Dmbtr: false, DmbtrR: false }]);
         setId(id + 1);
@@ -182,6 +190,20 @@ const Expense = () => {
         setSnackbarOpen(false);
     };
 
+    const handleSuccessSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSuccessSnackbarOpen(false);
+    };
+
+    const handleErrorSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setErrorSnackbarOpen(false);
+    };
+
 
     const copySeletedRowsIds = () => {
         const ids = sRows.map(item => `${item.id}`).join(', ');
@@ -206,6 +228,8 @@ const Expense = () => {
         console.log(tdata);
         console.log(postData);
         console.log(mainPost);
+
+        handlePostExpense(mainPost);
     }
 
     const getCalling = async (url) => {
@@ -214,25 +238,71 @@ const Expense = () => {
             const response = await api.get(currentURL);
             if (url.includes('costCenter')) {
                 console.log(response);
+                // console.log(response.data.data.message);
                 console.log(response.data.data);
                 setcostce(response.data.data);
+                setLoading(false);
             } else if (url.includes('cmpCodes')) {
                 console.log(response.data.data);
                 setcocode(response.data.data);
+                setLoading(false);
             }
         } catch (error) {
             console.error('unable to get the response', error);
+            setLoading(false);
+        }
+    };
+
+    const handlePostData = async (url, body) => {
+        var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
+        try {
+            const response = await api.post(currentURL, body, {
+                // headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (url.includes('createExpense')) {
+                console.log(response);
+                setLoading(false);
+                setSuccessMessage(response.data.message);
+                setSuccessSnackbarOpen(true);
+                // setBussinessPlace(response.data.data.businessPlacesSet.results);
+                // setSideLoading(false);
+            }
+        } catch (error) {
+            console.error('unable to get the response', error);
+            if (url.includes('createExpense')) {
+                // setErrorMessage(response.data);
+                var ee = error.response.data.message;
+                console.log(error.response.data.message);
+                setLoading(false);
+                // console.log(error.response.data.message);
+                setErrorMessage(ee);
+                setErrorSnackbarOpen(true);
+                // setErrorMessage(response.data.message);
+                // setOpenError(true);
+                // setSideLoading(false);
+            }
+            // setSideLoading(false);
         }
     };
 
     const handleCostCenter = () => {
+        setLoading(true);
         const url = '/public/costCenter';
         getCalling(url);
     };
     const handleCompanyCode = () => {
+        setLoading(true);
         const url = '/public/cmpCodes';
         getCalling(url);
     };
+
+    const handlePostExpense = (body) => {
+        setLoading(true);
+        // setSideLoading(true);
+        const url = '/public/createExpense';
+        // const body = 
+        handlePostData(url, body);
+    }
 
     // const cocode = [
     //     { value: '1000', label: 'Company Code 1000' },
@@ -264,78 +334,80 @@ const Expense = () => {
     }, [])
 
     return (
-        <div className='maincomponent'>
-            <div className='df'>
-                <div className='basic-margin'>
-                    <p>Company Code</p>
-                    <TextField
-                        id="companycode"
-                        select
-                        size='small'
-                        style={{ width: '221px' }}
-                        onChange={(e) => { setPostData(prev => ({ ...prev, cocode: e.target.value })) }}
-                    >
-                        {cocode.length > 0 ? (
-                            cocode.map((option) => (
-                                <MenuItem key={option.code} value={option.code}>
-                                    {option.code} ({option.companyText})
-                                </MenuItem>
-                            ))
-                        ) : (
-                            <MenuItem disabled>No options available</MenuItem>
-                        )}
-                    </TextField>
+        <>
+            {loading && <FullScreenLoader />}
+            <div className='maincomponent'>
+                <div className='df'>
+                    <div className='basic-margin'>
+                        <p>Company Code</p>
+                        <TextField
+                            id="companycode"
+                            select
+                            size='small'
+                            style={{ width: '221px' }}
+                            onChange={(e) => { setPostData(prev => ({ ...prev, cocode: e.target.value })) }}
+                        >
+                            {cocode.length > 0 ? (
+                                cocode.map((option) => (
+                                    <MenuItem key={option.code} value={option.code}>
+                                        {option.code} ({option.companyText})
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>No options available</MenuItem>
+                            )}
+                        </TextField>
+                    </div>
+                    <div className='basic-margin'>
+                        <p>Document type</p>
+                        <TextField onChange={(e) => { setPostData(prev => ({ ...prev, doctype: e.target.value })) }} size='small' />
+                    </div>
+                    <div className='basic-margin'>
+                        <p>Document Date</p>
+                        <input className='date' onChange={(e) => { setPostData(prev => ({ ...prev, docdate: e.target.value })) }} type='date' style={{ width: '221px' }} />
+                    </div>
                 </div>
-                <div className='basic-margin'>
-                    <p>Document type</p>
-                    <TextField onChange={(e) => { setPostData(prev => ({ ...prev, doctype: e.target.value })) }} size='small' />
+                <div className='df'>
+                    <div className='basic-margin'>
+                        <p>Refrence Number</p>
+                        <TextField onChange={(e) => { setPostData(prev => ({ ...prev, refno: e.target.value })) }} size='small' />
+                    </div>
+                    <div className='basic-margin'>
+                        <p>Document Header Text</p>
+                        <TextField onChange={(e) => { setPostData(prev => ({ ...prev, docheadertxt: e.target.value })) }} size='small' />
+                    </div>
                 </div>
-                <div className='basic-margin'>
-                    <p>Document Date</p>
-                    <input className='date' onChange={(e) => { setPostData(prev => ({ ...prev, docdate: e.target.value })) }} type='date' style={{ width: '221px' }} />
+                <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
+                    <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlinePostAdd />} onClick={handleClickOpenExpense}>Add</Button>
+                    <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineCopyAll />} color='warning' onClick={copySeletedRowsIds}>Copy</Button>
+                    <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineDeleteOutline />} color="error" onClick={deleteSelected}>Delete</Button>
                 </div>
-            </div>
-            <div className='df'>
-                <div className='basic-margin'>
-                    <p>Refrence Number</p>
-                    <TextField onChange={(e) => { setPostData(prev => ({ ...prev, refno: e.target.value })) }} size='small' />
+                {/* table */}
+                <div style={{ marginTop: '10px' }}>
+                    <div style={{ height: 400, width: '100%' }}>
+                        {/* table data from use state automatically updated from usestate => tdata */}
+                        <DataGrid
+                            rows={tdata}
+                            columns={columns}
+                            slots={{ noRowsOverlay: NoRowsOverlay }}
+                            initialState={{
+                                pagination: {
+                                    paginationModel: { page: 0, pageSize: 5 },
+                                },
+                            }}
+                            pageSizeOptions={[5, 10]}
+                            checkboxSelection
+                            onRowSelectionModelChange={handleSelectionChange}
+                        />
+                    </div>
                 </div>
-                <div className='basic-margin'>
-                    <p>Document Header Text</p>
-                    <TextField onChange={(e) => { setPostData(prev => ({ ...prev, docheadertxt: e.target.value })) }} size='small' />
+                {/* table */}
+                <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
+                    <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<RiShare2Fill />} onClick={submitExpense}>Submit Expense</Button>
                 </div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
-                <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlinePostAdd />} onClick={handleClickOpenExpense}>Add</Button>
-                <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineCopyAll />} color='warning' onClick={copySeletedRowsIds}>Copy</Button>
-                <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<MdOutlineDeleteOutline />} color="error" onClick={deleteSelected}>Delete</Button>
-            </div>
-            {/* table */}
-            <div style={{ marginTop: '10px' }}>
-                <div style={{ height: 400, width: '100%' }}>
-                    {/* table data from use state automatically updated from usestate => tdata */}
-                    <DataGrid
-                        rows={tdata}
-                        columns={columns}
-                        slots={{ noRowsOverlay: NoRowsOverlay }}
-                        initialState={{
-                            pagination: {
-                                paginationModel: { page: 0, pageSize: 5 },
-                            },
-                        }}
-                        pageSizeOptions={[5, 10]}
-                        checkboxSelection
-                        onRowSelectionModelChange={handleSelectionChange}
-                    />
-                </div>
-            </div>
-            {/* table */}
-            <div style={{ display: 'flex', justifyContent: 'end', margin: '10px' }}>
-                <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<RiShare2Fill />} onClick={submitExpense}>Submit Expense</Button>
-            </div>
 
 
-            {/* <Dialog fullWidth={true} maxWidth={'sm'} open={openAddExpense} onClose={handleCloseExpense} >
+                {/* <Dialog fullWidth={true} maxWidth={'sm'} open={openAddExpense} onClose={handleCloseExpense} >
                 <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
                     Add Expense
                 </DialogTitle>
@@ -364,18 +436,18 @@ const Expense = () => {
                 </DialogActions>
             </Dialog> */}
 
-            {/* add expenses pop-up */}
-            <Dialog fullWidth={true} maxWidth={'md'} open={openAddExpense} onClose={handleCloseExpense}>
-                <DialogTitle>Add Expense</DialogTitle>
-                <DialogContent dividers>
-                    <Button onClick={handleExpenseAddRow} color='success' startIcon={<FaPlus />} >Add Row</Button>
-                    <TableContainer >
-                        <Table>
-                            <TableBody>
-                                {formData.map((row, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>
-                                            {/* <TextField
+                {/* add expenses pop-up */}
+                <Dialog fullWidth={true} maxWidth={'md'} open={openAddExpense} onClose={handleCloseExpense}>
+                    <DialogTitle>Add Expense</DialogTitle>
+                    <DialogContent dividers>
+                        <Button onClick={handleExpenseAddRow} color='success' startIcon={<FaPlus />} >Add Row</Button>
+                        <TableContainer >
+                            <Table>
+                                <TableBody>
+                                    {formData.map((row, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                {/* <TextField
                                                 value={row.costcenter}
                                                 placeholder='Cost Center'
                                                 onChange={(event) => handleChange(index, 'costcenter', event)}
@@ -384,117 +456,140 @@ const Expense = () => {
                                                 size='small'
                                                 type='text'
                                             /> */}
-                                            <TextField
-                                                id="companycode"
-                                                select
-                                                value={row.Kostl}
-                                                // placeholder='Cost Center'
-                                                label='Cost Center'
-                                                onChange={(event) => handleChange(index, 'Kostl', event)}
-                                                error={errors[index]?.Kostl}
-                                                size='small'
-                                                style={{ width: '150px' }}
-                                            >
-                                                {costce.length > 0 ? (
-                                                    costce.map((option) => (
-                                                        <MenuItem key={option.cost} value={option.cost}>
-                                                            {option.cost} ({option.costCenText})
+                                                <TextField
+                                                    id="companycode"
+                                                    select
+                                                    value={row.Kostl}
+                                                    // placeholder='Cost Center'
+                                                    label='Cost Center'
+                                                    onChange={(event) => handleChange(index, 'Kostl', event)}
+                                                    error={errors[index]?.Kostl}
+                                                    size='small'
+                                                    style={{ width: '150px' }}
+                                                >
+                                                    {costce.length > 0 ? (
+                                                        costce.map((option) => (
+                                                            <MenuItem key={option.cost} value={option.cost}>
+                                                                {option.cost} ({option.costCenText})
+                                                            </MenuItem>
+                                                        ))
+                                                    ) : (
+                                                        <MenuItem disabled>No options available</MenuItem>
+                                                    )}
+                                                </TextField>
+                                            </TableCell>
+                                            <TableCell>
+                                                <TextField
+                                                    value={row.expense}
+                                                    // placeholder='Expense'
+                                                    label='Expense'
+                                                    onChange={(event) => handleChange(index, 'expense', event)}
+                                                    error={errors[index]?.expense}
+                                                    // helperText={errors[index]?.expense ? 'Required' : ''}
+                                                    size='small'
+                                                    type='text'
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <TextField
+                                                    id="Waers"
+                                                    select
+                                                    value={row.Waers}
+                                                    // placeholder='Currency'
+                                                    label='Currency'
+                                                    onChange={(event) => handleChange(index, 'Waers', event)}
+                                                    error={errors[index]?.Waers}
+                                                    size='small'
+                                                    style={{ width: '110px' }}
+                                                >
+                                                    {Waers.map((option) => (
+                                                        <MenuItem key={option.value} value={option.value}>
+                                                            {option.label} ({option.value})
                                                         </MenuItem>
-                                                    ))
-                                                ) : (
-                                                    <MenuItem disabled>No options available</MenuItem>
-                                                )}
-                                            </TextField>
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                value={row.expense}
-                                                // placeholder='Expense'
-                                                label='Expense'
-                                                onChange={(event) => handleChange(index, 'expense', event)}
-                                                error={errors[index]?.expense}
-                                                // helperText={errors[index]?.expense ? 'Required' : ''}
-                                                size='small'
-                                                type='text'
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                id="Waers"
-                                                select
-                                                value={row.Waers}
-                                                // placeholder='Currency'
-                                                label='Currency'
-                                                onChange={(event) => handleChange(index, 'Waers', event)}
-                                                error={errors[index]?.Waers}
-                                                size='small'
-                                                style={{ width: '110px' }}
-                                            >
-                                                {Waers.map((option) => (
-                                                    <MenuItem key={option.value} value={option.value}>
-                                                        {option.label} ({option.value})
-                                                    </MenuItem>
-                                                ))}
-                                            </TextField>
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                value={row.Dmbtr}
-                                                // placeholder='Amount'
-                                                label='Amount'
-                                                onChange={(event) => handleChange(index, 'Dmbtr', event)}
-                                                error={errors[index]?.Dmbtr}
-                                                // helperText={errors[index]?.Dmbtr ? 'Required' : ''}
-                                                size='small'
-                                                type='number'
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                value={row.DmbtrR}
-                                                placeholder='Requested'
-                                                label='Requested'
-                                                onChange={(event) => handleChange(index, 'DmbtrR', event)}
-                                                error={errors[index]?.DmbtrR}
-                                                // helperText={errors[index]?.DmbtrR ? 'Required' : ''}
-                                                size='small'
-                                                type='number'
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton onClick={() => handleDeleteRow(index)} >
-                                                <FaMinus />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseExpense} color="error">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSubmit} color="primary">
-                        Submit
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            {/* add expenses pop-up */}
+                                                    ))}
+                                                </TextField>
+                                            </TableCell>
+                                            <TableCell>
+                                                <TextField
+                                                    value={row.Dmbtr}
+                                                    // placeholder='Amount'
+                                                    label='Amount'
+                                                    onChange={(event) => handleChange(index, 'Dmbtr', event)}
+                                                    error={errors[index]?.Dmbtr}
+                                                    // helperText={errors[index]?.Dmbtr ? 'Required' : ''}
+                                                    size='small'
+                                                    type='number'
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <TextField
+                                                    value={row.DmbtrR}
+                                                    placeholder='Requested'
+                                                    label='Requested'
+                                                    onChange={(event) => handleChange(index, 'DmbtrR', event)}
+                                                    error={errors[index]?.DmbtrR}
+                                                    // helperText={errors[index]?.DmbtrR ? 'Required' : ''}
+                                                    size='small'
+                                                    type='number'
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <IconButton onClick={() => handleDeleteRow(index)} >
+                                                    <FaMinus />
+                                                </IconButton>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseExpense} color="error">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSubmit} color="primary">
+                            Submit
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                {/* add expenses pop-up */}
 
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={3000}
-                onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert icon={<MdOutlineCopyAll />} onClose={handleSnackbarClose} severity="warning" sx={{ width: '100%' }}>
-                    Selected IDs copied to clipboard!
-                </Alert>
-            </Snackbar>
+                <Snackbar
+                    open={snackbarOpen}
+                    autoHideDuration={3000}
+                    onClose={handleSnackbarClose}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                >
+                    <Alert icon={<MdOutlineCopyAll />} onClose={handleSnackbarClose} severity="warning" sx={{ width: '100%' }}>
+                        Selected IDs copied to clipboard!
+                    </Alert>
+                </Snackbar>
 
-        </div>
+                <Snackbar
+                    open={successSnackbarOpen}
+                    autoHideDuration={3000}
+                    onClose={handleSuccessSnackbarClose}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                >
+                    <Alert icon={<IoCloudDone />} onClose={handleSuccessSnackbarClose} severity="success" sx={{ width: '100%' }}>
+                        {successMessage}
+                    </Alert>
+                </Snackbar>
+
+                <Snackbar
+                    open={errorSnackbarOpen}
+                    autoHideDuration={3000}
+                    onClose={handleErrorSnackbarClose}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                >
+                    <Alert icon={<BiSolidError />} onClose={handleErrorSnackbarClose} severity="error" sx={{ width: '100%' }}>
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
+
+            </div>
+        </>
     );
 }
 
