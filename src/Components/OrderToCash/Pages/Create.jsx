@@ -54,10 +54,11 @@ const Create = () => {
     const [loading, setLoading] = useState(false);
 
     const [postData, setPostData] = useState({
-        customernumber: user,
-        customername: user,
-        date: '',
-        tabelData: []
+        CustomerNumber: user,
+        CustomerName: user,
+        OrderDate: '',
+        SalesOrderNumber: "",
+        salesOrderNav: []
     })
     const [sRows, setSRows] = useState([]);                 //store selected data in table tdata
     const [materialData, setMaterialData] = useState([]);
@@ -79,7 +80,7 @@ const Create = () => {
 
         setPostData(prev => ({
             ...prev,
-            tabelData: selectedData.map(({ id, ...rest }) => rest)
+            salesOrderNav: selectedData.map(({ id, ...rest }) => rest)
         }));
 
     };
@@ -125,7 +126,7 @@ const Create = () => {
             ),
         },
         {
-            field: 'Quantity',
+            field: 'TargetQty',
             headerName: 'Qty',
             width: 150,
             renderCell: (params) => (
@@ -143,7 +144,7 @@ const Create = () => {
             ),
         },
         {
-            field: 'Uom',
+            field: 'TargetUom',
             headerName: 'UOM',
             width: 190,
             renderCell: (params) => (
@@ -173,8 +174,8 @@ const Create = () => {
         const newRow = {
             id: tdata.length + 1, // Ensure unique ID for each row
             Material: "",
-            Quantity: "",
-            Uom: "",
+            TargetQty: "",
+            TargetUom: "",
         };
         setTData([...tdata, newRow]);
     };
@@ -196,19 +197,73 @@ const Create = () => {
         console.log(remainingData);
     };
 
+    const handlePostData = async (url, body) => {
+        var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
+        try {
+            const response = await api.post(currentURL, body, {
+                // headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (url.includes('createSales')) {
+                console.log(response);
+                setLoading(false);
+                // setSuccessMessage(response.data.message);
+                // setSuccessSnackbarOpen(true);
+                // ---
+                // setBussinessPlace(response.data.data.businessPlacesSet.results);
+                // setSideLoading(false);
+            }
+        } catch (error) {
+            console.error('unable to get the response', error);
+            // if (url.includes('createSales')) {
+            //     // setErrorMessage(response.data);
+            //     var ee = error.response.data.message;
+            //     console.log(error.response.data.message);
+                setLoading(false);
+            //     // console.log(error.response.data.message);
+            //     setErrorMessage(ee);
+            //     setErrorSnackbarOpen(true);
+            //     // setErrorMessage(response.data.message);
+            //     // setOpenError(true);
+            //     // setSideLoading(false);
+            // }
+            // setSideLoading(false);
+        }
+    };
+
+    const handlePostExpense = (body) => {
+        setLoading(true);
+        // setSideLoading(true);
+        const url = '/public/createSales';
+        // const body = 
+        handlePostData(url, body);
+    }
+
     const submitExpense = () => {
 
         // const cleanedLineItems = sRows.map(({ id, ...rest }) => rest);
 
         // console.log(cleanedLineItems);
 
-        // setPostData=>(prev, ({...prev, tabelData: cleanedLineItems}));
+        // setPostData=>(prev, ({...prev, salesOrderNav: cleanedLineItems}));
         // setPostData(prev => ({
         //     ...prev,
-        //     tabelData: cleanedLineItems
+        //     salesOrderNav: cleanedLineItems
         // }));
 
-        console.log(postData);
+        var mainD = postData;
+        mainD.OrderDate = mainD.OrderDate.replaceAll('-', '');
+        // mainD.OrderDate.replaceAll('-','');
+        // (prev =>({...prev, OrderDate: postData.OrderDate.replaceAll('-','')}));
+        // var mainD = (prev) => ({
+        //     ...prev,
+        //     OrderDate: postData?.OrderDate?.replaceAll('-', '') || '', // Safely access and update OrderDate
+        //   });
+          
+        // console.log(postData);
+
+        console.log(mainD);
+
+        handlePostExpense(mainD);
 
     }
 
@@ -295,7 +350,7 @@ const Create = () => {
                     </div>
                     <div className='basic-margin'>
                         <p>Date</p>
-                        <input className='date' onChange={(e) => { setPostData(prev => ({ ...prev, date: e.target.value })) }} type='date' style={{ width: '221px' }} />
+                        <input className='date' onChange={(e) => { setPostData(prev => ({ ...prev, OrderDate: e.target.value })) }} type='date' style={{ width: '221px' }} />
                     </div>
                 </div>
                 {/* <div className='df'>
