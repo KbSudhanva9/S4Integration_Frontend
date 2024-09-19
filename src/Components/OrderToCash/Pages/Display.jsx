@@ -6,70 +6,87 @@ import { TbNotesOff } from "react-icons/tb";
 
 const Display = () => {
 
-    const [tdata, setTData] = useState([]);
+    // const [tdata, setTData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const columns = [
-        { field: 'Docno', headerName: 'SAPDocument No.', width: 170 },
-        { field: 'Bldat', headerName: 'Requested Date', width: 150 },
-        { field: 'Budat', headerName: 'Approved Date', width: 150 },
-        { field: 'Xblnr', headerName: 'Request Details', width: 170 },
-        { field: 'Bktxt', headerName: 'Request Text', width: 120 },
-        { field: 'Dmbtr', headerName: 'Amount', width: 140 },
-        { field: 'Tflag', headerName: 'Status', width: 100 },
-        { field: 'Remarks', headerName: 'Remarks', width: 140 },
-    ];
+    // const columns = [
+    //     { field: 'Docno', headerName: 'SAPDocument No.', width: 170 },
+    //     { field: 'Bldat', headerName: 'Requested Date', width: 150 },
+    //     { field: 'Budat', headerName: 'Approved Date', width: 150 },
+    //     { field: 'Xblnr', headerName: 'Request Details', width: 170 },
+    //     { field: 'Bktxt', headerName: 'Request Text', width: 120 },
+    //     { field: 'Dmbtr', headerName: 'Amount', width: 140 },
+    //     { field: 'Tflag', headerName: 'Status', width: 100 },
+    //     { field: 'Remarks', headerName: 'Remarks', width: 140 },
+    // ];
 
     const [cdata, setCData] = useState([]);
     const columnsDisplay = [
-        { field: 'createddate', headerName: 'Created Date', width: 150 },
-        { field: 'sapsono', headerName: 'SAP SO no.', width: 130 },
-        { field: 'itemno', headerName: 'Item no.', width: 130 },
-        { field: 'material', headerName: 'Material', width: 150 },
-        { field: 'MATDescription', headerName: 'MAT Description', width: 170 },
-        { field: 'quantity', headerName: 'Qty', width: 120 },
-        { field: 'uom', headerName: 'UOM', width: 120 },
-        { field: 'price', headerName: 'Price', width: 120 },
-        { field: 'totalsoval', headerName: 'Total SO Value', width: 140 },
+        { field: 'CustomerNumber', headerName: 'Customer No.', width: 160 },
+        { field: 'OrderDate', headerName: 'Created Date', width: 160 },
+        { field: 'SalesOrderNumber', headerName: 'SAP SO no.', width: 150 },
+        { field: 'ItemNumber', headerName: 'Item no.', width: 140 },
+        { field: 'Material', headerName: 'Material', width: 160 },
+        // { field: 'MATDescription', headerName: 'MAT Description', width: 170 },
+        { field: 'TargetQty', headerName: 'Qty', width: 130 },
+        { field: 'TargetUom', headerName: 'UOM', width: 130 },
+        // { field: 'price', headerName: 'Price', width: 120 },
+        // { field: 'totalsoval', headerName: 'Total SO Value', width: 140 },
     ];
 
     const convertDate = (dateString) => {
-        // Extract the timestamp from the date string
-        const timestamp = parseInt(dateString.match(/\/Date\((\d+)\)\//)[1], 10);
+        if (!dateString || dateString.length !== 8) {
+          return ''; // Return an empty string if date is invalid or not in the expected format
+        }
+      
+        // Extract year, month, and day from the string
+        const year = dateString.slice(0, 4);
+        const month = dateString.slice(4, 6);
+        const day = dateString.slice(6, 8);
+      
+        // Return in the format yyyy-MM-dd
+        return `${year}-${month}-${day}`;
+      };
 
-        // Convert the timestamp to a Date object
-        const date = new Date(timestamp);
+    // const convertDate = (dateString) => {
+    //     // Extract the timestamp from the date string
+    //     const timestamp = parseInt(dateString.match(/\/Date\((\d+)\)\//)[1], 10);
 
-        // Format the date as needed (e.g., yyyy-MM-dd)
-        const formattedDate = date.toISOString().slice(0, 10);
+    //     // Convert the timestamp to a Date object
+    //     const date = new Date(timestamp);
 
-        return formattedDate;
-    };
+    //     // Format the date as needed (e.g., yyyy-MM-dd)
+    //     const formattedDate = date.toISOString().slice(0, 10);
+
+    //     return formattedDate;
+    // };
 
     const handleGetData = async (url) => {
         var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
         try {
             const response = await api.get(currentURL);
-            if (url.includes('tableData')) {
+            if (url.includes('getAllSales')) {
 
                 console.log(response);
 
                 const formattedLineItems = response.data.data.results.map((item, index) => ({
                     id: index + 1,
-                    Docno: item.Docno,
-                    Bldat: convertDate(item.Bldat),
-                    Budat: convertDate(item.Budat),
-                    Xblnr: item.Xblnr,
-                    Bktxt: item.Bktxt,
-                    Dmbtr: item.Dmbtr,
-                    Tflag: item.Tflag,
-                    Remarks: item.Remarks,
+                    CustomerNumber: item.CustomerNumber,
+                    OrderDate: convertDate(item.OrderDate),
+                    // OrderDate: item.OrderDate,
+                    SalesOrderNumber: item.SalesOrderNumber,
+                    ItemNumber: item.ItemNumber,
+                    Material: item.Material,
+                    TargetQty: item.TargetQty,
+                    TargetUom: item.TargetUom,
                     // approvedOrRejected: item.approvedOrRejected,
                     // remarks: item.remarks,
                 }));
-                setTData(formattedLineItems);
+                // setTData(formattedLineItems);
+                setCData(formattedLineItems);
 
                 setLoading(false);
             }
+            setLoading(false);
         } catch (error) {
             console.error('unable to get the response', error);
             setLoading(false);
@@ -78,13 +95,13 @@ const Display = () => {
 
     const handleTableDate = () => {
         setLoading(true);
-        var url = '/public/tableData';
+        var url = '/public/getAllSales';
         handleGetData(url);
     }
 
-    // useEffect(() => {
-    //     handleTableDate();
-    // }, []);
+    useEffect(() => {
+        handleTableDate();
+    }, []);
 
     const NoRowsOverlay = () => (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>

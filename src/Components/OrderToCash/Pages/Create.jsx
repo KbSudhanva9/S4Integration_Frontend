@@ -4,7 +4,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { MenuItem } from '@mui/material';
 import { RiShare2Fill } from "react-icons/ri";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { BiSolidEdit } from "react-icons/bi";
+import { BiSolidEdit, BiSolidError } from "react-icons/bi";
 import { MdOutlinePostAdd } from "react-icons/md";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { MdOutlineCopyAll } from "react-icons/md";
@@ -31,6 +31,8 @@ import api from '../../../Utils/ApiCalls/Api';
 import { TbNotesOff } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
 import FullScreenLoader from '../../../Utils/Loading/FullScreenLoader';
+import { IoCloudDone } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 // import api from '../../../Utils/ApiCalls/Api';
 
 const Create = () => {
@@ -52,6 +54,7 @@ const Create = () => {
     const [submitExp, setSubmitExp] = useState([]);         //store selected row id's tdata
     const { token, user } = useSelector((state) => state.auth);
     const [loading, setLoading] = useState(false);
+    const nav = useNavigate();
 
     const [postData, setPostData] = useState({
         CustomerNumber: user,
@@ -67,9 +70,28 @@ const Create = () => {
     // const [openAddExpense, setOpenAddExpense] = useState(false);    //pop-up open/close
     // const [errors, setErrors] = useState([]);               //handeling pop-up error
     // const [snackbarOpen, setSnackbarOpen] = useState(false);        //for copy display snackbar
+    const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);        //for success display snackbar
+    const [successMessage, setSuccessMessage] = useState([]);
+    const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState([]);
+
 
     // const [cocode, setcocode] = useState([]);
     // const [costce, setcostce] = useState([]);
+
+    const handleSuccessSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSuccessSnackbarOpen(false);
+    };
+
+    const handleErrorSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setErrorSnackbarOpen(false);
+    };
 
     // on selecting or un-selecting the rows in table live change
     const handleSelectionChange = (selection) => {
@@ -206,26 +228,26 @@ const Create = () => {
             if (url.includes('createSales')) {
                 console.log(response);
                 setLoading(false);
-                // setSuccessMessage(response.data.message);
-                // setSuccessSnackbarOpen(true);
+                setSuccessMessage(response.data.message);
+                setSuccessSnackbarOpen(true);
                 // ---
                 // setBussinessPlace(response.data.data.businessPlacesSet.results);
                 // setSideLoading(false);
             }
         } catch (error) {
             console.error('unable to get the response', error);
-            // if (url.includes('createSales')) {
-            //     // setErrorMessage(response.data);
-            //     var ee = error.response.data.message;
-            //     console.log(error.response.data.message);
+            if (url.includes('createSales')) {
+                //     // setErrorMessage(response.data);
+                var ee = error.response.data.message;
+                //     console.log(error.response.data.message);
                 setLoading(false);
-            //     // console.log(error.response.data.message);
-            //     setErrorMessage(ee);
-            //     setErrorSnackbarOpen(true);
-            //     // setErrorMessage(response.data.message);
-            //     // setOpenError(true);
-            //     // setSideLoading(false);
-            // }
+                //     // console.log(error.response.data.message);
+                setErrorMessage(ee);
+                setErrorSnackbarOpen(true);
+                //     // setErrorMessage(response.data.message);
+                //     // setOpenError(true);
+                //     // setSideLoading(false);
+            }
             // setSideLoading(false);
         }
     };
@@ -239,32 +261,26 @@ const Create = () => {
     }
 
     const submitExpense = () => {
-
-        // const cleanedLineItems = sRows.map(({ id, ...rest }) => rest);
-
-        // console.log(cleanedLineItems);
-
-        // setPostData=>(prev, ({...prev, salesOrderNav: cleanedLineItems}));
-        // setPostData(prev => ({
-        //     ...prev,
-        //     salesOrderNav: cleanedLineItems
-        // }));
-
         var mainD = postData;
-        mainD.OrderDate = mainD.OrderDate.replaceAll('-', '');
-        // mainD.OrderDate.replaceAll('-','');
-        // (prev =>({...prev, OrderDate: postData.OrderDate.replaceAll('-','')}));
-        // var mainD = (prev) => ({
-        //     ...prev,
-        //     OrderDate: postData?.OrderDate?.replaceAll('-', '') || '', // Safely access and update OrderDate
-        //   });
-          
-        // console.log(postData);
 
-        console.log(mainD);
+        if (mainD.OrderDate === "" || mainD.OrderDate === undefined || mainD.OrderDate === null) {
+            console.log(mainD.OrderDate);
+            setErrorMessage("Select Date");
+            setErrorSnackbarOpen(true);
+        } else if(mainD.salesOrderNav < 1){
+            console.log("no rows");
+            setErrorMessage("Add or Select atleast one row");
+            setErrorSnackbarOpen(true);
+        } else {
+            // console.log(mainD.OrderDate);
+            mainD.OrderDate = mainD.OrderDate.replaceAll('-', '');
 
-        handlePostExpense(mainD);
+            console.log(mainD);
+            // console.log(mainD.OrderDate);
+            handlePostExpense(mainD);
 
+            // nav("/order-to-cash/display");
+        }
     }
 
     const handleGetData = async (url) => {
@@ -393,6 +409,28 @@ const Create = () => {
                     <Button style={{ margin: '0px 5px' }} size="small" variant="outlined" startIcon={<RiShare2Fill />} onClick={submitExpense}>Submit Expense</Button>
                 </div>
             </div>
+
+            <Snackbar
+                open={successSnackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSuccessSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert icon={<IoCloudDone />} onClose={handleSuccessSnackbarClose} severity="success" sx={{ width: '100%' }}>
+                    {successMessage}
+                </Alert>
+            </Snackbar>
+
+            <Snackbar
+                open={errorSnackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleErrorSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert icon={<BiSolidError />} onClose={handleErrorSnackbarClose} severity="error" sx={{ width: '100%' }}>
+                    {errorMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

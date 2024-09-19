@@ -37,17 +37,17 @@ const Travel = () => {
     // date is like yyyyMMdd to yyyy-mm-dd
     const convertDate = (dateString) => {
         if (!dateString || dateString.length !== 8) {
-          return ''; // Return an empty string if date is invalid or not in the expected format
+            return ''; // Return an empty string if date is invalid or not in the expected format
         }
-      
+
         // Extract year, month, and day from the string
         const year = dateString.slice(0, 4);
         const month = dateString.slice(4, 6);
         const day = dateString.slice(6, 8);
-      
+
         // Return in the format yyyy-MM-dd
         return `${year}-${month}-${day}`;
-      };
+    };
 
     const handleGetData = async (url) => {
         var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
