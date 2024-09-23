@@ -48,7 +48,7 @@ const OrderToCashHeader = () => {
           Create
         </NavLink>
         <NavLink
-          to="display"
+          to="report"
           style={({ isActive, isPending, isTransitioning }) => ({
             padding: "10px",
             textDecoration: "none",
@@ -56,7 +56,7 @@ const OrderToCashHeader = () => {
             fontWeight: isPending ? "bold" : "normal",
           })}
         >
-          Display
+          Report
         </NavLink>
         {/* <NavLink
           to="invoice-status"

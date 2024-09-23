@@ -36,7 +36,6 @@ import OrderToCashMainLayout from "../Components/OrderToCash/OrderToCashMainLayo
 import Display from "../Components/OrderToCash/Pages/Display";
 import Create from "../Components/OrderToCash/Pages/Create";
 import NotFound from "../Utils/NotFound/NotFound";
-import NewExpense from "../Components/Expenses/Expense/NewExpense";
 
 export const LayoutRouting = [
 
@@ -48,6 +47,7 @@ export const LayoutRouting = [
             {path: "expense", element: <ProtectedRoute element={<Expense />}/>},
             {path: "new-expense", element: <ProtectedRoute element={<NewExpense />}/>},
             {path: "travel", element: <ProtectedRoute element={<Travel />} />},
+            {path: "details/:id", element: <ProtectedRoute element={<DetailsOfOrder />} />}
         ]
     },
 
@@ -56,7 +56,7 @@ export const LayoutRouting = [
     {path: "order-to-cash", element: <OrderToCashMainLayout />,
         children: [
             {path: "create", element: <Create />},
-            {path: "display", element: <Display />},
+            {path: "report", element: <Display />},
             // {path: "invoice-status", element: <VendorNonPOInvoiceStatus />},
         ]
     },
