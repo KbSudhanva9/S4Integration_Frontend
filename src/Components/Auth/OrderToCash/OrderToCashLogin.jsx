@@ -107,7 +107,7 @@ const OrderToCashLogin = () => {
             <Form>
               <p className='center-items'><b>Order to Cash Login</b></p>
               <div>
-                <label htmlFor="vid">Vendor ID <span style={{ color: 'red' }}>*</span></label>
+                <label htmlFor="vid">Customer ID <span style={{ color: 'red' }}>*</span></label>
                 <Field type="string" name="vid" className={touched.vid && errors.vid ? 'error' : ''} />
                 {/* <ErrorMessage name="vid" component="div" className="error-message" /> */}
               </div>
