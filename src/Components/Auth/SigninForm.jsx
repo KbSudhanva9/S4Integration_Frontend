@@ -27,12 +27,15 @@ const SigninForm = () => {
   const handleSignUpClick = async (values) => {
     try {
       const response = await api.post(`${import.meta.env.VITE_BASE_URL}${import.meta.env.VITE_LOGIN_URL}`, values);
-      const { accessToken, user_role, email } = response.data.user;
+      const { accessToken, user_role, email, firstName, lastName, mobile } = response.data.user;
 
       // Store token and role in local storage
       localStorage.setItem('token', accessToken);
       localStorage.setItem('role', user_role);
       localStorage.setItem('email', email);
+      localStorage.setItem('firstName', firstName);
+      localStorage.setItem('lastName', lastName);
+      localStorage.setItem('mobile', mobile);
 
       // Redirect to a protected route after successful login
       navigate('/admin/expense');
@@ -97,7 +100,7 @@ const SigninForm = () => {
           >
             {({ errors, touched, isSubmitting }) => (
               <Form>
-                <p className='title'>Expense Sign-in</p>
+                <p className='title'>Travel Expense Sign-in</p>
                 <div>
                   <label htmlFor="email">Email <span style={{ color: 'red' }}>*</span></label>
                   <Field type="email" name="email" className={touched.email && errors.email ? 'error' : ''} />

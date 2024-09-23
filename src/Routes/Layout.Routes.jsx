@@ -36,6 +36,7 @@ import OrderToCashMainLayout from "../Components/OrderToCash/OrderToCashMainLayo
 import Display from "../Components/OrderToCash/Pages/Display";
 import Create from "../Components/OrderToCash/Pages/Create";
 import NotFound from "../Utils/NotFound/NotFound";
+import NewExpense from "../Components/Expenses/Expense/NewExpense";
 
 export const LayoutRouting = [
 
@@ -45,6 +46,7 @@ export const LayoutRouting = [
     {path: "admin", element: <ProtectedRoute element={<MainLayout />} allowedRole={['Admin']} /> ,
         children : [
             {path: "expense", element: <ProtectedRoute element={<Expense />}/>},
+            {path: "new-expense", element: <ProtectedRoute element={<NewExpense />}/>},
             {path: "travel", element: <ProtectedRoute element={<Travel />} />},
         ]
     },
