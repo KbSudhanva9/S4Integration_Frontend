@@ -80,14 +80,15 @@ const NewExpense = () => {
     const [cocode, setcocode] = useState([]);
     const [costce, setcostce] = useState([]);
     const [postData, setPostData] = useState({
-        cocode: '',
-        doctype: 'Fi',
-        docdate: '',
+        Bukrs: '',
+        Blart: 'SA',
+        Bldat: '',
+        Budat:'',
         Smtpadr: localStorage.getItem('email'),
-        purpose: '',
-        currency: '',
-        docheadertxt: '',
-        expensetype: '',
+        Purpose: '',
+        Waers: '',
+        Bktxt: '',
+        ExpenseType: '',
         ItemNav: []
     })
 
@@ -99,7 +100,9 @@ const NewExpense = () => {
         let currentDate = `${currentYear}-${currentMonth}-${currentDay}`;
         // console.log("The current date is " + currentDate);
 
-        setPostData(prev => ({ ...prev, docdate: currentDate }));
+        setPostData(prev => ({ ...prev, Bldat: currentDate }));
+        setPostData(prev => ({ ...prev, Budat: currentDate }));
+        
     }
 
     // console.log(currentDate);
@@ -130,6 +133,14 @@ const NewExpense = () => {
             ItemNav: selectedData.map(({ id, ...rest }) => rest)
         }));
 
+        setPostData(prevPostData => ({
+            ...prevPostData,
+            ItemNav: prevPostData.ItemNav.map(item => ({
+                ...item,
+                DmbtrR: item.Dmbtr // Update DmbtrR to match Dmbtr
+            }))
+        }));
+
     };
 
     // open add expense pop-up
@@ -141,7 +152,7 @@ const NewExpense = () => {
 
     const columns = [
         {
-            field: 'RefrenceNo',
+            field: 'Xblnr',
             headerName: 'Refrence No',
             width: 140,
             renderCell: (params) => (
@@ -159,7 +170,7 @@ const NewExpense = () => {
             ),
         },
         {
-            field: 'CostCenter',
+            field: 'Kostl',
             headerName: 'Cost Center',
             width: 160,
             renderCell: (params) => (
@@ -209,7 +220,7 @@ const NewExpense = () => {
             ),
         },
         {
-            field: 'ExpenseType',
+            field: 'ItemExpenseType',
             headerName: 'Expense Type',
             width: 160,
             renderCell: (params) => (
@@ -252,7 +263,7 @@ const NewExpense = () => {
             ),
         },
         {
-            field: 'Amount',
+            field: 'Dmbtr',
             headerName: 'Amount',
             width: 150,
             renderCell: (params) => (
@@ -342,14 +353,15 @@ const NewExpense = () => {
     const handleAddRow = () => {
         const newRow = {
             id: tdata.length + 1, // Ensure unique ID for each row
-            RefrenceNo: "",
-            CostCenter: "",
+            Xblnr: "",
+            Kostl: "",
             ItemText: "",
-            ExpenseType: "",
+            ItemExpenseType: "",
             Description: "",
-            Amount: "",
+            Dmbtr: "",
+            DmbtrR: "",
             Document: "",
-            GLAcc: "63006000",
+            Hkont: "63006000",
             Tflag: false
         };
         setTData([...tdata, newRow]);
@@ -416,7 +428,14 @@ const NewExpense = () => {
     const submitExpense = () => {
         var mainD = postData;
 
-        mainD.docdate = mainD.docdate.replaceAll('-', '');
+        var mainD = postData;
+
+        mainD.Bldat = mainD.Bldat.replaceAll('-', '');
+        mainD.Budat = mainD.Budat.replaceAll('-', '');
+
+        // mainD.ItemNav.DmbtrR = mainD.ItemNav.Dmbtr;
+
+        console.log(mainD.ItemNav.Dmbtr);
 
         console.log(mainD);
 
@@ -434,7 +453,7 @@ const NewExpense = () => {
 
         //     console.log(mainD);
         //     // console.log(mainD.OrderDate);
-        //     handlePostExpense(mainD);
+            handlePostExpense(mainD);
 
         //     // nav("/order-to-cash/display");
         // }
@@ -512,7 +531,7 @@ const NewExpense = () => {
         handlePostData(url, body);
     }
 
-    const purpose = [
+    const Purpose = [
         { value: 'Expense', label: 'Expense' },
         { value: 'Travel', label: 'Travel' },
     ]
@@ -568,7 +587,7 @@ const NewExpense = () => {
                                 select
                                 size='small'
                                 style={{ width: '165px' }}
-                                onChange={(e) => { setPostData(prev => ({ ...prev, cocode: e.target.value })) }}
+                                onChange={(e) => { setPostData(prev => ({ ...prev, Bukrs: e.target.value })) }}
                             >
                                 {cocode.length > 0 ? (
                                     cocode.map((option) => (
@@ -583,25 +602,25 @@ const NewExpense = () => {
                         </div>
                         <div className='basic-margin'>
                             <p >Document type</p>
-                            <TextField disabled value={postData.doctype} style={{ width: '165px' }} size='small' />
+                            <TextField disabled value={postData.Blart} style={{ width: '165px' }} size='small' />
                             {/* <TextField onChange={(e) => { setPostData(prev => ({ ...prev, doctype: e.target.value })) }} size='small' /> */}
                         </div>
                         <div className='basic-margin'>
                             <p >Document Date</p>
-                            <TextField value={postData.docdate} size='small' style={{ width: '165px' }} className='date' disabled type='date' />
+                            <TextField value={postData.Bldat} size='small' style={{ width: '165px' }} className='date' disabled type='date' />
                             {/* onChange={(e) => { setPostData(prev => ({ ...prev, docdate: e.target.value })) }} */}
                         </div>
                         <div className='basic-margin'>
                             <p >Purpose</p>
                             <TextField
-                                id="purpose"
+                                id="Purpose"
                                 select
                                 size='small'
                                 style={{ width: '165px' }}
-                                onChange={(e) => { setPostData(prev => ({ ...prev, purpose: e.target.value })) }}
+                                onChange={(e) => { setPostData(prev => ({ ...prev, Purpose: e.target.value })) }}
                             >
-                                {purpose.length > 0 ? (
-                                    purpose.map((option) => (
+                                {Purpose.length > 0 ? (
+                                    Purpose.map((option) => (
                                         <MenuItem key={option.value} value={option.value}>
                                             {option.value}
                                         </MenuItem>
@@ -614,11 +633,11 @@ const NewExpense = () => {
                         <div className='basic-margin'>
                             <p >Expense Type</p>
                             <TextField
-                                id="expensetype"
+                                id="ExpenseType"
                                 select
                                 size='small'
                                 style={{ width: '165px' }}
-                                onChange={(e) => { setPostData(prev => ({ ...prev, expensetype: e.target.value })) }}
+                                onChange={(e) => { setPostData(prev => ({ ...prev, ExpenseType: e.target.value })) }}
                             >
                                 {expensetype.length > 0 ? (
                                     expensetype.map((option) => (
@@ -636,11 +655,11 @@ const NewExpense = () => {
                         <div className='basic-margin'>
                             <p >Currency</p>
                             <TextField
-                                id="currency"
+                                id="Waers"
                                 select
                                 size='small'
                                 style={{ width: '165px' }}
-                                onChange={(e) => { setPostData(prev => ({ ...prev, currency: e.target.value })) }}
+                                onChange={(e) => { setPostData(prev => ({ ...prev, Waers: e.target.value })) }}
                             >
                                 {currency.length > 0 ? (
                                     currency.map((option) => (
@@ -655,7 +674,7 @@ const NewExpense = () => {
                         </div>
                         <div className='basic-margin'>
                             <p >Document Header Text</p>
-                            <TextField onChange={(e) => { setPostData(prev => ({ ...prev, docheadertxt: e.target.value })) }} style={{ width: '165px' }} size='small' />
+                            <TextField onChange={(e) => { setPostData(prev => ({ ...prev, Bktxt: e.target.value })) }} style={{ width: '165px' }} size='small' />
                         </div>
                     </div>
                 </div>
