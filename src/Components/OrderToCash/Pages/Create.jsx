@@ -380,6 +380,19 @@ const Create = () => {
     setPostData((prev) => ({ ...prev, OrderDate: currentDate }));
   };
 
+  const divdata = [
+    { value: "one", label: 1 },
+    { value: "two", label: 2 },
+    { value: "three", label: 3 },
+    { value: "four", label: 4 },
+    { value: "five", label: 5 }
+  ]
+
+  const PreferredTransporter = [
+    { value: "DHL", label: "DHL" },
+    { value: "Navata", label: "Navata" }
+  ]
+
   useEffect(() => {
     handleMaterialData();
     currentDate();
@@ -390,121 +403,157 @@ const Create = () => {
   return (
     <>
       {loading && <FullScreenLoader />}
-      <div className="maincomponent">
-        <div className="df">
-          <div className="basic-margin">
-            <p>Customer Number</p>
-            <TextField
-              id="companycode"
-              // select
-              size="small"
-              style={{ width: "221px" }}
-              type="number"
-              // onChange={(e)=>{setPostData(prev => ({...prev, customernumber: e.target.value}))}}
-              disabled
-              value={user}
-            />
-            {/* {cocode.length > 0 ? (
-                            cocode.map((option) => (
-                                <MenuItem key={option.code} value={option.code}>
-                                    {option.code} ({option.companyText})
-                                </MenuItem>
-                            ))
-                        ) : (
-                            <MenuItem disabled>No options available</MenuItem>
-                        )} */}
-            {/* </TextField> */}
-          </div>
-          <div className="basic-margin">
-            <p>Customer Name</p>
-            <TextField
-              size="small"
-              disabled
-              value={user}
+      <div className="flx-wrap">
+        <div style={{ width: '65%' }}>
+          <div className="maincomponent flx-wrap" style={{ paddingBottom: '15px' }}>
+            <div className="basic-margin">
+              <p>Customer Number</p>
+              <TextField
+                id="companycode"
+                // select
+                size="small"
+                style={{ width: "165px" }}
+                type="number"
+                disabled
+                value={user}
+              />
+            </div>
+            <div className="basic-margin">
+              <p>Customer Name</p>
+              <TextField
+                size="small"
+                style={{ width: "165px" }}
+                disabled
+                value={user}
               // onChange={(e)=>{setPostData(prev => ({...prev, customername: e.target.value}))}}
-            />
+              />
+            </div>
+            <div className="basic-margin">
+              <p>Date</p>
+              <TextField
+                className="date"
+                //   onChange={(e) => {
+                //     setPostData((prev) => ({ ...prev, OrderDate: e.target.value }));
+                //   }}
+                type="date"
+                size="small"
+                style={{ width: "165px" }}
+                value={postData.OrderDate}
+                disabled
+              />
+            </div>
+            <div className='basic-margin'>
+              <p >Preferred Transporter</p>
+              <TextField
+                id="PreferredTransporter"
+                select
+                size='small'
+                style={{ width: '165px' }}
+              // onChange={(e) => { setPostData(prev => ({ ...prev, Bukrs: e.target.value })) }}
+              >
+                {PreferredTransporter.length > 0 ? (
+                  PreferredTransporter.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.value}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No options available</MenuItem>
+                )}
+              </TextField>
+            </div>
           </div>
-          <div className="basic-margin">
-            <p>Date</p>
-            <input
-              className="date"
-              //   onChange={(e) => {
-              //     setPostData((prev) => ({ ...prev, OrderDate: e.target.value }));
-              //   }}
-              type="date"
-              style={{ width: "221px" }}
-              value={postData.OrderDate}
-              disabled
-            />
+
+          {/* ========================================================== */}
+
+          <div className="maincomponent flx-wrap" style={{ paddingBottom: '15px' }}>
+            <div className="basic-margin">
+              <p>Ship to Party</p>
+              <p style={{ width: "165px", fontSize: "14px" }}>Tecnics Integreaction pvt.lmtd</p>
+              {/* <TextField
+                id="shipToParty"
+                size="small"
+                style={{ width: "165px" }}
+                type="text"
+                disabled
+              //   value={}
+              /> */}
+            </div>
+            <div className="basic-margin">
+              <p>Ship to Name</p>
+              <p style={{ width: "165px", fontSize: "14px" }}>K.B.Sudhanva</p>
+              {/* <TextField
+                id="shipToName"
+                size="small"
+                style={{ width: "165px" }}
+                type="text"
+                disabled
+              //   value={}
+              /> */}
+            </div>
+            <div className="basic-margin">
+              <p>Ship to Party Address</p>
+              <p style={{ width: "165px", fontSize: "14px" }}>Hi-tech city, Madhapur, HYD</p>
+              {/* <TextField
+                id="shipToPartyAddr"
+                size="small"
+                style={{ width: "165px" }}
+                type="text"
+                disabled
+              //   value={}
+              /> */}
+            </div>
+            <div className="basic-margin">
+              <p>GSTIN number</p>
+              <p style={{ width: "165px", fontSize: "14px" }}>36AADCP4798A1ZC</p>
+              {/* <TextField
+                id="gstinNo"
+                size="small"
+                style={{ width: "165px" }}
+                type="text"
+                disabled
+              //   value={}
+              /> */}
+            </div>
+            <div className="basic-margin">
+              <p>OUSTANDING on Date</p>
+              <p style={{ width: "165px", fontSize: "14px" }}>09/29/2024</p>
+              {/* <TextField
+                id="outstandingDate"
+                className="date"
+                type="date"
+                size="small"
+                style={{ width: "165px" }}
+                //   value={}
+                disabled
+              /> */}
+            </div>
           </div>
         </div>
-        <div className="df">
-          <div className="basic-margin">
-            <p>Ship to Party</p>
-            <TextField
-              id="shipToParty"
-              size="small"
-              style={{ width: "221px" }}
-              type="text"
-              disabled
-              //   value={}
-            />
-          </div>
-          <div className="basic-margin">
-            <p>Ship to Name</p>
-            <TextField
-              id="shipToName"
-              size="small"
-              style={{ width: "221px" }}
-              type="text"
-              disabled
-              //   value={}
-            />
-          </div>
-          <div className="basic-margin">
-            <p>Ship to Party Address</p>
-            <TextField
-              id="shipToPartyAddr"
-              size="small"
-              style={{ width: "221px" }}
-              type="text"
-              disabled
-              //   value={}
-            />
-          </div>
-          <div className="basic-margin">
-            <p>GSTIN number</p>
-            <TextField
-              id="gstinNo"
-              size="small"
-              style={{ width: "221px" }}
-              type="text"
-              disabled
-              //   value={}
-            />
-          </div>
-          <div className="basic-margin">
-            <p>OUSTANDING on Date</p>
-            <input
-              id="outstandingDate"
-              className="date"
-              type="date"
-              style={{ width: "221px" }}
-              //   value={}
-              disabled
-            />
-          </div>
+
+        {/* ========================================================== */}
+
+
+        <div className="maincomponent" style={{ paddingBottom: '15px', width: '32%' }}>
+          <p><b>Latest Reports</b></p>
+          {divdata.length > 0 ? (
+            divdata.map((option) => (
+              <div style={{ padding: "10px" }} key={option.label} value={option.label}>
+                {option.label} ({option.value})
+              </div>
+            ))
+          ) : (
+            <div disabled>No options available</div>
+          )}
+          {/* // <div>
+          //   {name}
+          // </div> */}
         </div>
-        {/* <div className='df'>
-                <div className='basic-margin'>
-                    <p>Refrence Number</p>
-                    <TextField size='small' />
-                </div>
-                <div className='basic-margin'>
-                    <p>Document Header Text</p>
-                    <TextField size='small' />
-                </div>
-            </div> */}
+
+        {/* ========================================================== */}
+      </div>
+      <div className="maincomponent">
+
         <div style={{ display: "flex", justifyContent: "end", margin: "10px" }}>
           <Button
             style={{ margin: "0px 5px" }}
