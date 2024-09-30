@@ -114,6 +114,24 @@ const Create = () => {
 
   const columns = [
     {
+      field: "Xblnr",
+      headerName: "Refrence No",
+      width: 150,
+      renderCell: (params) => (
+        <TextField
+          type="text"
+          value={params.value || ""}
+          onChange={(e) => {
+            handleCellChange(e, params);
+            // calculateTotal(selectedRows); // Call calculateTotal after a change
+          }}
+          size="small"
+          fullWidth
+          style={{ marginTop: "5px" }}
+        />
+      ),
+    },
+    {
       field: "Material",
       headerName: "Material",
       width: 250,
@@ -230,21 +248,47 @@ const Create = () => {
   const handleAddRow = () => {
     const newRow = {
       id: tdata.length + 1, // Ensure unique ID for each row
+      Xblnr: "",
       Material: "",
-      TargetQty: "",
       TargetUom: "",
+      TargetQty: "",
+      TargetPrice: "",
+      TargetAmount: ""
     };
     setTData([...tdata, newRow]);
   };
 
+  // const handleCellChange = (e, params) => {
+  //   const updatedLineItems = [...tdata];
+  //   const index = updatedLineItems.findIndex((item) => item.id === params.id);
+  //   if (index !== -1) {
+  //     updatedLineItems[index][params.field] = e.target.value;
+  //     setTData(updatedLineItems);
+  //   }
+  // };
+
   const handleCellChange = (e, params) => {
     const updatedLineItems = [...tdata];
     const index = updatedLineItems.findIndex((item) => item.id === params.id);
+
     if (index !== -1) {
+      // Update the changed field (Qty or Price)
       updatedLineItems[index][params.field] = e.target.value;
+
+      // Convert values to numbers for multiplication
+      const qty = parseFloat(updatedLineItems[index]["TargetQty"]) || 0;
+      const price = parseFloat(updatedLineItems[index]["TargetPrice"]) || 0;
+
+      // If both qty and price are available, update the amount
+      if (params.field === "TargetQty" || params.field === "TargetPrice") {
+        updatedLineItems[index]["TargetAmount"] = (qty * price).toFixed(2);
+      }
+
+      // Update the table data
       setTData(updatedLineItems);
     }
   };
+
 
   //delete the selected row in tdata in main table
   const deleteSelected = () => {
@@ -298,11 +342,7 @@ const Create = () => {
   const submitExpense = () => {
     var mainD = postData;
 
-    if (
-      mainD.OrderDate === "" ||
-      mainD.OrderDate === undefined ||
-      mainD.OrderDate === null
-    ) {
+    if (mainD.OrderDate === "" || mainD.OrderDate === undefined || mainD.OrderDate === null) {
       console.log(mainD.OrderDate);
       setErrorMessage("Select Date");
       setErrorSnackbarOpen(true);
@@ -316,7 +356,8 @@ const Create = () => {
 
       console.log(mainD);
       // console.log(mainD.OrderDate);
-      handlePostExpense(mainD);
+
+      // handlePostExpense(mainD);
 
       // nav("/order-to-cash/display");
     }

@@ -4,7 +4,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { MenuItem } from '@mui/material';
 import { RiShare2Fill } from "react-icons/ri";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { BiSolidEdit, BiSolidError } from "react-icons/bi";
+import { BiQrScan, BiSolidEdit, BiSolidError } from "react-icons/bi";
 import { MdOutlinePostAdd } from "react-icons/md";
 import { FaMinus, FaPlus, FaRegUser, FaUser } from "react-icons/fa6";
 import { MdOutlineCopyAll } from "react-icons/md";
@@ -34,9 +34,10 @@ import FullScreenLoader from '../../../Utils/Loading/FullScreenLoader';
 import { IoCallOutline, IoCloudDone } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { FiMail } from 'react-icons/fi';
+import DynamicQR from '../../../Utils/QRCode/DynamicQR';
 // import api from '../../../Utils/ApiCalls/Api';
 
-const NewExpense = () => {
+const Expense = () => {
 
     // const data = [
     //     { id: 1, costcenter: "234490", expense: "Office & Other Supplies", amount: '$89.09', requested: '89.09' }
@@ -55,6 +56,11 @@ const NewExpense = () => {
     const [submitExp, setSubmitExp] = useState([]);         //store selected row id's tdata
     // const { token, user } = useSelector((state) => state.auth);
     const [loading, setLoading] = useState(false);
+
+    const [qr, setQr] = useState(false);
+    const [invno, setInvno] = useState('');
+    const [value, setValue] = useState('http://invoice/');
+
     // const nav = useNavigate();
 
     // const [postData, setPostData] = useState({
@@ -83,7 +89,7 @@ const NewExpense = () => {
         Bukrs: '',
         Blart: 'SA',
         Bldat: '',
-        Budat:'',
+        Budat: '',
         Smtpadr: localStorage.getItem('email'),
         Purpose: '',
         Waers: '',
@@ -102,7 +108,7 @@ const NewExpense = () => {
 
         setPostData(prev => ({ ...prev, Bldat: currentDate }));
         setPostData(prev => ({ ...prev, Budat: currentDate }));
-        
+
     }
 
     // console.log(currentDate);
@@ -153,8 +159,8 @@ const NewExpense = () => {
     const columns = [
         {
             field: 'Xblnr',
-            headerName: 'Refrence No',
-            width: 140,
+            headerName: 'Invoice No',
+            width: 120,
             renderCell: (params) => (
                 <TextField
                     // type="number"
@@ -172,7 +178,7 @@ const NewExpense = () => {
         {
             field: 'Kostl',
             headerName: 'Cost Center',
-            width: 160,
+            width: 140,
             renderCell: (params) => (
                 <TextField
                     select
@@ -204,7 +210,7 @@ const NewExpense = () => {
         {
             field: 'ItemText',
             headerName: 'Item Text',
-            width: 150,
+            width: 135,
             renderCell: (params) => (
                 <TextField
                     // type="number"
@@ -222,7 +228,7 @@ const NewExpense = () => {
         {
             field: 'ItemExpenseType',
             headerName: 'Expense Type',
-            width: 160,
+            width: 140,
             renderCell: (params) => (
                 <TextField
                     select
@@ -247,7 +253,7 @@ const NewExpense = () => {
         {
             field: 'Description',
             headerName: 'Description',
-            width: 220,
+            width: 200,
             renderCell: (params) => (
                 <TextField
                     // type="number"
@@ -265,7 +271,7 @@ const NewExpense = () => {
         {
             field: 'Dmbtr',
             headerName: 'Amount',
-            width: 150,
+            width: 135,
             renderCell: (params) => (
                 <TextField
                     value={params.value || ''}
@@ -302,9 +308,24 @@ const NewExpense = () => {
         //     ),
         // },
         {
+            field: 'qr',
+            headerName: 'QR',
+            width: 100,
+            renderCell: (params) => (
+                // <TextField
+                //     // type="file"
+                //     // onChange={(e) => handleFileChange(e, params)}
+                //     size="small"
+                //     fullWidth
+                //     style={{ marginTop: '5px' }}
+                // />
+                <Button startIcon={<BiQrScan />} color='info' onClick={() => { setQr(true); setInvno(params.row.Xblnr); }} />
+            ),
+        },
+        {
             field: 'Document',
             headerName: 'Document',
-            width: 270,
+            width: 250,
             renderCell: (params) => (
                 <TextField
                     type="file"
@@ -453,7 +474,7 @@ const NewExpense = () => {
 
         //     console.log(mainD);
         //     // console.log(mainD.OrderDate);
-            handlePostExpense(mainD);
+        handlePostExpense(mainD);
 
         //     // nav("/order-to-cash/display");
         // }
@@ -577,9 +598,13 @@ const NewExpense = () => {
     return (
         <>
             {loading && <FullScreenLoader />}
+            {/* {qr && <DynamicQR />} */}
+            {qr && <DynamicQR value={value+invno} setQr={setQr} invno={invno} />}
             <div className='df'>
-                <div className='maincomponent' style={{ paddingBottom: '15px', width: '70%'}}>
-                    <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap'}}>
+            
+            {/* <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}> */}
+                <div className='maincomponent' style={{ paddingBottom: '15px', width: '65%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
                         <div className='basic-margin'>
                             <p >Company Code</p>
                             <TextField
@@ -650,7 +675,7 @@ const NewExpense = () => {
                                 )}
                             </TextField>
                         </div>
-                    {/* </div>
+                        {/* </div>
                     <div className='df'> */}
                         <div className='basic-margin'>
                             <p >Currency</p>
@@ -676,14 +701,20 @@ const NewExpense = () => {
                             <p >Document Header Text</p>
                             <TextField onChange={(e) => { setPostData(prev => ({ ...prev, Bktxt: e.target.value })) }} style={{ width: '165px' }} size='small' />
                         </div>
+                        <div className='basic-margin'>
+                            <p >QR</p>
+                            <Button startIcon={<BiQrScan />} color='info' onClick={() => { setQr(true) }} />
+                            {/* <TextField onChange={(e) => { setPostData(prev => ({ ...prev, Bktxt: e.target.value })) }} style={{ width: '165px' }} size='small' /> */}
+                        </div>
+
                     </div>
                 </div>
-                <div className='maincomponent' style={{width: '30%', padding: '20px'}}>
+                <div className='maincomponent' style={{ width: '30%', padding: '20px' }}>
                     <div>
                         <p><FaRegUser /><b> Name : </b> {localStorage.getItem('firstName') + " " + localStorage.getItem('lastName')}</p>
                         <p><FiMail /><b> Email : </b> {localStorage.getItem('email')}</p>
                         <p><IoCallOutline /><b> Mobile : </b> {localStorage.getItem('mobile')}</p>
-                        
+
                     </div>
 
                 </div>
@@ -747,4 +778,4 @@ const NewExpense = () => {
     );
 }
 
-export default NewExpense;
+export default Expense;
