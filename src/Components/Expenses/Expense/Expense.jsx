@@ -309,8 +309,8 @@ const Expense = () => {
         // },
         {
             field: 'qr',
-            headerName: 'QR',
-            width: 100,
+            headerName: 'Uplode Doc with QR',
+            width: 180,
             renderCell: (params) => (
                 // <TextField
                 //     // type="file"
@@ -319,7 +319,7 @@ const Expense = () => {
                 //     fullWidth
                 //     style={{ marginTop: '5px' }}
                 // />
-                <Button startIcon={<BiQrScan />} color='info' onClick={() => { setQr(true); setInvno(params.row.Xblnr); }} />
+                <Button endIcon={<BiQrScan />} color='info' onClick={() => { setQr(true); setInvno(params.row.Xblnr); }} >Scan here</Button>
             ),
         },
         {

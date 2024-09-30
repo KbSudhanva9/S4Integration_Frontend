@@ -36,6 +36,10 @@ import Display from "../Components/OrderToCash/Pages/Display";
 import Create from "../Components/OrderToCash/Pages/Create";
 import NotFound from "../Utils/NotFound/NotFound";
 import DetailsOfOrder from "../Components/OrderToCash/Pages/DetailsOfOrder";
+import MobileView from "../Components/MobileWeb/MobileView";
+import QRTestOne from "../Components/Test/QRTestOne";
+import ViewDoc from "../Components/MobileWeb/ViewDoc";
+import ClearFireBaseStorage from "../Utils/FireBase/ClearFireBaseStorage";
 
 export const LayoutRouting = [
 
@@ -106,7 +110,12 @@ export const LayoutRouting = [
             {path: "invoice-status", element: <VendorNonPOInvoiceStatus />},
         ]
     },
-    
+
+    // mobile
+    {path: "uplode", element: <MobileView />},
+    {path: "view", element: <ViewDoc />},
+    {path: "delete-view", element: <ClearFireBaseStorage />},
+    {path: "staticQR", element: <QRTestOne />},
     
     // default wrong path
     {path: "*", element: <NotFound />},

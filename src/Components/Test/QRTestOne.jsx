@@ -4,12 +4,12 @@ import QRCode from "react-qr-code";
 
 const QRTestOne = () => {
 
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState('https://s4hanaintegrationui.netlify.app/vendor-onbording-login');
 
     return (
         <div style={{ height: '100vh', display: 'grid', placeItems: 'center' }}>
 
-            <TextField value={value} onChange={(e) => setValue(e.target.value)} />
+            {/* <TextField value={value} onChange={(e) => setValue(e.target.value)} /> */}
 
             <div style={{ width: '300px', height: '300px', backgroundColor: '#ccc', display: 'grid', placeItems: 'center' }}>
                 {/* hello */}
