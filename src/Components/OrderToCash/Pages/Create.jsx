@@ -55,11 +55,30 @@ const Create = () => {
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
 
+  // const divdata = [
+  //   { value: "one", label: 1 },
+  //   { value: "two", label: 2 },
+  //   { value: "three", label: 3 },
+  //   { value: "four", label: 4 },
+  //   { value: "five", label: 5 }
+  // ]
+
+  const [divdata, setDivData] = useState([]);
+
+  const columnsTopFive = [
+    { field: 'ItemNumber', headerName: 'Item Number', width: 150 },
+    { field: 'OrderDate', headerName: 'Order Date', width: 150 },
+    { field: 'Material', headerName: 'Material', width: 150 },
+    // { field: 'ReferenceNumber', headerName: 'Reference Number', width: 200 }
+  ];
+
+
   const [postData, setPostData] = useState({
     CustomerNumber: user,
     CustomerName: user,
     OrderDate: "",
-    SalesOrderNumber: "",
+    PreferredTransporter: "",
+    // SalesOrderNumber: "",
     salesOrderNav: [],
   });
   const [sRows, setSRows] = useState([]); //store selected data in table tdata
@@ -73,6 +92,8 @@ const Create = () => {
   const [successMessage, setSuccessMessage] = useState([]);
   const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState([]);
+
+  const [custDetails, setCustDetails] = useState();
 
   // const [cocode, setcocode] = useState([]);
   // const [costce, setcostce] = useState([]);
@@ -114,7 +135,7 @@ const Create = () => {
 
   const columns = [
     {
-      field: "Xblnr",
+      field: "ReferenceNumber",
       headerName: "Refrence No",
       width: 150,
       renderCell: (params) => (
@@ -144,10 +165,19 @@ const Create = () => {
           fullWidth
           style={{ marginTop: "5px" }}
         >
-          {materialData.length > 0 ? (
+          {/* {materialData.length > 0 ? (
             materialData.map((option) => (
               <MenuItem key={option.mat_code} value={option.mat_code}>
                 {option.mat_code} ({option.mat_desc})
+              </MenuItem>
+            ))
+          ) : (
+            <MenuItem disabled>No options available</MenuItem>
+          )} */}
+          {custDetails.custItemnav.results.length > 0 ? (
+            custDetails.custItemnav.results.map((option) => (
+              <MenuItem key={option.Material} value={option.Material}>
+                {option.Material}
               </MenuItem>
             ))
           ) : (
@@ -168,24 +198,27 @@ const Create = () => {
       headerName: "UOM",
       width: 190,
       renderCell: (params) => (
-        <TextField
-          select
-          value={params.value || ""}
-          onChange={(e) => handleCellChange(e, params)}
-          size="small"
-          fullWidth
-          style={{ marginTop: "5px" }}
-        >
-          {uom.length > 0 ? (
-            uom.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.value} ({option.label})
-              </MenuItem>
-            ))
-          ) : (
-            <MenuItem disabled>No options available</MenuItem>
-          )}
+        <TextField style={{ marginTop: "5px" }} fullWidth size="small" disabled value={params.value || ""}>
+
         </TextField>
+        // <TextField
+        //   select
+        //   value={params.value || ""}
+        //   onChange={(e) => handleCellChange(e, params)}
+        //   size="small"
+        //   fullWidth
+        //   style={{ marginTop: "5px" }}
+        // >
+        //   {uom.length > 0 ? (
+        //     uom.map((option) => (
+        //       <MenuItem key={option.value} value={option.value}>
+        //         {option.value} ({option.label})
+        //       </MenuItem>
+        //     ))
+        //   ) : (
+        //     <MenuItem disabled>No options available</MenuItem>
+        //   )}
+        // </TextField>
       ),
     },
     {
@@ -207,7 +240,7 @@ const Create = () => {
       ),
     },
     {
-      field: "TargetPrice",
+      field: "UnitPrice",
       headerName: "Price",
       width: 150,
       renderCell: (params) => (
@@ -225,7 +258,7 @@ const Create = () => {
       ),
     },
     {
-      field: "TargetAmount",
+      field: "Amount",
       headerName: "Amout",
       width: 150,
       renderCell: (params) => (
@@ -248,12 +281,12 @@ const Create = () => {
   const handleAddRow = () => {
     const newRow = {
       id: tdata.length + 1, // Ensure unique ID for each row
-      Xblnr: "",
+      ReferenceNumber: "",
       Material: "",
       TargetUom: "",
       TargetQty: "",
-      TargetPrice: "",
-      TargetAmount: ""
+      UnitPrice: "",
+      Amount: ""
     };
     setTData([...tdata, newRow]);
   };
@@ -272,22 +305,59 @@ const Create = () => {
     const index = updatedLineItems.findIndex((item) => item.id === params.id);
 
     if (index !== -1) {
-      // Update the changed field (Qty or Price)
+      // Update the changed field (e.g., Material, Qty, Price, etc.)
       updatedLineItems[index][params.field] = e.target.value;
 
-      // Convert values to numbers for multiplication
-      const qty = parseFloat(updatedLineItems[index]["TargetQty"]) || 0;
-      const price = parseFloat(updatedLineItems[index]["TargetPrice"]) || 0;
+      // Handle updating the TargetUom when Material is changed
+      if (params.field === "Material") {
+        const selectedMaterial = custDetails.custItemnav.results.find(
+          (item) => item.Material === e.target.value
+        );
 
-      // If both qty and price are available, update the amount
-      if (params.field === "TargetQty" || params.field === "TargetPrice") {
-        updatedLineItems[index]["TargetAmount"] = (qty * price).toFixed(2);
+        console.log(selectedMaterial.TargetUom);
+
+        // Update the TargetUom if the selected material is found
+        if (selectedMaterial) {
+          updatedLineItems[index]["TargetUom"] = selectedMaterial.TargetUom;
+        }
       }
 
-      // Update the table data
+      // Handle calculating the Amount based on TargetQty and UnitPrice
+      const qty = parseFloat(updatedLineItems[index]["TargetQty"]) || 0;
+      const price = parseFloat(updatedLineItems[index]["UnitPrice"]) || 0;
+
+      // If either TargetQty or UnitPrice is updated, recalculate Amount
+      if (params.field === "TargetQty" || params.field === "UnitPrice") {
+        updatedLineItems[index]["Amount"] = (qty * price).toFixed(2);
+      }
+
+      // Update the table data with the new values
       setTData(updatedLineItems);
     }
   };
+
+
+  // const handleCellChange = (e, params) => {
+  //   const updatedLineItems = [...tdata];
+  //   const index = updatedLineItems.findIndex((item) => item.id === params.id);
+
+  //   if (index !== -1) {
+  //     // Update the changed field (Qty or Price)
+  //     updatedLineItems[index][params.field] = e.target.value;
+
+  //     // Convert values to numbers for multiplication
+  //     const qty = parseFloat(updatedLineItems[index]["TargetQty"]) || 0;
+  //     const price = parseFloat(updatedLineItems[index]["UnitPrice"]) || 0;
+
+  //     // If both qty and price are available, update the amount
+  //     if (params.field === "TargetQty" || params.field === "UnitPrice") {
+  //       updatedLineItems[index]["Amount"] = (qty * price).toFixed(2);
+  //     }
+
+  //     // Update the table data
+  //     setTData(updatedLineItems);
+  //   }
+  // };
 
 
   //delete the selected row in tdata in main table
@@ -309,6 +379,18 @@ const Create = () => {
         setLoading(false);
         setSuccessMessage(response.data.message);
         setSuccessSnackbarOpen(true);
+        // ---
+        // setBussinessPlace(response.data.data.businessPlacesSet.results);
+        // setSideLoading(false);
+      } else if (url.includes("customerDetail")) {
+        console.log(response);
+        console.log(response.data.data);
+
+        setCustDetails(response.data.data);
+
+        // setLoading(false);
+        // setSuccessMessage(response.data.message);
+        // setSuccessSnackbarOpen(true);
         // ---
         // setBussinessPlace(response.data.data.businessPlacesSet.results);
         // setSideLoading(false);
@@ -339,6 +421,16 @@ const Create = () => {
     handlePostData(url, body);
   };
 
+  const handlePostToGetData = () => {
+    setLoading(true);
+    // setSideLoading(true);
+    const url = "/public/customerDetail";
+    const body = {
+      "customerId": user
+    }
+    handlePostData(url, body);
+  };
+
   const submitExpense = () => {
     var mainD = postData;
 
@@ -357,7 +449,7 @@ const Create = () => {
       console.log(mainD);
       // console.log(mainD.OrderDate);
 
-      // handlePostExpense(mainD);
+      handlePostExpense(mainD);
 
       // nav("/order-to-cash/display");
     }
@@ -373,6 +465,12 @@ const Create = () => {
         // console.log(response.data.data);
         setMaterialData(response.data.data);
         setLoading(false);
+      } else if (url.includes("top5SalesOrder")) {
+        // console.log(response);
+        // console.log(response.data.data);
+        // console.log(response.data.data.results);
+        setDivData(response.data.data.results);
+        setLoading(false);
       } //else if (url.includes('cmpCodes')) {
       //     console.log(response.data.data);
       //     setcocode(response.data.data);
@@ -387,6 +485,12 @@ const Create = () => {
   const handleMaterialData = () => {
     setLoading(true);
     var url = "/public/cmpMat";
+    handleGetData(url);
+  };
+
+  const handleTopFive = () => {
+    setLoading(true);
+    var url = "/public/top5SalesOrder";
     handleGetData(url);
   };
 
@@ -421,14 +525,6 @@ const Create = () => {
     setPostData((prev) => ({ ...prev, OrderDate: currentDate }));
   };
 
-  const divdata = [
-    { value: "one", label: 1 },
-    { value: "two", label: 2 },
-    { value: "three", label: 3 },
-    { value: "four", label: 4 },
-    { value: "five", label: 5 }
-  ]
-
   const PreferredTransporter = [
     { value: "DHL", label: "DHL" },
     { value: "Navata", label: "Navata" }
@@ -436,17 +532,19 @@ const Create = () => {
 
   useEffect(() => {
     handleMaterialData();
+    handleTopFive();
     currentDate();
     // handleCostCenter();
     // handleCompanyCode();
+    handlePostToGetData();
   }, []);
 
   return (
     <>
       {loading && <FullScreenLoader />}
       <div className="flx-wrap">
-        <div style={{ width: '65%' }}>
-          <div className="maincomponent flx-wrap" style={{ paddingBottom: '15px' }}>
+        <div style={{ width: '62%' }}>
+          <div className="maincomponent flx-wrap" style={{ paddingBottom: '25px' }}>
             <div className="basic-margin">
               <p>Customer Number</p>
               <TextField
@@ -490,7 +588,7 @@ const Create = () => {
                 select
                 size='small'
                 style={{ width: '165px' }}
-              // onChange={(e) => { setPostData(prev => ({ ...prev, Bukrs: e.target.value })) }}
+                onChange={(e) => { setPostData(prev => ({ ...prev, PreferredTransporter: e.target.value })) }}
               >
                 {PreferredTransporter.length > 0 ? (
                   PreferredTransporter.map((option) => (
@@ -510,7 +608,11 @@ const Create = () => {
           <div className="maincomponent flx-wrap" style={{ paddingBottom: '15px' }}>
             <div className="basic-margin">
               <p>Ship to Party</p>
-              <p style={{ width: "165px", fontSize: "14px" }}>Tecnics Integreaction pvt.lmtd</p>
+              {/* <p style={{ width: "165px", fontSize: "14px" }}>{!custDetails.shipToPartyName ? "" : custDetails.shipToPartyName}</p> */}
+              <p style={{ width: "165px", fontSize: "14px" }}>
+                {custDetails?.shipToPartyName || ""}
+              </p>
+
               {/* <TextField
                 id="shipToParty"
                 size="small"
@@ -520,7 +622,7 @@ const Create = () => {
               //   value={}
               /> */}
             </div>
-            <div className="basic-margin">
+            {/* <div className="basic-margin">
               <p>Ship to Name</p>
               <p style={{ width: "165px", fontSize: "14px" }}>K.B.Sudhanva</p>
               {/* <TextField
@@ -530,11 +632,14 @@ const Create = () => {
                 type="text"
                 disabled
               //   value={}
-              /> */}
-            </div>
+              /> 
+            </div> */}
             <div className="basic-margin">
               <p>Ship to Party Address</p>
-              <p style={{ width: "165px", fontSize: "14px" }}>Hi-tech city, Madhapur, HYD</p>
+              {/* <p style={{ width: "165px", fontSize: "14px" }}>{custDetails.shipToPartyAdress}</p> */}
+              <p style={{ width: "165px", fontSize: "14px" }}>
+                {custDetails?.shipToPartyAdress || ""}
+              </p>
               {/* <TextField
                 id="shipToPartyAddr"
                 size="small"
@@ -546,7 +651,10 @@ const Create = () => {
             </div>
             <div className="basic-margin">
               <p>GSTIN number</p>
-              <p style={{ width: "165px", fontSize: "14px" }}>36AADCP4798A1ZC</p>
+              {/* <p style={{ width: "165px", fontSize: "14px" }}>{custDetails.taxNumber}</p> */}
+              <p style={{ width: "165px", fontSize: "14px" }}>
+                {custDetails?.taxNumber || ""}
+              </p>
               {/* <TextField
                 id="gstinNo"
                 size="small"
@@ -558,7 +666,10 @@ const Create = () => {
             </div>
             <div className="basic-margin">
               <p>OUSTANDING on Date</p>
-              <p style={{ width: "165px", fontSize: "14px" }}>09/29/2024</p>
+              {/* <p style={{ width: "165px", fontSize: "14px" }}>{custDetails.outstandingAmount}</p> */}
+              <p style={{ width: "165px", fontSize: "14px" }}>
+                {custDetails?.outstandingAmount || ""}
+              </p>
               {/* <TextField
                 id="outstandingDate"
                 className="date"
@@ -575,17 +686,78 @@ const Create = () => {
         {/* ========================================================== */}
 
 
-        <div className="maincomponent" style={{ paddingBottom: '15px', width: '32%' }}>
-          <p><b>Latest Reports</b></p>
+        <div className="maincomponent" style={{ paddingBottom: '15px', width: '33%' }}>
+          <p style={{marginBottom: '5px'}}><b>Latest Reports</b></p>
           {divdata.length > 0 ? (
+            <TableContainer component={Paper}>
+              <Table  size="small" aria-label="a dense table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Item Number</TableCell>
+                    <TableCell >Order Date</TableCell>
+                    <TableCell >Material</TableCell>
+                    {/* <TableCell align="right">Reference Number</TableCell> */}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {divdata.map((row) => (
+                    <TableRow
+                      key={row.ItemNumber}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.ItemNumber}
+                      </TableCell>
+                      <TableCell >{row.OrderDate}</TableCell>
+                      <TableCell >{row.Material}</TableCell>
+                      {/* <TableCell align="right">{row.ReferenceNumber}</TableCell> */}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <div disabled>No data available</div>
+          )}
+
+          {/* {divdata.length > 0 ? (
             divdata.map((option) => (
-              <div style={{ padding: "10px" }} key={option.label} value={option.label}>
-                {option.label} ({option.value})
+              <div style={{ padding: "10px", display: 'flex', justifyContent: 'space-between',  }} key={option.ItemNumber} value={option.ItemNumber}>
+                
+                <div>{option.ItemNumber} </div>
+                <div>{option.OrderDate} </div> 
+                <div>{option.Material} </div> 
+                {/* <div>{option.ReferenceNumber} </div>  
               </div>
             ))
           ) : (
-            <div disabled>No options available</div>
-          )}
+            <div disabled>No data available</div>
+          )} */}
+
+          {/* ================= */}
+          {/* {divdata.length > 0 ? (
+            <DataGrid
+              rows={divdata}
+              columns={columnsTopFive}
+              getRowId={(row) => row.ItemNumber} // Ensure that `ItemNumber` is a unique identifier
+              pagination={false}  // Disable pagination to remove rows per page and arrows
+            />
+          ) : (
+            <div disabled>No data available</div>
+          )} */}
+
+          {/* {divdata.length > 0 ? (
+            <DataGrid
+              rows={divdata}
+              columns={columnsTopFive}
+              // pageSize={5}
+              // rowsPerPageOptions={[5]}
+              getRowId={(row) => row.ItemNumber} // Ensure that `ItemNumber` is a unique identifier
+            />
+          ) : (
+            <div disabled>No data available</div>
+          )} */}
+          {/* ============================== */}
           {/* // <div>
           //   {name}
           // </div> */}

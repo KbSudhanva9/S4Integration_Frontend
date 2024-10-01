@@ -39,7 +39,7 @@ import DetailsOfOrder from "../Components/OrderToCash/Pages/DetailsOfOrder";
 import MobileView from "../Components/MobileWeb/MobileView";
 import QRTestOne from "../Components/Test/QRTestOne";
 import ViewDoc from "../Components/MobileWeb/ViewDoc";
-import ClearFireBaseStorage from "../Utils/FireBase/ClearFireBaseStorage";
+import ClearFireBaseStorage from "../Components/MobileWeb/ClearFireBaseStorage";
 
 export const LayoutRouting = [
 

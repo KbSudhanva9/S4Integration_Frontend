@@ -73,13 +73,13 @@ const MobileView = () => {
 
             {/* Button to trigger file upload */}
             <Button variant="contained" color="primary" onClick={handleFileUploadClick}>
-                Upload from files
+                Choose to Uplode
             </Button>
 
             {/* Button to trigger camera */}
-            <Button variant="contained" color="secondary" onClick={handleCameraClick}>
+            {/* <Button variant="contained" color="secondary" onClick={handleCameraClick}>
                 Open Camera
-            </Button>
+            </Button> */}
 
             {/* Display the file preview */}
             {filePreview && (

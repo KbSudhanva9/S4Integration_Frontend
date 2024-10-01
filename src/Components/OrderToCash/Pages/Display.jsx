@@ -19,17 +19,21 @@ const Display = () => {
   // ];
 
   const [cdata, setCData] = useState([]);
+
+  const [res, setRes] = useState([]);
+
   const columnsDisplay = [
     { field: "CustomerNumber", headerName: "Customer No.", width: 160 },
     { field: "OrderDate", headerName: "Created Date", width: 160 },
-    { field: "SalesOrderNumber", headerName: "SAP SO no.", width: 150 },
+    { field: "SalesOrderNumber", headerName: "SAP SO no.", width: 160 },
     // { field: 'ItemNumber', headerName: 'Item no.', width: 140 },
-    // { field: 'Material', headerName: 'Material', width: 160 },
+    { field: 'Material', headerName: 'Material', width: 180 },
     // { field: 'MATDescription', headerName: 'MAT Description', width: 170 },
-    { field: "TargetQty", headerName: "Qty", width: 130 },
-    { field: "TargetUom", headerName: "UOM", width: 130 },
-    // { field: 'price', headerName: 'Price', width: 120 },
-    // { field: 'totalsoval', headerName: 'Total SO Value', width: 140 },
+    { field: "TargetUom", headerName: "UOM", width: 100 },
+    { field: "TargetQty", headerName: "Qty", width: 120 },
+    // { field: "UnitPrice", headerName: "Unit   Price", width: 90 },
+    // { field: 'Total_amount', headerName: 'Total Amount', width: 100 },
+    { field: 'Remarks', headerName: 'Remarks', width: 140 },
   ];
 
   const convertDate = (dateString) => {
@@ -66,6 +70,8 @@ const Display = () => {
       if (url.includes("getAllSales")) {
         console.log(response);
 
+        setRes(response.data.data.results);
+
         const formattedLineItems = response.data.data.results.map(
           (item, index) => ({
             id: index + 1,
@@ -74,10 +80,12 @@ const Display = () => {
             // OrderDate: item.OrderDate,
             SalesOrderNumber: item.SalesOrderNumber,
             // ItemNumber: item.ItemNumber,
-            // Material: item.Material,
-            TargetQty: item.TargetQty,
+            Material: item.Material,
             TargetUom: item.TargetUom,
-            // approvedOrRejected: item.approvedOrRejected,
+            TargetQty: item.TargetQty,
+            // UnitPrice: item.UnitPrice,
+            // Total_amount: item.Total_amount,
+            Remarks: item.Remarks,
             // remarks: item.remarks,
           })
         );
@@ -119,7 +127,7 @@ const Display = () => {
   );
 
  const handleRowClick = (params) => {
-    console.log('Row clicked:', params.row);
+    console.log('Row clicked:', res[params.row.id]);
  }
 
   return (

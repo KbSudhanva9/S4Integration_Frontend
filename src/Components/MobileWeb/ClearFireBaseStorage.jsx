@@ -57,6 +57,13 @@ const ClearFireBaseStorage = () => {
       <h2>Clear Firebase Storage</h2>
       <Button
         variant="contained"
+        color="primary"
+        onClick={fetchFiles} // Refresh the file list
+      >
+        Refresh
+      </Button>
+      <Button
+        variant="contained"
         color="secondary"
         onClick={handleDeleteFiles}
         disabled={selectedFiles.size === 0}
