@@ -75,7 +75,7 @@ const Create = () => {
 
   const [postData, setPostData] = useState({
     CustomerNumber: user,
-    CustomerName: user,
+    CustomerName: "",
     OrderDate: "",
     PreferredTransporter: "",
     // SalesOrderNumber: "",
@@ -394,6 +394,11 @@ const Create = () => {
         // ---
         // setBussinessPlace(response.data.data.businessPlacesSet.results);
         // setSideLoading(false);
+
+        setPostData((prev) => ({ ...prev, CustomerName: response.data.data.customerName}));
+        
+
+        // setPostData(prev, (prev..., customerName:response.data.data.customerName));
       }
     } catch (error) {
       console.error("unable to get the response", error);
@@ -445,11 +450,13 @@ const Create = () => {
     } else {
       // console.log(mainD.OrderDate);
       mainD.OrderDate = mainD.OrderDate.replaceAll("-", "");
-
+      // mainD.CustomerName = custDetails.CustomerName;
+      // mainD.CustomerName = custDetails.customerNumber;
+      
       console.log(mainD);
       // console.log(mainD.OrderDate);
 
-      handlePostExpense(mainD);
+      // handlePostExpense(mainD);
 
       // nav("/order-to-cash/display");
     }
@@ -563,7 +570,7 @@ const Create = () => {
                 size="small"
                 style={{ width: "165px" }}
                 disabled
-                value={user}
+                value={custDetails?.customerName || ""}
               // onChange={(e)=>{setPostData(prev => ({...prev, customername: e.target.value}))}}
               />
             </div>
@@ -693,9 +700,9 @@ const Create = () => {
               <Table  size="small" aria-label="a dense table">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Item Number</TableCell>
+                    <TableCell>Sales Order Number</TableCell>
                     <TableCell >Order Date</TableCell>
-                    <TableCell >Material</TableCell>
+                    <TableCell >Total Amount</TableCell>
                     {/* <TableCell align="right">Reference Number</TableCell> */}
                   </TableRow>
                 </TableHead>
@@ -705,11 +712,9 @@ const Create = () => {
                       key={row.ItemNumber}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     >
-                      <TableCell component="th" scope="row">
-                        {row.ItemNumber}
-                      </TableCell>
+                      <TableCell component="th" scope="row"> {row.SalesOrderNumber} </TableCell>
                       <TableCell >{row.OrderDate}</TableCell>
-                      <TableCell >{row.Material}</TableCell>
+                      <TableCell >{row.Total_amount}</TableCell>
                       {/* <TableCell align="right">{row.ReferenceNumber}</TableCell> */}
                     </TableRow>
                   ))}

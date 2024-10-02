@@ -1,12 +1,34 @@
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridCloseIcon } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import api from "../../../Utils/ApiCalls/Api";
-import { CircularProgress } from "@mui/material";
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from "@mui/material";
 import { TbNotesOff } from "react-icons/tb";
+import styled from "styled-components";
 
 const Display = () => {
   // const [tdata, setTData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+
+  // const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  //   '& .MuiDialogContent-root': {
+  //     padding: theme.spacing(2),
+  //   },
+  //   '& .MuiDialogActions-root': {
+  //     padding: theme.spacing(1),
+  //   },
+  // }));
+
   // const columns = [
   //     { field: 'Docno', headerName: 'SAPDocument No.', width: 170 },
   //     { field: 'Bldat', headerName: 'Requested Date', width: 150 },
@@ -21,6 +43,7 @@ const Display = () => {
   const [cdata, setCData] = useState([]);
 
   const [res, setRes] = useState([]);
+  const [currentRow, setCurrentRow] = useState([]);
 
   const columnsDisplay = [
     { field: "CustomerNumber", headerName: "Customer No.", width: 160 },
@@ -126,9 +149,12 @@ const Display = () => {
     </div>
   );
 
- const handleRowClick = (params) => {
-    console.log('Row clicked:', res[params.row.id]);
- }
+  const handleRowClick = (params) => {
+    console.log('Row clicked:', res[params.row.id - 1]);
+    setCurrentRow(res[params.row.id - 1]);
+
+    handleClickOpen();
+  }
 
   return (
     <div className="maincomponent" style={{ height: "85vh" }}>
@@ -156,6 +182,130 @@ const Display = () => {
           onRowClick={handleRowClick}
         />
       )}
+
+      {/* <Button variant="outlined" onClick={handleClickOpen}>
+        Open dialog
+      </Button> */}
+      <Dialog open={open} maxWidth='md' fullWidth='true'>
+        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+          Report Details
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={(theme) => ({
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: theme.palette.grey[500],
+          })}
+        >
+          <GridCloseIcon />
+        </IconButton>
+        <DialogContent dividers='blue'>
+
+
+          <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
+            <div className="basic-margin">
+              <p><b>Customer Id</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.CustomerNumber} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Customer Mail Id</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Mail} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Sales Order Number</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.SalesOrderNumber} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Item Number</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ItemNumber} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Invoice Number</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.InvoiceNumber} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Reference Number</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ReferenceNumber} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Delivery Number</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.DeliveryNumber} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Flag</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Flag} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Material</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Material} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Uom</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetUom} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Order Date</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.OrderDate)} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Delivery Date</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.DeliveryDate)} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Invoice Date</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.InvoiceDate)} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Qty</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetQty} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Unit Price</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.UnitPrice} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Total Amount</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Description</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Description} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Preferred Transporter</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.PreferredTransporter} </p>
+            </div>
+            <div className="basic-margin">
+              <p><b>Remarks</b></p>
+              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Remarks} </p>
+            </div>
+          </div>
+
+          {/* <Typography gutterBottom>
+            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
+            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
+            consectetur ac, vestibulum at eros.
+          </Typography>
+          <Typography gutterBottom>
+            Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
+            Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
+          </Typography>
+          <Typography gutterBottom>
+            Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus
+            magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec
+            ullamcorper nulla non metus auctor fringilla.
+          </Typography> */}
+        </DialogContent>
+        <DialogActions>
+          <Button size="small" color="warning" onClick={handleClose}>
+            close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </div>
   );
 };
