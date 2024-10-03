@@ -35,6 +35,7 @@ import { IoCallOutline, IoCloudDone } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { FiMail } from 'react-icons/fi';
 import DynamicQR from '../../../Utils/QRCode/DynamicQR';
+import uploadImage from '../../../Utils/FireBase/UploadImage';
 // import api from '../../../Utils/ApiCalls/Api';
 
 const Expense = () => {
@@ -60,6 +61,10 @@ const Expense = () => {
     const [qr, setQr] = useState(false);
     const [invno, setInvno] = useState('');
     const [value, setValue] = useState('http://invoice/');
+    const currentEpochTimeMs = new Date().getTime();
+
+    // const currentEpochTimeMs = new Date().getTime();
+    // console.log(currentEpochTimeMs);
 
     // const nav = useNavigate();
 
@@ -319,7 +324,7 @@ const Expense = () => {
                 //     fullWidth
                 //     style={{ marginTop: '5px' }}
                 // />
-                <Button endIcon={<BiQrScan />} color='info' onClick={() => { setQr(true); setInvno(params.row.Xblnr); }} >Scan here</Button>
+                <Button endIcon={<BiQrScan />} color='info' onClick={() => { setQr(true); setInvno(params.row.docTime); }} >Scan here</Button>
             ),
         },
         {
@@ -359,17 +364,39 @@ const Expense = () => {
     const handleFileChange = (event, params) => {
         const file = event.target.files[0]; // Get the selected file
         if (file) {
+            // Get the file extension (e.g., '.pdf', '.jpeg')
+            const fileExtension = file.name.split('.').pop();
+            const ModifyedDocNumber = params.row.docTime; // Get the current row's invoice number (e.g., INV123)
+
+            // If the invoice number is available, use it as the document name
+            const newDocumentName = ModifyedDocNumber ? `${ModifyedDocNumber}.${fileExtension}` : file.name;
+
             const updatedRows = tdata.map((row) =>
                 row.id === params.id
-                    ? { ...row, Document: file.name } // Update the document name in the row
+                    ? { ...row, Document: newDocumentName } // Update the document name in the row
                     : row
             );
             setTData(updatedRows);
 
             // Here you can send the `file` to the server if needed
-            console.log('File uploaded for row:', params.id, file);
+            console.log('File uploaded for row:', params.id, newDocumentName);
         }
     };
+
+    // const handleFileChange = (event, params) => {
+    //     const file = event.target.files[0]; // Get the selected file
+    //     if (file) {
+    //         const updatedRows = tdata.map((row) =>
+    //             row.id === params.id
+    //                 ? { ...row, Document: file.name } // Update the document name in the row
+    //                 : row
+    //         );
+    //         setTData(updatedRows);
+
+    //         // Here you can send the `file` to the server if needed
+    //         console.log('File uploaded for row:', params.id, file);
+    //     }
+    // };
 
     const handleAddRow = () => {
         const newRow = {
@@ -383,7 +410,8 @@ const Expense = () => {
             DmbtrR: "",
             Document: "",
             Hkont: "63006000",
-            Tflag: false
+            Tflag: false,
+            docTime: currentEpochTimeMs
         };
         setTData([...tdata, newRow]);
     };
@@ -447,6 +475,7 @@ const Expense = () => {
     // }
 
     const submitExpense = () => {
+        setLoading(true);
         var mainD = postData;
 
         var mainD = postData;
@@ -456,9 +485,21 @@ const Expense = () => {
 
         // mainD.ItemNav.DmbtrR = mainD.ItemNav.Dmbtr;
 
-        console.log(mainD.ItemNav.Dmbtr);
+        // console.log(mainD.ItemNav.Dmbtr);
+
+        mainD.ItemNav.forEach(async (item) => {
+            if (item.Document) {
+                const file = {
+                    name: item.Document, // Assuming this is the document name with extension
+                    docTime: item.docTime, // Assuming this is the timestamp for each document
+                };
+                await uploadImage(file);
+            }
+        });
 
         console.log(mainD);
+
+        // uploadImage(mainD.ItemNav.Document);
 
         // if (mainD.OrderDate === "" || mainD.OrderDate === undefined || mainD.OrderDate === null) {
         //     console.log(mainD.OrderDate);
@@ -474,10 +515,11 @@ const Expense = () => {
 
         //     console.log(mainD);
         //     // console.log(mainD.OrderDate);
-        handlePostExpense(mainD);
+        // handlePostExpense(mainD);
 
         //     // nav("/order-to-cash/display");
         // }
+        setLoading(false);
     }
 
     const getCalling = async (url) => {
@@ -558,8 +600,8 @@ const Expense = () => {
     ]
 
     const expensetype = [
-        { value: 'Business', label: 'Business' },
-        { value: 'Development', label: 'Development' },
+        { value: 'Business Development', label: 'Business Development' },
+        // { value: 'Development', label: 'Development' },
         { value: 'Project', label: 'Project' }
     ]
 
@@ -599,10 +641,10 @@ const Expense = () => {
         <>
             {loading && <FullScreenLoader />}
             {/* {qr && <DynamicQR />} */}
-            {qr && <DynamicQR value={value+invno} setQr={setQr} invno={invno} />}
+            {qr && <DynamicQR value={value + invno} setQr={setQr} invno={invno} />}
             <div className='df'>
-            
-            {/* <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}> */}
+
+                {/* <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}> */}
                 <div className='maincomponent' style={{ paddingBottom: '15px', width: '65%' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
                         <div className='basic-margin'>
@@ -701,11 +743,11 @@ const Expense = () => {
                             <p >Document Header Text</p>
                             <TextField onChange={(e) => { setPostData(prev => ({ ...prev, Bktxt: e.target.value })) }} style={{ width: '165px' }} size='small' />
                         </div>
-                        <div className='basic-margin'>
+                        {/* <div className='basic-margin'>
                             <p >QR</p>
                             <Button startIcon={<BiQrScan />} color='info' onClick={() => { setQr(true) }} />
-                            {/* <TextField onChange={(e) => { setPostData(prev => ({ ...prev, Bktxt: e.target.value })) }} style={{ width: '165px' }} size='small' /> */}
-                        </div>
+                            {/* <TextField onChange={(e) => { setPostData(prev => ({ ...prev, Bktxt: e.target.value })) }} style={{ width: '165px' }} size='small' /> 
+                        </div> */}
 
                     </div>
                 </div>

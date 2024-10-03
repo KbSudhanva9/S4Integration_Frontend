@@ -112,7 +112,7 @@ export const LayoutRouting = [
     },
 
     // mobile
-    {path: "uplode", element: <MobileView />},
+    {path: "upload", element: <MobileView />},
     {path: "view", element: <ViewDoc />},
     {path: "delete-view", element: <ClearFireBaseStorage />},
     {path: "staticQR", element: <QRTestOne />},

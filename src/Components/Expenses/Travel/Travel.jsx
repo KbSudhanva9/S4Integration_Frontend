@@ -11,12 +11,13 @@ const Travel = () => {
     const [loading, setLoading] = useState(false);
     const columns = [
         { field: 'Docno', headerName: 'SAPDocument No.', width: 170 },
-        { field: 'Bldat', headerName: 'Requested Date', width: 150 },
-        { field: 'Budat', headerName: 'Approved Date', width: 150 },
-        { field: 'Xblnr', headerName: 'Request Details', width: 170 },
+        { field: 'Bldat', headerName: 'Requested Date', width: 140 },
+        { field: 'Budat', headerName: 'Approved Date', width: 140 },
+        { field: 'Xblnr', headerName: 'Request Details', width: 160 },
         { field: 'Bktxt', headerName: 'Request Text', width: 120 },
-        { field: 'Dmbtr', headerName: 'Amount', width: 140 },
-        { field: 'Tflag', headerName: 'Status', width: 100 },
+        { field: 'Dmbtr', headerName: 'Amount', width: 130 },
+        { field: 'Tflag', headerName: 'Status', width: 90 },
+        { field: 'Document', headerName: 'Document', width: 150 },
         { field: 'Remarks', headerName: 'Remarks', width: 210 },
     ];
 
@@ -65,6 +66,7 @@ const Travel = () => {
                     Bktxt: item.Bktxt,
                     Dmbtr: item.Dmbtr,
                     Tflag: item.Tflag,
+                    Document: item.Document,
                     Remarks: item.Remarks,
                     // approvedOrRejected: item.approvedOrRejected,
                     // remarks: item.remarks,
