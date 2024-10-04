@@ -40,6 +40,7 @@ import MobileView from "../Components/MobileWeb/MobileView";
 import QRTestOne from "../Components/Test/QRTestOne";
 import ViewDoc from "../Components/MobileWeb/ViewDoc";
 import ClearFireBaseStorage from "../Components/MobileWeb/ClearFireBaseStorage";
+import DynamicDocUplode from "../Components/MobileWeb/DynamicDocUplode";
 
 export const LayoutRouting = [
 
@@ -112,7 +113,11 @@ export const LayoutRouting = [
     },
 
     // mobile
-    {path: "upload", element: <MobileView />},
+    // {path: "upload/{}", element: <DynamicDocUplode path={'from the path'}/>},
+    {path: "upload/:docName", element: <DynamicDocUplode />},
+
+    
+    {path: "upload-file-doc", element: <MobileView />},
     {path: "view", element: <ViewDoc />},
     {path: "delete-view", element: <ClearFireBaseStorage />},
     {path: "staticQR", element: <QRTestOne />},

@@ -1,23 +1,32 @@
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from './FireBaseConfig';
 
-const uploadImage = async (file) => {
-  const storageRef = ref(storage, `images/${file.name}`);
-  // const storageRef = ref(storage, `documents/${file.name}`);
+// const uploadImage = async (file) => {
+//   const storageRef = ref(storage, `images/${file.name}`);
+//   // const storageRef = ref(storage, `documents/${file.name}`);
 
 
-  // console.log("Uploading file:", file.name);
+//   // console.log("Uploading file:", file.name);
 
+//   await uploadBytes(storageRef, file);
+//   const downloadURL = await getDownloadURL(storageRef);
+//   console.log("File available at:", downloadURL);
+
+//   // const downloadURL = await getDownloadURL(storageRef);
+//   // console.log("File available at:", downloadURL);
+// };
+
+// export default uploadImage;
+
+const uploadImage = async (file, documentName) => {
+  const storageRef = ref(storage, `images/${documentName}`); // Use the new document name
   await uploadBytes(storageRef, file);
   const downloadURL = await getDownloadURL(storageRef);
   console.log("File available at:", downloadURL);
-
-  // const downloadURL = await getDownloadURL(storageRef);
-  // console.log("File available at:", downloadURL);
+  return downloadURL;  // Return the download URL to store in the postData if needed
 };
 
 export default uploadImage;
-
 
 // import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 // import { storage } from './FireBaseConfig';

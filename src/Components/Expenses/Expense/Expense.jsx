@@ -34,8 +34,9 @@ import FullScreenLoader from '../../../Utils/Loading/FullScreenLoader';
 import { IoCallOutline, IoCloudDone } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { FiMail } from 'react-icons/fi';
-import DynamicQR from '../../../Utils/QRCode/DynamicQR';
+// import DynamicQR from '../../../Utils/QRCode/DynamicQR';
 import uploadImage from '../../../Utils/FireBase/UploadImage';
+import DynamicQRForLineItem from '../../MobileWeb/DynamicQRForLineItem';
 // import api from '../../../Utils/ApiCalls/Api';
 
 const Expense = () => {
@@ -60,7 +61,8 @@ const Expense = () => {
 
     const [qr, setQr] = useState(false);
     const [invno, setInvno] = useState('');
-    const [value, setValue] = useState('http://invoice/');
+    // const [value, setValue] = useState(`${import.meta.env.VITE_BASE_URL}`);
+    // ('http://invoice/');
     const currentEpochTimeMs = new Date().getTime();
 
     // const currentEpochTimeMs = new Date().getTime();
@@ -183,7 +185,7 @@ const Expense = () => {
         {
             field: 'Kostl',
             headerName: 'Cost Center',
-            width: 140,
+            width: 130,
             renderCell: (params) => (
                 <TextField
                     select
@@ -315,7 +317,7 @@ const Expense = () => {
         {
             field: 'qr',
             headerName: 'Uplode Doc with QR',
-            width: 180,
+            width: 160,
             renderCell: (params) => (
                 // <TextField
                 //     // type="file"
@@ -330,7 +332,7 @@ const Expense = () => {
         {
             field: 'Document',
             headerName: 'Document',
-            width: 250,
+            width: 230,
             renderCell: (params) => (
                 <TextField
                     type="file"
@@ -361,27 +363,59 @@ const Expense = () => {
         // },
     ];
 
+    // ------------------working-----------
+    // const handleFileChange = (event, params) => {
+    //     const file = event.target.files[0]; // Get the selected file
+    //     if (file) {
+    //         // Get the file extension (e.g., '.pdf', '.jpeg')
+    //         const fileExtension = file.name.split('.').pop();
+    //         const ModifyedDocNumber = params.row.docTime; // Get the current row's invoice number (e.g., INV123)
+
+    //         // If the invoice number is available, use it as the document name
+    //         const newDocumentName = ModifyedDocNumber ? `${ModifyedDocNumber}.${fileExtension}` : file.name;
+
+    //         // Update the row data with both the new document name and the actual file
+    //         const updatedRows = tdata.map((row) =>
+    //             row.id === params.id
+    //                 ? {
+    //                     ...row,
+    //                     Document: newDocumentName,  // Update the document name
+    //                     file: file                  // Store the actual file for upload later
+    //                 }
+    //                 : row
+    //         );
+    //         setTData(updatedRows);
+
+    //         console.log('File uploaded for row:', params.id, newDocumentName);
+    //     }
+    // };
+
     const handleFileChange = (event, params) => {
         const file = event.target.files[0]; // Get the selected file
         if (file) {
-            // Get the file extension (e.g., '.pdf', '.jpeg')
-            const fileExtension = file.name.split('.').pop();
-            const ModifyedDocNumber = params.row.docTime; // Get the current row's invoice number (e.g., INV123)
+            // You can get the current row's document number
+            const ModifyedDocNumber = params.row.docTime; // Get the current row's document number
 
-            // If the invoice number is available, use it as the document name
-            const newDocumentName = ModifyedDocNumber ? `${ModifyedDocNumber}.${fileExtension}` : file.name;
+            // Just use the document number without appending the file extension
+            const newDocumentName = ModifyedDocNumber || file.name;
 
+            // Update the row data with both the new document name and the actual file
             const updatedRows = tdata.map((row) =>
                 row.id === params.id
-                    ? { ...row, Document: newDocumentName } // Update the document name in the row
+                    ? {
+                        ...row,
+                        Document: newDocumentName,  // Update the document name without extension
+                        file: file                  // Store the actual file for upload later
+                    }
                     : row
             );
             setTData(updatedRows);
 
-            // Here you can send the `file` to the server if needed
             console.log('File uploaded for row:', params.id, newDocumentName);
         }
     };
+
+
 
     // const handleFileChange = (event, params) => {
     //     const file = event.target.files[0]; // Get the selected file
@@ -474,11 +508,16 @@ const Expense = () => {
     //     handlePostData(url, body);
     // }
 
-    const submitExpense = () => {
+    const handleClearAfterSubmit = () => {
+        setTData([]);
+        setSubmitExp([]);
+    }
+
+    const submitExpense = async () => {
         setLoading(true);
         var mainD = postData;
 
-        var mainD = postData;
+        // var mainD = postData;
 
         mainD.Bldat = mainD.Bldat.replaceAll('-', '');
         mainD.Budat = mainD.Budat.replaceAll('-', '');
@@ -487,15 +526,17 @@ const Expense = () => {
 
         // console.log(mainD.ItemNav.Dmbtr);
 
-        mainD.ItemNav.forEach(async (item) => {
-            if (item.Document) {
-                const file = {
-                    name: item.Document, // Assuming this is the document name with extension
-                    docTime: item.docTime, // Assuming this is the timestamp for each document
-                };
-                await uploadImage(file);
-            }
-        });
+        // mainD.ItemNav.forEach(async (item) => {
+        //     if (item.Document) {
+        //         const file = {
+        //             name: item.Document, // Assuming this is the document name with extension
+        //             docTime: item.docTime, // Assuming this is the timestamp for each document
+        //         };
+        //         await uploadImage(file);
+        //     }
+        // });
+
+        // -----------------working
 
         console.log(mainD);
 
@@ -510,15 +551,30 @@ const Expense = () => {
         //     setErrorMessage("Add or Select atleast one row");
         //     setErrorSnackbarOpen(true);
         // } else {
-        //     // console.log(mainD.OrderDate);
-        //     mainD.OrderDate = mainD.OrderDate.replaceAll('-', '');
+        // console.log(mainD.OrderDate);
+        // mainD.OrderDate = mainD.OrderDate.replaceAll('-', '');
 
-        //     console.log(mainD);
-        //     // console.log(mainD.OrderDate);
-        // handlePostExpense(mainD);
+        console.log(mainD);
+        // console.log(mainD.OrderDate);
 
-        //     // nav("/order-to-cash/display");
+        for (const item of tdata) { // assuming you're using tdata for the table
+            if (item.file) { // Check if there's an actual file stored in the row
+                const file = item.file;
+
+                // Upload the file to Firebase with the new document name
+                const downloadURL = await uploadImage(file, item.Document);
+
+                // You can update the postData here if you need the download URL for the document
+                item.Document = downloadURL;
+            }
+        }
+
+        handlePostExpense(mainD);
+
+        // nav("/order-to-cash/display");
         // }
+
+        handleClearAfterSubmit();
         setLoading(false);
     }
 
@@ -641,7 +697,7 @@ const Expense = () => {
         <>
             {loading && <FullScreenLoader />}
             {/* {qr && <DynamicQR />} */}
-            {qr && <DynamicQR value={value + invno} setQr={setQr} invno={invno} />}
+            {qr && <DynamicQRForLineItem value={`${import.meta.env.VITE_UPLODE_DOC}` + invno} setQr={setQr} invno={invno} />}
             <div className='df'>
 
                 {/* <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}> */}
