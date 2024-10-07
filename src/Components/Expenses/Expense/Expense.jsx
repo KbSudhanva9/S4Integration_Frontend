@@ -445,7 +445,7 @@ const Expense = () => {
             Document: "",
             Hkont: "63006000",
             Tflag: false,
-            docTime: currentEpochTimeMs
+            docTime: (currentEpochTimeMs).toString()
         };
         setTData([...tdata, newRow]);
     };
@@ -513,11 +513,22 @@ const Expense = () => {
         setSubmitExp([]);
     }
 
+    // Function to remove 'file' from each object in 'ItemNav'
+    const removeFileProperty = (data) => {
+        return {
+            ...data,
+            ItemNav: data.ItemNav.map(item => {
+                const { file, ...rest } = item; // Destructure 'file' out of the item and keep the rest
+                return rest; // Return the object without the 'file' property
+            })
+        };
+    };
+
     const submitExpense = async () => {
         setLoading(true);
         var mainD = postData;
 
-        // var mainD = postData;
+        var mainD = removeFileProperty(mainD);
 
         mainD.Bldat = mainD.Bldat.replaceAll('-', '');
         mainD.Budat = mainD.Budat.replaceAll('-', '');
@@ -538,7 +549,7 @@ const Expense = () => {
 
         // -----------------working
 
-        console.log(mainD);
+        // console.log(mainD);
 
         // uploadImage(mainD.ItemNav.Document);
 
@@ -554,7 +565,7 @@ const Expense = () => {
         // console.log(mainD.OrderDate);
         // mainD.OrderDate = mainD.OrderDate.replaceAll('-', '');
 
-        console.log(mainD);
+        // console.log(mainD);
         // console.log(mainD.OrderDate);
 
         for (const item of tdata) { // assuming you're using tdata for the table
@@ -573,9 +584,7 @@ const Expense = () => {
 
         // nav("/order-to-cash/display");
         // }
-
-        handleClearAfterSubmit();
-        setLoading(false);
+        
     }
 
     const getCalling = async (url) => {
@@ -612,6 +621,8 @@ const Expense = () => {
                 setSuccessSnackbarOpen(true);
                 // setBussinessPlace(response.data.data.businessPlacesSet.results);
                 // setSideLoading(false);
+                handleClearAfterSubmit();
+                setLoading(false);
             }
         } catch (error) {
             console.error('unable to get the response', error);
@@ -626,6 +637,7 @@ const Expense = () => {
                 // setErrorMessage(response.data.message);
                 // setOpenError(true);
                 // setSideLoading(false);
+                setLoading(false);
             }
             // setSideLoading(false);
         }

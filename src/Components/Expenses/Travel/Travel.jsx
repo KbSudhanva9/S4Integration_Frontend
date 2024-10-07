@@ -4,11 +4,18 @@ import api from "../../../Utils/ApiCalls/Api";
 import { Box, CircularProgress, styled } from "@mui/material";
 import { TbNotesOff } from "react-icons/tb";
 import { FaList, FaTimesCircle } from "react-icons/fa";
+import { getDownloadURL, ref } from "firebase/storage";
+import { storage } from "../../../Utils/FireBase/FireBaseConfig";
+import { IoDocumentAttachOutline } from "react-icons/io5";
+import FullScreenLoader from "../../../Utils/Loading/FullScreenLoader";
+// import FireBaseConfig from "../../../Utils/FireBase/FireBaseConfig"
 
 const Travel = () => {
 
     const [tdata, setTData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [fullLoading, setFullLoading] = useState(false);
+    
     const columns = [
         { field: 'Docno', headerName: 'SAPDocument No.', width: 170 },
         { field: 'Bldat', headerName: 'Requested Date', width: 140 },
@@ -17,9 +24,48 @@ const Travel = () => {
         { field: 'Bktxt', headerName: 'Request Text', width: 120 },
         { field: 'Dmbtr', headerName: 'Amount', width: 130 },
         { field: 'Tflag', headerName: 'Status', width: 90 },
-        { field: 'Document', headerName: 'Document', width: 150 },
+        // { field: 'docTime', headerName: 'Document', width: 150 },
+        {
+            field: 'docTime',
+            headerName: 'Document',
+            width: 100,
+            renderCell: (params) => (
+                <span
+                    style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={() => handleDocumentClick(params.row.docTime)} // Call function to fetch document
+                >
+                    {/* {params.row.docTime} */}
+                    <IoDocumentAttachOutline style={{ height: '20px', width: '20px' }} />
+
+                </span>
+            )
+        },
         { field: 'Remarks', headerName: 'Remarks', width: 210 },
     ];
+
+    // const handleDocumentClick = async (docNumber) => {
+    //     try {
+    //       const storageRef = ref(storage, `images/${docNumber}`); // Search document by docNumber
+    //       const downloadURL = await getDownloadURL(storageRef);
+    //       window.open(downloadURL, "_blank"); // Open the document in a new tab
+    //     } catch (error) {
+    //       console.error("Error fetching document from Firebase:", error);
+    //       alert("Unable to find the document.");
+    //     }
+    //   };
+    const handleDocumentClick = async (docNumber) => {
+        setFullLoading(true);
+        try {
+            const storageRef = ref(storage, `images/${docNumber}`); // Use docNumber to reference the file in Firebase storage
+            const downloadURL = await getDownloadURL(storageRef);   // Fetch download URL from Firebase
+            window.open(downloadURL, "_blank"); // Open the document in a new tab
+            setFullLoading(false);
+        } catch (error) {
+            console.error("Error fetching document from Firebase:", error);
+            alert("Unable to find the document.");
+            setFullLoading(false);
+        }
+    };
 
     // If date is like /Date(1234567890)/"
     // const convertDate = (dateString) => {
@@ -66,7 +112,7 @@ const Travel = () => {
                     Bktxt: item.Bktxt,
                     Dmbtr: item.Dmbtr,
                     Tflag: item.Tflag,
-                    Document: item.Document,
+                    docTime: item.docTime,
                     Remarks: item.Remarks,
                     // approvedOrRejected: item.approvedOrRejected,
                     // remarks: item.remarks,
@@ -109,37 +155,42 @@ const Travel = () => {
     }, []);
 
     return (
-        <div className="maincomponent" style={{ height: '85vh' }}>
-            {/* Travel */}
-            {loading ? (
-                <div style={{
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(5px)',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 1100
-                }}>
-                    <CircularProgress style={{ color: '#ea1214' }} />
-                </div>
-            ) : (
-                <DataGrid
-                    rows={tdata}
-                    columns={columns}
-                    slots={{ noRowsOverlay: NoRowsOverlay }}
-                // initialState={{
-                //     pagination: {
-                //         paginationModel: { page: 0, pageSize: 5 },
-                //     },
-                // }}
-                // pageSizeOptions={[5, 10]}
-                // checkboxSelection
-                // onRowSelectionModelChange={handleSelectionChange}
-                />
-            )}
-        </div>
+
+        <>
+            {fullLoading && <FullScreenLoader />}
+
+            <div className="maincomponent" style={{ height: '85vh' }}>
+                {/* Travel */}
+                {loading ? (
+                    <div style={{
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        backdropFilter: 'blur(5px)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1100
+                    }}>
+                        <CircularProgress style={{ color: '#ea1214' }} />
+                    </div>
+                ) : (
+                    <DataGrid
+                        rows={tdata}
+                        columns={columns}
+                        slots={{ noRowsOverlay: NoRowsOverlay }}
+                    // initialState={{
+                    //     pagination: {
+                    //         paginationModel: { page: 0, pageSize: 5 },
+                    //     },
+                    // }}
+                    // pageSizeOptions={[5, 10]}
+                    // checkboxSelection
+                    // onRowSelectionModelChange={handleSelectionChange}
+                    />
+                )}
+            </div>
+        </>
     );
 }
 
