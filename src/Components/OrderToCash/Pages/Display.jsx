@@ -41,7 +41,8 @@ const Display = () => {
   // ];
 
   const [cdata, setCData] = useState([]);
-
+  const [cPopData, setCPopData] = useState([]);
+  
   const [res, setRes] = useState([]);
   const [currentRow, setCurrentRow] = useState([]);
 
@@ -57,6 +58,16 @@ const Display = () => {
     // { field: "UnitPrice", headerName: "Unit   Price", width: 90 },
     // { field: 'Total_amount', headerName: 'Total Amount', width: 100 },
     { field: 'Remarks', headerName: 'Remarks', width: 140 },
+  ];
+
+  const columnsDisplayInPopUp = [
+    { field: "Material", headerName: "Material", width: 120 },
+    { field: "TargetQty", headerName: "Target Qty", width: 100 },
+    { field: "TargetUom", headerName: "Target Uom", width: 100 },
+    { field: 'Description', headerName: 'Description', width: 170 },
+    { field: "ReferenceNumber", headerName: "Reference No.", width: 120 },
+    { field: "Amount", headerName: "Amount", width: 100 },
+    { field: 'UnitPrice', headerName: 'UnitPrice', width: 100 },
   ];
 
   const convertDate = (dateString) => {
@@ -204,84 +215,101 @@ const Display = () => {
         </IconButton>
         <DialogContent dividers='blue'>
 
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
+              <div className="basic-margin">
+                <p><b>Customer Id</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.CustomerNumber} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Customer Mail Id</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Mail} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Sales Order Number</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.SalesOrderNumber} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Item Number</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ItemNumber} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Invoice Number</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.InvoiceNumber} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Reference Number</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ReferenceNumber} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Delivery Number</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.DeliveryNumber} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Portal No</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.PortalNo} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Material</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Material} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Uom</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetUom} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Order Date</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.OrderDate)} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Delivery Date</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.DeliveryDate)} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Invoice Date</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.InvoiceDate)} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Qty</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetQty} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Unit Price</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.UnitPrice} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Total Amount</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Flag</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Flag} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Description</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Description} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Preferred Transporter</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.PreferredTransporter} </p>
+              </div>
+              <div className="basic-margin">
+                <p><b>Remarks</b></p>
+                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Remarks} </p>
+              </div>
+            </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
-            <div className="basic-margin">
-              <p><b>Customer Id</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.CustomerNumber} </p>
+            <div style={{ height: '250px', padding: '10px' }}>
+
+              <DataGrid
+                rows={cPopData}
+                columns={columnsDisplayInPopUp}
+                slots={{ noRowsOverlay: NoRowsOverlay }}
+              />
+
             </div>
-            <div className="basic-margin">
-              <p><b>Customer Mail Id</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Mail} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Sales Order Number</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.SalesOrderNumber} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Item Number</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ItemNumber} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Invoice Number</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.InvoiceNumber} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Reference Number</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ReferenceNumber} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Delivery Number</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.DeliveryNumber} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Flag</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Flag} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Material</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Material} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Uom</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetUom} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Order Date</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.OrderDate)} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Delivery Date</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.DeliveryDate)} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Invoice Date</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.InvoiceDate)} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Qty</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetQty} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Unit Price</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.UnitPrice} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Total Amount</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Description</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Description} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Preferred Transporter</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.PreferredTransporter} </p>
-            </div>
-            <div className="basic-margin">
-              <p><b>Remarks</b></p>
-              <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Remarks} </p>
-            </div>
+
+
           </div>
 
           {/* <Typography gutterBottom>
