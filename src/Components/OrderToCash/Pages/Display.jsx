@@ -4,10 +4,12 @@ import api from "../../../Utils/ApiCalls/Api";
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from "@mui/material";
 import { TbNotesOff } from "react-icons/tb";
 import styled from "styled-components";
+import FullScreenLoader from "../../../Utils/Loading/FullScreenLoader";
 
 const Display = () => {
   // const [tdata, setTData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fLoading, setFLoading] = useState(false);
 
   const [open, setOpen] = useState(false);
 
@@ -42,7 +44,7 @@ const Display = () => {
 
   const [cdata, setCData] = useState([]);
   const [cPopData, setCPopData] = useState([]);
-  
+
   const [res, setRes] = useState([]);
   const [currentRow, setCurrentRow] = useState([]);
 
@@ -50,7 +52,7 @@ const Display = () => {
     { field: "CustomerNumber", headerName: "Customer No.", width: 160 },
     { field: "OrderDate", headerName: "Created Date", width: 160 },
     { field: "SalesOrderNumber", headerName: "SAP SO no.", width: 160 },
-    // { field: 'ItemNumber', headerName: 'Item no.', width: 140 },
+    { field: 'PortalNo', headerName: 'Portal No.', width: 140 },
     { field: 'Material', headerName: 'Material', width: 180 },
     // { field: 'MATDescription', headerName: 'MAT Description', width: 170 },
     { field: "TargetUom", headerName: "UOM", width: 100 },
@@ -113,7 +115,7 @@ const Display = () => {
             OrderDate: convertDate(item.OrderDate),
             // OrderDate: item.OrderDate,
             SalesOrderNumber: item.SalesOrderNumber,
-            // ItemNumber: item.ItemNumber,
+            PortalNo: item.PortalNo,
             Material: item.Material,
             TargetUom: item.TargetUom,
             TargetQty: item.TargetQty,
@@ -135,11 +137,50 @@ const Display = () => {
     }
   };
 
+  const handlePostData = async (url, body) => {
+    var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
+    try {
+      const response = await api.post(currentURL, body);
+      if (url.includes("getSalesOnPortal")) {
+        console.log(response.data.data);
+        // setCurrentRow(response.data.data);
+
+        const formattedLineItems = response.data.data.salesOrderNav.results.map(
+          (item, index) => ({
+            id: index + 1,
+            Material: item.Material,
+            TargetQty: item.TargetQty,
+            TargetUom: item.TargetUom,
+            Description: item.Description,
+            ReferenceNumber: item.ReferenceNumber,
+            Amount: item.Amount,
+            UnitPrice: item.UnitPrice,
+          })
+        );
+        // setTData(formattedLineItems);
+        setCPopData(formattedLineItems);
+        handleClickOpen();
+        setFLoading(false);
+      }
+    } catch (error) {
+      console.error('unable to get the response', error);
+      setFLoading(false);
+    }
+  };
+
   const handleTableDate = () => {
     setLoading(true);
     var url = "/public/getAllSales";
     handleGetData(url);
   };
+  const handleGetAllSalesDetatils = (PortalNo) => {
+    setFLoading(true);
+    const url = '/public/getSalesOnPortal';
+    const body = {
+      "portal_no": `${PortalNo}`
+    }
+    handlePostData(url, body);
+  }
 
   useEffect(() => {
     handleTableDate();
@@ -161,158 +202,167 @@ const Display = () => {
   );
 
   const handleRowClick = (params) => {
+    // console.log('Row clicked:', params.row);
+    // console.log('Row clicked:', params.row.PortalNo);
     console.log('Row clicked:', res[params.row.id - 1]);
     setCurrentRow(res[params.row.id - 1]);
 
-    handleClickOpen();
+    handleGetAllSalesDetatils(params.row.PortalNo);
+
+    // handleClickOpen();
   }
 
   return (
-    <div className="maincomponent" style={{ height: "85vh" }}>
-      {/* Travel */}
-      {loading ? (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            backdropFilter: "blur(5px)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1100,
-          }}
-        >
-          <CircularProgress style={{ color: "#ea1214" }} />
-        </div>
-      ) : (
-        <DataGrid
-          rows={cdata}
-          columns={columnsDisplay}
-          slots={{ noRowsOverlay: NoRowsOverlay }}
-          onRowClick={handleRowClick}
-        />
-      )}
 
-      {/* <Button variant="outlined" onClick={handleClickOpen}>
+    <>
+      {fLoading && <FullScreenLoader />}
+
+
+      <div className="maincomponent" style={{ height: "85vh" }}>
+        {/* Travel */}
+        {loading ? (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              backdropFilter: "blur(5px)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 1100,
+            }}
+          >
+            <CircularProgress style={{ color: "#ea1214" }} />
+          </div>
+        ) : (
+          <DataGrid
+            rows={cdata}
+            columns={columnsDisplay}
+            slots={{ noRowsOverlay: NoRowsOverlay }}
+            onRowClick={handleRowClick}
+          />
+        )}
+
+        {/* <Button variant="outlined" onClick={handleClickOpen}>
         Open dialog
       </Button> */}
-      <Dialog open={open} maxWidth='md' fullWidth='true'>
-        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-          Report Details
-        </DialogTitle>
-        <IconButton
-          aria-label="close"
-          onClick={handleClose}
-          sx={(theme) => ({
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: theme.palette.grey[500],
-          })}
-        >
-          <GridCloseIcon />
-        </IconButton>
-        <DialogContent dividers='blue'>
+        <Dialog open={open} maxWidth='md' fullWidth='true'>
+          <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+            Report Details
+          </DialogTitle>
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={(theme) => ({
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: theme.palette.grey[500],
+            })}
+          >
+            <GridCloseIcon />
+          </IconButton>
+          <DialogContent dividers='blue'>
 
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
-              <div className="basic-margin">
-                <p><b>Customer Id</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.CustomerNumber} </p>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
+                <div className="basic-margin">
+                  <p><b>Customer Id</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.CustomerNumber} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Customer Mail Id</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Mail} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Sales Order Number</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.SalesOrderNumber} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Item Number</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ItemNumber} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Invoice Number</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.InvoiceNumber} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Reference Number</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ReferenceNumber} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Delivery Number</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.DeliveryNumber} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Portal No</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.PortalNo} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Material</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Material} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Uom</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetUom} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Order Date</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.OrderDate)} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Delivery Date</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.DeliveryDate)} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Invoice Date</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.InvoiceDate)} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Qty</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetQty} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Unit Price</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.UnitPrice} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Total Amount</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Flag</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Flag} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Description</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Description} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Preferred Transporter</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.PreferredTransporter} </p>
+                </div>
+                <div className="basic-margin">
+                  <p><b>Remarks</b></p>
+                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Remarks} </p>
+                </div>
               </div>
-              <div className="basic-margin">
-                <p><b>Customer Mail Id</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Mail} </p>
+
+              <div style={{ height: '250px', padding: '10px' }}>
+
+                <DataGrid
+                  rows={cPopData}
+                  columns={columnsDisplayInPopUp}
+                  slots={{ noRowsOverlay: NoRowsOverlay }}
+                />
+
               </div>
-              <div className="basic-margin">
-                <p><b>Sales Order Number</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.SalesOrderNumber} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Item Number</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ItemNumber} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Invoice Number</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.InvoiceNumber} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Reference Number</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ReferenceNumber} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Delivery Number</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.DeliveryNumber} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Portal No</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.PortalNo} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Material</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Material} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Uom</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetUom} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Order Date</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.OrderDate)} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Delivery Date</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.DeliveryDate)} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Invoice Date</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.InvoiceDate)} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Qty</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetQty} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Unit Price</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.UnitPrice} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Total Amount</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Flag</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Flag} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Description</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Description} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Preferred Transporter</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.PreferredTransporter} </p>
-              </div>
-              <div className="basic-margin">
-                <p><b>Remarks</b></p>
-                <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Remarks} </p>
-              </div>
+
+
             </div>
 
-            <div style={{ height: '250px', padding: '10px' }}>
-
-              <DataGrid
-                rows={cPopData}
-                columns={columnsDisplayInPopUp}
-                slots={{ noRowsOverlay: NoRowsOverlay }}
-              />
-
-            </div>
-
-
-          </div>
-
-          {/* <Typography gutterBottom>
+            {/* <Typography gutterBottom>
             Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
             dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
             consectetur ac, vestibulum at eros.
@@ -326,15 +376,16 @@ const Display = () => {
             magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec
             ullamcorper nulla non metus auctor fringilla.
           </Typography> */}
-        </DialogContent>
-        <DialogActions>
-          <Button size="small" color="warning" onClick={handleClose}>
-            close
-          </Button>
-        </DialogActions>
-      </Dialog>
+          </DialogContent>
+          <DialogActions>
+            <Button size="small" color="warning" onClick={handleClose}>
+              close
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-    </div>
+      </div>
+    </>
   );
 };
 
