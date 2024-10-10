@@ -456,7 +456,7 @@ const Create = () => {
       console.log(mainD);
       // console.log(mainD.OrderDate);
 
-      // handlePostExpense(mainD);
+      handlePostExpense(mainD);
 
       // nav("/order-to-cash/display");
     }
