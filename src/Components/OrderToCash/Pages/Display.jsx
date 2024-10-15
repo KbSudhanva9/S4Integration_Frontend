@@ -1,7 +1,7 @@
-import { DataGrid, GridCloseIcon } from "@mui/x-data-grid";
+import { DataGrid, GridCloseIcon, GridToolbar } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import api from "../../../Utils/ApiCalls/Api";
-import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from "@mui/material";
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { TbNotesOff } from "react-icons/tb";
 import styled from "styled-components";
 import FullScreenLoader from "../../../Utils/Loading/FullScreenLoader";
@@ -67,7 +67,7 @@ const Display = () => {
     { field: "TargetQty", headerName: "Target Qty", width: 100 },
     { field: "TargetUom", headerName: "Target Uom", width: 100 },
     { field: 'Description', headerName: 'Description', width: 170 },
-    { field: "ReferenceNumber", headerName: "Reference No.", width: 120 },
+    // { field: "ReferenceNumber", headerName: "Reference No.", width: 120 },
     { field: "Amount", headerName: "Amount", width: 100 },
     { field: 'UnitPrice', headerName: 'UnitPrice', width: 100 },
   ];
@@ -152,7 +152,7 @@ const Display = () => {
             TargetQty: item.TargetQty,
             TargetUom: item.TargetUom,
             Description: item.Description,
-            ReferenceNumber: item.ReferenceNumber,
+            // ReferenceNumber: item.ReferenceNumber,
             Amount: item.Amount,
             UnitPrice: item.UnitPrice,
           })
@@ -186,7 +186,7 @@ const Display = () => {
     handleTableDate();
   }, []);
 
-  const NoRowsOverlay = () => (
+  const NoRowsOverlayOne = () => (
     <div
       style={{
         display: "flex",
@@ -198,6 +198,23 @@ const Display = () => {
     >
       <TbNotesOff size={60} color="gray" />
       <span style={{ marginTop: "8px", color: "gray" }}>No data available</span>
+    </div>
+  );
+
+  const NoRowsOverlay = () => (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100px",
+      }}
+    >
+      <TbNotesOff size={60} color="gray" />
+      <Typography color="gray" mt={1}>
+        No data available
+      </Typography>
     </div>
   );
 
@@ -239,7 +256,7 @@ const Display = () => {
           <DataGrid
             rows={cdata}
             columns={columnsDisplay}
-            slots={{ noRowsOverlay: NoRowsOverlay }}
+            slots={{ noRowsOverlay: NoRowsOverlayOne }}
             onRowClick={handleRowClick}
           />
         )}
@@ -266,19 +283,101 @@ const Display = () => {
           <DialogContent dividers='blue'>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
-                <div className="basic-margin">
-                  <p><b>Customer Id</b></p>
-                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.CustomerNumber} </p>
+              <div>
+                <p><b>Sales order</b></p>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
+                  <div className="basic-margin">
+                    <p><b>Customer Id</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.CustomerNumber} </p>
+                  </div>
+                  <div className="basic-margin">
+                    <p><b>Customer Name</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.CustomerName} </p>
+                  </div>
+                  <div className="basic-margin">
+                    <p><b>Sales Order Date</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.OrderDate)} </p>
+                  </div>
+                  {/* <div className="basic-margin">
+                    <p><b>Sales Order Number</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.SalesOrderNumber} </p>
+                  </div> */}
+                  <div className="basic-margin">
+                    <p><b>Total Amount</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
+                  </div>
                 </div>
-                <div className="basic-margin">
-                  <p><b>Customer Mail Id</b></p>
-                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Mail} </p>
+              </div>
+
+              <div>
+                <p><b>Delivery</b></p>
+                <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
+                  <div className="basic-margin">
+                    <p><b>Ship to Party Code</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.shipToPartyNumber} </p>
+                  </div>
+                  <div className="basic-margin">
+                    <p><b>Ship to Party Name</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.shipToPartyName} </p>
+                  </div>
+                  <div className="basic-margin">
+                    <p><b>Sales Order Date</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.OrderDate)} </p>
+                  </div>
+                  {/* <div className="basic-margin">
+                    <p><b>Total Amount</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
+                  </div> */}
                 </div>
-                <div className="basic-margin">
-                  <p><b>Sales Order Number</b></p>
-                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.SalesOrderNumber} </p>
+              </div>
+
+              <div>
+                <p><b>Invoice</b></p>
+                <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
+                  <div className="basic-margin">
+                    <p><b>Payer Code</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.shipToPartyNumber} </p>
+                  </div>
+                  <div className="basic-margin">
+                    <p><b>Payer Name</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.shipToPartyName} </p>
+                  </div>
+                  <div className="basic-margin">
+                    <p><b>Invoice Date</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.InvoiceDate)} </p>
+                  </div>
+                  <div className="basic-margin">
+                    <p><b>Invoice Value</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
+                  </div>
                 </div>
+              </div>
+
+              <div>
+                {/* <p><b>Invoice</b></p> */}
+                <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
+                  <div className="basic-margin">
+                    <p><b>Reference Number</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ReferenceNumber} </p>
+                  </div>
+                  <div className="basic-margin">
+                    <p><b>Preferred Transporter</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.PreferredTransporter} </p>
+                  </div>
+                  {/* <div className="basic-margin">
+                    <p><b>Description</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Description} </p>
+                  </div> */}
+                  <div className="basic-margin">
+                    <p><b>Remarks</b></p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Remarks} </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
+
                 <div className="basic-margin">
                   <p><b>Item Number</b></p>
                   <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.ItemNumber} </p>
@@ -307,10 +406,10 @@ const Display = () => {
                   <p><b>Uom</b></p>
                   <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.TargetUom} </p>
                 </div>
-                <div className="basic-margin">
+                {/* <div className="basic-margin">
                   <p><b>Order Date</b></p>
                   <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.OrderDate)} </p>
-                </div>
+                </div> 
                 <div className="basic-margin">
                   <p><b>Delivery Date</b></p>
                   <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.DeliveryDate)} </p>
@@ -328,10 +427,6 @@ const Display = () => {
                   <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.UnitPrice} </p>
                 </div>
                 <div className="basic-margin">
-                  <p><b>Total Amount</b></p>
-                  <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
-                </div>
-                <div className="basic-margin">
                   <p><b>Flag</b></p>
                   <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Flag} </p>
                 </div>
@@ -347,15 +442,45 @@ const Display = () => {
                   <p><b>Remarks</b></p>
                   <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Remarks} </p>
                 </div>
-              </div>
+              </div> */}
 
               <div style={{ height: '250px', padding: '10px' }}>
 
-                <DataGrid
+                {/* <DataGrid
                   rows={cPopData}
                   columns={columnsDisplayInPopUp}
                   slots={{ noRowsOverlay: NoRowsOverlay }}
-                />
+                /> */}
+                <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        {columnsDisplayInPopUp.map((column) => (
+                          <TableCell key={column.field}>{column.headerName}</TableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {cPopData.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={columnsDisplayInPopUp.length} align="center">
+                            <NoRowsOverlay />
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        cPopData.map((row, index) => (
+                          <TableRow key={index}>
+                            {columnsDisplayInPopUp.map((column) => (
+                              <TableCell key={column.field}>
+                                {row[column.field]}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
 
               </div>
 

@@ -76,9 +76,16 @@ const Create = () => {
   const [postData, setPostData] = useState({
     CustomerNumber: user,
     CustomerName: "",
+    Mail: "",
     OrderDate: "",
     PreferredTransporter: "",
     // SalesOrderNumber: "",
+    shipToPartyNumber: "",
+    shipToPartyName: "",
+    shipToPartyAdress: "",
+    taxNumber: "",
+    outstandingAmount: "",
+    ReferenceNumber: "",
     salesOrderNav: [],
   });
   const [sRows, setSRows] = useState([]); //store selected data in table tdata
@@ -135,11 +142,12 @@ const Create = () => {
 
   const columns = [
     {
-      field: "ReferenceNumber",
-      headerName: "Refrence No",
+      field: "id",
+      headerName: "Serial No.",
       width: 150,
       renderCell: (params) => (
         <TextField
+          disabled
           type="text"
           value={params.value || ""}
           onChange={(e) => {
@@ -194,6 +202,24 @@ const Create = () => {
       ),
     },
     {
+      field: "Description",
+      headerName: "Description",
+      width: 190,
+      renderCell: (params) => (
+        <TextField
+          type="text"
+          value={params.value || ""}
+          onChange={(e) => {
+            handleCellChange(e, params);
+            // calculateTotal(selectedRows); // Call calculateTotal after a change
+          }}
+          size="small"
+          fullWidth
+          style={{ marginTop: "5px" }}
+        />
+      ),
+    },
+    {
       field: "TargetUom",
       headerName: "UOM",
       width: 190,
@@ -230,63 +256,81 @@ const Create = () => {
           type="text"
           value={params.value || ""}
           onChange={(e) => {
-            handleCellChange(e, params);
-            // calculateTotal(selectedRows); // Call calculateTotal after a change
+            const inputValue = e.target.value;
+
+            // Check if the value is a valid number before updating
+            if (!isNaN(inputValue) || inputValue === '') {
+              handleCellChange(e, params); // Only update if it's a valid number or empty
+            }
           }}
+          // onChange={(e) => {
+          //   handleCellChange(e, params);
+          //   // calculateTotal(selectedRows); // Call calculateTotal after a change
+          // }}
           size="small"
           fullWidth
           style={{ marginTop: "5px" }}
         />
       ),
     },
-    {
-      field: "UnitPrice",
-      headerName: "Price",
-      width: 150,
-      renderCell: (params) => (
-        <TextField
-          type="text"
-          value={params.value || ""}
-          onChange={(e) => {
-            handleCellChange(e, params);
-            // calculateTotal(selectedRows); // Call calculateTotal after a change
-          }}
-          size="small"
-          fullWidth
-          style={{ marginTop: "5px" }}
-        />
-      ),
-    },
-    {
-      field: "Amount",
-      headerName: "Amout",
-      width: 150,
-      renderCell: (params) => (
-        <TextField
-          type="text"
-          disabled={true}
-          value={params.value || ""}
-          onChange={(e) => {
-            handleCellChange(e, params);
-            // calculateTotal(selectedRows); // Call calculateTotal after a change
-          }}
-          size="small"
-          fullWidth
-          style={{ marginTop: "5px" }}
-        />
-      ),
-    },
+    // {
+    //   field: "UnitPrice",
+    //   headerName: "Price",
+    //   width: 150,
+    //   renderCell: (params) => (
+    //     <TextField
+    //       type="text"
+    //       value={params.value || ""}
+    //       onChange={(e) => {
+    //         const inputValue = e.target.value;
+
+    //         // Check if the value is a valid number before updating
+    //         if (!isNaN(inputValue) || inputValue === '') {
+    //           handleCellChange(e, params); // Only update if it's a valid number or empty
+    //         }
+    //       }}
+    //       // onChange={(e) => {
+    //       //   handleCellChange(e, params);
+    //       //   // calculateTotal(selectedRows); // Call calculateTotal after a change
+    //       // }}
+    //       size="small"
+    //       fullWidth
+    //       style={{ marginTop: "5px" }}
+    //     />
+    //   ),
+    // },
+    // {
+    //   field: "Amount",
+    //   headerName: "Amout",
+    //   width: 150,
+    //   renderCell: (params) => (
+    //     <TextField
+    //       type="text"
+    //       disabled={true}
+    //       value={params.value || ""}
+    //       onChange={(e) => {
+    //         handleCellChange(e, params);
+    //         // calculateTotal(selectedRows); // Call calculateTotal after a change
+    //       }}
+    //       size="small"
+    //       fullWidth
+    //       style={{ marginTop: "5px" }}
+    //     />
+    //   ),
+    // },
   ];
 
   const handleAddRow = () => {
     const newRow = {
       id: tdata.length + 1, // Ensure unique ID for each row
-      ReferenceNumber: "",
+      // ReferenceNumber: tdata.length + 1,
+      // "",
       Material: "",
       TargetUom: "",
-      TargetQty: "",
-      UnitPrice: "",
-      Amount: ""
+      TargetQty: "0",
+      UnitPrice: "0.00",
+      Amount: "0.00",
+      Description: ""
     };
     setTData([...tdata, newRow]);
   };
@@ -368,6 +412,45 @@ const Create = () => {
     console.log(remainingData);
   };
 
+  const handleGetData = async (url) => {
+    var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
+    try {
+      const response = await api.get(currentURL);
+      // console.log(response);
+      if (url.includes("cmpMat")) {
+        // console.log(response);
+        // console.log(response.data.data);
+        setMaterialData(response.data.data);
+        setLoading(false);
+      } else if (url.includes("top5SalesOrder")) {
+        // console.log(response);
+        // console.log(response.data.data);
+        // console.log(response.data.data.results);
+        setDivData(response.data.data.results);
+        setLoading(false);
+      } //else if (url.includes('cmpCodes')) {
+      //     console.log(response.data.data);
+      //     setcocode(response.data.data);
+      // }
+      setLoading(false);
+    } catch (error) {
+      console.error("unable to get the response", error);
+      setLoading(false);
+    }
+  };
+
+  const handleMaterialData = () => {
+    setLoading(true);
+    var url = "/public/cmpMat";
+    handleGetData(url);
+  };
+
+  const handleTopFive = () => {
+    setLoading(true);
+    var url = "/public/top5SalesOrder";
+    handleGetData(url);
+  };
+
   const handlePostData = async (url, body) => {
     var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
     try {
@@ -386,6 +469,17 @@ const Create = () => {
         console.log(response);
         console.log(response.data.data);
 
+        // setPostData(...prev => {postData})
+        setPostData((prev) => ({
+          ...prev,
+          shipToPartyNumber: response.data.data.shipToPartyNumber,
+          shipToPartyName: response.data.data.shipToPartyName,
+          shipToPartyAdress: response.data.data.shipToPartyAdress,
+          taxNumber: response.data.data.taxNumber,
+          outstandingAmount: response.data.data.outstandingAmount
+        }));
+
+
         setCustDetails(response.data.data);
 
         // setLoading(false);
@@ -395,8 +489,8 @@ const Create = () => {
         // setBussinessPlace(response.data.data.businessPlacesSet.results);
         // setSideLoading(false);
 
-        setPostData((prev) => ({ ...prev, CustomerName: response.data.data.customerName}));
-        
+        setPostData((prev) => ({ ...prev, CustomerName: response.data.data.customerName }));
+
 
         // setPostData(prev, (prev..., customerName:response.data.data.customerName));
       }
@@ -452,7 +546,7 @@ const Create = () => {
       mainD.OrderDate = mainD.OrderDate.replaceAll("-", "");
       // mainD.CustomerName = custDetails.CustomerName;
       // mainD.CustomerName = custDetails.customerNumber;
-      
+
       console.log(mainD);
       // console.log(mainD.OrderDate);
 
@@ -462,44 +556,7 @@ const Create = () => {
     }
   };
 
-  const handleGetData = async (url) => {
-    var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
-    try {
-      const response = await api.get(currentURL);
-      // console.log(response);
-      if (url.includes("cmpMat")) {
-        // console.log(response);
-        // console.log(response.data.data);
-        setMaterialData(response.data.data);
-        setLoading(false);
-      } else if (url.includes("top5SalesOrder")) {
-        // console.log(response);
-        // console.log(response.data.data);
-        // console.log(response.data.data.results);
-        setDivData(response.data.data.results);
-        setLoading(false);
-      } //else if (url.includes('cmpCodes')) {
-      //     console.log(response.data.data);
-      //     setcocode(response.data.data);
-      // }
-      setLoading(false);
-    } catch (error) {
-      console.error("unable to get the response", error);
-      setLoading(false);
-    }
-  };
 
-  const handleMaterialData = () => {
-    setLoading(true);
-    var url = "/public/cmpMat";
-    handleGetData(url);
-  };
-
-  const handleTopFive = () => {
-    setLoading(true);
-    var url = "/public/top5SalesOrder";
-    handleGetData(url);
-  };
 
   const uom = [
     { value: "%", label: "Percentage" },
@@ -608,13 +665,46 @@ const Create = () => {
                 )}
               </TextField>
             </div>
+            <div className="basic-margin">
+              <p>Reference Number</p>
+              <TextField
+                className="date"
+                onChange={(e) => {
+                  setPostData((prev) => ({ ...prev, ReferenceNumber: e.target.value }));
+                }}
+                length='20'
+                size="small"
+                style={{ width: "165px" }}
+                value={postData.ReferenceNumber}
+              />
+            </div>
+            <div className="basic-margin">
+              <p>Outstanding Amount</p>
+              <TextField
+                // className="date"
+                // onChange={(e) => {
+                //   setPostData((prev) => ({ ...prev, ReferenceNumber: e.target.value }));
+                // }}
+                // length='20'
+                disabled
+                size="small"
+                style={{ width: "165px" }}
+                value={custDetails?.outstandingAmount || ""}
+              />
+            </div>
           </div>
 
           {/* ========================================================== */}
 
           <div className="maincomponent flx-wrap" style={{ paddingBottom: '15px' }}>
             <div className="basic-margin">
-              <p>Ship to Party</p>
+              <p>Ship to Party Number</p>
+              <p style={{ width: "165px", fontSize: "14px" }}>
+                {custDetails?.shipToPartyNumber || ""}
+              </p>
+            </div>
+            <div className="basic-margin">
+              <p>Ship to Party Name</p>
               {/* <p style={{ width: "165px", fontSize: "14px" }}>{!custDetails.shipToPartyName ? "" : custDetails.shipToPartyName}</p> */}
               <p style={{ width: "165px", fontSize: "14px" }}>
                 {custDetails?.shipToPartyName || ""}
@@ -671,9 +761,9 @@ const Create = () => {
               //   value={}
               /> */}
             </div>
-            <div className="basic-margin">
-              <p>OUSTANDING on Date</p>
-              {/* <p style={{ width: "165px", fontSize: "14px" }}>{custDetails.outstandingAmount}</p> */}
+            {/* <div className="basic-margin">
+              <p>Outstanding Amount</p>
+              {/* <p style={{ width: "165px", fontSize: "14px" }}>{custDetails.outstandingAmount}</p> 
               <p style={{ width: "165px", fontSize: "14px" }}>
                 {custDetails?.outstandingAmount || ""}
               </p>
@@ -685,8 +775,8 @@ const Create = () => {
                 style={{ width: "165px" }}
                 //   value={}
                 disabled
-              /> */}
-            </div>
+              /> 
+            </div> */}
           </div>
         </div>
 
@@ -694,10 +784,10 @@ const Create = () => {
 
 
         <div className="maincomponent" style={{ paddingBottom: '15px', width: '33%' }}>
-          <p style={{marginBottom: '5px'}}><b>Latest Reports</b></p>
+          <p style={{ marginBottom: '5px' }}><b>Latest Reports</b></p>
           {divdata.length > 0 ? (
             <TableContainer component={Paper}>
-              <Table  size="small" aria-label="a dense table">
+              <Table size="small" aria-label="a dense table">
                 <TableHead>
                   <TableRow>
                     <TableCell>Sales Order Number</TableCell>
