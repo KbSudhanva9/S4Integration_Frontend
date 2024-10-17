@@ -47,6 +47,7 @@ const Display = () => {
 
   const [res, setRes] = useState([]);
   const [currentRow, setCurrentRow] = useState([]);
+  const [currentRowPostData, setCurrentRowPostData] = useState([]);
 
   const columnsDisplay = [
     { field: "CustomerNumber", headerName: "Customer No.", width: 160 },
@@ -144,6 +145,8 @@ const Display = () => {
       if (url.includes("getSalesOnPortal")) {
         console.log(response.data.data);
         // setCurrentRow(response.data.data);
+        setCurrentRowPostData(response.data.data);
+
 
         const formattedLineItems = response.data.data.salesOrderNav.results.map(
           (item, index) => ({
@@ -322,7 +325,7 @@ const Display = () => {
                     <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.shipToPartyName} </p>
                   </div>
                   <div className="basic-margin">
-                    <p><b>Sales Order Date</b></p>
+                    <p><b>Delivery Date</b></p>
                     <p style={{ width: "165px", fontSize: "14px" }}> {convertDate(currentRow.OrderDate)} </p>
                   </div>
                   {/* <div className="basic-margin">
@@ -337,11 +340,11 @@ const Display = () => {
                 <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
                   <div className="basic-margin">
                     <p><b>Payer Code</b></p>
-                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.shipToPartyNumber} </p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRowPostData.PayerCode} </p>
                   </div>
                   <div className="basic-margin">
                     <p><b>Payer Name</b></p>
-                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.shipToPartyName} </p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRowPostData.PayerName} </p>
                   </div>
                   <div className="basic-margin">
                     <p><b>Invoice Date</b></p>
@@ -349,7 +352,7 @@ const Display = () => {
                   </div>
                   <div className="basic-margin">
                     <p><b>Invoice Value</b></p>
-                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Total_amount} </p>
+                    <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.InvoiceValue} </p>
                   </div>
                 </div>
               </div>

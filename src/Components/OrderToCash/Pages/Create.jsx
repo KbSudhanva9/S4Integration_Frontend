@@ -672,7 +672,8 @@ const Create = () => {
                 onChange={(e) => {
                   setPostData((prev) => ({ ...prev, ReferenceNumber: e.target.value }));
                 }}
-                length='20'
+                // maxLength={20}
+                inputProps={{ maxLength: 20 }}
                 size="small"
                 style={{ width: "165px" }}
                 value={postData.ReferenceNumber}
