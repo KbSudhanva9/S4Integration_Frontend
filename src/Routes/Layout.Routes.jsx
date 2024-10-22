@@ -41,6 +41,9 @@ import QRTestOne from "../Components/Test/QRTestOne";
 import ViewDoc from "../Components/MobileWeb/ViewDoc";
 import ClearFireBaseStorage from "../Components/MobileWeb/ClearFireBaseStorage";
 import DynamicDocUplode from "../Components/MobileWeb/DynamicDocUplode";
+import GatePassDisplay from "../Components/Auth/GatePass/GatePassDisplay";
+import GatePassMainLayout from "../Components/GatePass/GatePassMainLayout";
+import GatePassDetails from "../Components/GatePass/Pages/GatePassDetails";
 
 export const LayoutRouting = [
 
@@ -112,11 +115,19 @@ export const LayoutRouting = [
         ]
     },
 
+    // GATEPASS 
+    {path: "gate-pass", element: <GatePassDisplay />,},
+    {path: "gate-pass", element: <GatePassMainLayout />,
+        children: [
+            {path: "details", element: <GatePassDetails />},
+            // {path: "invoice-upload", element: <VendorNonPOInvoiceUpload />},
+            // {path: "invoice-status", element: <VendorNonPOInvoiceStatus />},
+        ]
+    },
+
     // mobile
     // {path: "upload/{}", element: <DynamicDocUplode path={'from the path'}/>},
     {path: "upload/:docName", element: <DynamicDocUplode />},
-
-    
     {path: "upload-file-doc", element: <MobileView />},
     {path: "view", element: <ViewDoc />},
     {path: "delete-view", element: <ClearFireBaseStorage />},
