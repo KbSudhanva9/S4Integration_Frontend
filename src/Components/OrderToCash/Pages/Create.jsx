@@ -206,17 +206,18 @@ const Create = () => {
       headerName: "Description",
       width: 190,
       renderCell: (params) => (
-        <TextField
-          type="text"
-          value={params.value || ""}
-          onChange={(e) => {
-            handleCellChange(e, params);
-            // calculateTotal(selectedRows); // Call calculateTotal after a change
-          }}
-          size="small"
-          fullWidth
-          style={{ marginTop: "5px" }}
-        />
+        <TextField style={{ marginTop: "5px" }} fullWidth size="small" disabled value={params.value || ""} />
+        // <TextField
+        //   type="text"
+        //   value={params.value || ""}
+        //   onChange={(e) => {
+        //     handleCellChange(e, params);
+        //     // calculateTotal(selectedRows); // Call calculateTotal after a change
+        //   }}
+        //   size="small"
+        //   fullWidth
+        //   style={{ marginTop: "5px" }}
+        // />
       ),
     },
     {
@@ -224,9 +225,7 @@ const Create = () => {
       headerName: "UOM",
       width: 190,
       renderCell: (params) => (
-        <TextField style={{ marginTop: "5px" }} fullWidth size="small" disabled value={params.value || ""}>
-
-        </TextField>
+        <TextField style={{ marginTop: "5px" }} fullWidth size="small" disabled value={params.value || ""} />
         // <TextField
         //   select
         //   value={params.value || ""}
@@ -363,6 +362,7 @@ const Create = () => {
         // Update the TargetUom if the selected material is found
         if (selectedMaterial) {
           updatedLineItems[index]["TargetUom"] = selectedMaterial.TargetUom;
+          updatedLineItems[index]["Description"] = selectedMaterial.Description;
         }
       }
 
@@ -465,6 +465,7 @@ const Create = () => {
         // ---
         // setBussinessPlace(response.data.data.businessPlacesSet.results);
         // setSideLoading(false);
+        deleteSelected();
       } else if (url.includes("customerDetail")) {
         console.log(response);
         console.log(response.data.data);

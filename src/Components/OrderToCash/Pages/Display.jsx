@@ -54,7 +54,7 @@ const Display = () => {
     { field: "OrderDate", headerName: "Created Date", width: 160 },
     { field: "SalesOrderNumber", headerName: "SAP SO no.", width: 160 },
     { field: 'PortalNo', headerName: 'Portal No.', width: 140 },
-    { field: 'Material', headerName: 'Material', width: 180 },
+    // { field: 'Material', headerName: 'Material', width: 180 },
     // { field: 'MATDescription', headerName: 'MAT Description', width: 170 },
     { field: "TargetUom", headerName: "UOM", width: 100 },
     { field: "TargetQty", headerName: "Qty", width: 120 },
@@ -66,7 +66,7 @@ const Display = () => {
   const columnsDisplayInPopUp = [
     { field: "Material", headerName: "Material", width: 120 },
     { field: "TargetQty", headerName: "Target Qty", width: 100 },
-    { field: "TargetUom", headerName: "Target Uom", width: 100 },
+    { field: "TargetUom", headerName: "Target UOM", width: 100 },
     { field: 'Description', headerName: 'Description', width: 170 },
     // { field: "ReferenceNumber", headerName: "Reference No.", width: 120 },
     { field: "Amount", headerName: "Amount", width: 100 },
@@ -454,7 +454,7 @@ const Display = () => {
                   columns={columnsDisplayInPopUp}
                   slots={{ noRowsOverlay: NoRowsOverlay }}
                 /> */}
-                <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+                <TableContainer component={Paper} style={{ marginTop: "20px", border: "1px solid #afafaf" }}>
                   <Table>
                     <TableHead>
                       <TableRow>
