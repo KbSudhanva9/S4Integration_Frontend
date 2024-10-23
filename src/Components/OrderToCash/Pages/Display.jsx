@@ -51,16 +51,17 @@ const Display = () => {
 
   const columnsDisplay = [
     { field: "CustomerNumber", headerName: "Customer No.", width: 160 },
-    { field: "OrderDate", headerName: "Created Date", width: 160 },
+    { field: "ReferenceNumber", headerName: "Reference Number", width: 160 },
     { field: "SalesOrderNumber", headerName: "SAP SO no.", width: 160 },
     { field: 'PortalNo', headerName: 'Portal No.', width: 140 },
+    { field: "OrderDate", headerName: "Created Date", width: 160 },
     // { field: 'Material', headerName: 'Material', width: 180 },
     // { field: 'MATDescription', headerName: 'MAT Description', width: 170 },
-    { field: "TargetUom", headerName: "UOM", width: 100 },
-    { field: "TargetQty", headerName: "Qty", width: 120 },
+    // { field: "TargetUom", headerName: "UOM", width: 100 },
+    // { field: "TargetQty", headerName: "Qty", width: 120 },
     // { field: "UnitPrice", headerName: "Unit   Price", width: 90 },
-    // { field: 'Total_amount', headerName: 'Total Amount', width: 100 },
-    { field: 'Remarks', headerName: 'Remarks', width: 140 },
+    { field: 'Total_amount', headerName: 'Total Amount', width: 100 },
+    { field: 'Remarks', headerName: 'Status', width: 140 },
   ];
 
   const columnsDisplayInPopUp = [
@@ -69,8 +70,8 @@ const Display = () => {
     { field: "TargetUom", headerName: "Target UOM", width: 100 },
     { field: 'Description', headerName: 'Description', width: 170 },
     // { field: "ReferenceNumber", headerName: "Reference No.", width: 120 },
-    { field: "Amount", headerName: "Amount", width: 100 },
     { field: 'UnitPrice', headerName: 'UnitPrice', width: 100 },
+    { field: "Amount", headerName: "Amount", width: 100 },
   ];
 
   const convertDate = (dateString) => {
@@ -113,15 +114,16 @@ const Display = () => {
           (item, index) => ({
             id: index + 1,
             CustomerNumber: item.CustomerNumber,
-            OrderDate: convertDate(item.OrderDate),
             // OrderDate: item.OrderDate,
+            ReferenceNumber: item.ReferenceNumber,
             SalesOrderNumber: item.SalesOrderNumber,
             PortalNo: item.PortalNo,
-            Material: item.Material,
-            TargetUom: item.TargetUom,
-            TargetQty: item.TargetQty,
+            OrderDate: convertDate(item.OrderDate),
+            // Material: item.Material,
+            // TargetUom: item.TargetUom,
+            // TargetQty: item.TargetQty,
             // UnitPrice: item.UnitPrice,
-            // Total_amount: item.Total_amount,
+            Total_amount: item.Total_amount,
             Remarks: item.Remarks,
             // remarks: item.remarks,
           })
@@ -156,8 +158,10 @@ const Display = () => {
             TargetUom: item.TargetUom,
             Description: item.Description,
             // ReferenceNumber: item.ReferenceNumber,
+            // UnitPrice: item.UnitPrice,
+            UnitPrice: (item.Amount / item.TargetQty),
+            // Amount: (item.UnitPrice / item.TargetQty),
             Amount: item.Amount,
-            UnitPrice: item.UnitPrice,
           })
         );
         // setTData(formattedLineItems);
@@ -373,7 +377,7 @@ const Display = () => {
                     <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Description} </p>
                   </div> */}
                   <div className="basic-margin">
-                    <p><b>Remarks</b></p>
+                    <p><b>Status</b></p>
                     <p style={{ width: "165px", fontSize: "14px" }}> {currentRow.Remarks} </p>
                   </div>
                 </div>

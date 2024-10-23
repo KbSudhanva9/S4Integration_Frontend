@@ -204,7 +204,7 @@ const Create = () => {
     {
       field: "Description",
       headerName: "Description",
-      width: 190,
+      width: 340,
       renderCell: (params) => (
         <TextField style={{ marginTop: "5px" }} fullWidth size="small" disabled value={params.value || ""} />
         // <TextField
@@ -537,6 +537,14 @@ const Create = () => {
     if (mainD.OrderDate === "" || mainD.OrderDate === undefined || mainD.OrderDate === null) {
       console.log(mainD.OrderDate);
       setErrorMessage("Select Date");
+      setErrorSnackbarOpen(true);
+    } else if (mainD.PreferredTransporter === "" || mainD.PreferredTransporter === undefined || mainD.PreferredTransporter === null) {
+      console.log(mainD.PreferredTransporter);
+      setErrorMessage("Select Preferred Transporter");
+      setErrorSnackbarOpen(true);
+    } else if (mainD.ReferenceNumber === "" || mainD.ReferenceNumber === undefined || mainD.ReferenceNumber === null) {
+      console.log(mainD.ReferenceNumber);
+      setErrorMessage("ReferenceNumber is Mandatary");
       setErrorSnackbarOpen(true);
     } else if (mainD.salesOrderNav < 1) {
       console.log("no rows");
