@@ -35,7 +35,7 @@ const GatePassDisplay = () => {
             // console.log(response);
             localStorage.setItem('Gpno', Number(values.Gpno));
 
-              navigate('/gate-pass/details');
+            navigate('/gate-pass/details');
             setLoading(false);
         } catch (error) {
             // console.error('Login failed', error);
@@ -84,7 +84,7 @@ const GatePassDisplay = () => {
                     }}
                     validationSchema={SigninSchema}
                     onSubmit={(values) => {
-                        // setLoading(true);
+                        setLoading(true);
                         // setErrorMessage('');
                         // Handle form submission
                         //   console.log(values);

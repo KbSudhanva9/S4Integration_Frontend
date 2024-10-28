@@ -91,6 +91,7 @@ const Expense = () => {
 
 
     const [cocode, setcocode] = useState([]);
+    const [getcocode, setgetcocode] = useState("");
     const [costce, setcostce] = useState([]);
     const [postData, setPostData] = useState({
         Bukrs: '',
@@ -584,7 +585,7 @@ const Expense = () => {
 
         // nav("/order-to-cash/display");
         // }
-        
+
     }
 
     const getCalling = async (url) => {
@@ -597,11 +598,12 @@ const Expense = () => {
                 console.log(response.data.data);
                 setcostce(response.data.data);
                 setLoading(false);
-            } else if (url.includes('cmpCodes')) {
-                console.log(response.data.data);
-                setcocode(response.data.data);
-                setLoading(false);
             }
+            // else if (url.includes('cmpCodes')) {
+            //     console.log(response.data.data);
+            //     setcocode(response.data.data);
+            //     setLoading(false);
+            // }
         } catch (error) {
             console.error('unable to get the response', error);
             setLoading(false);
@@ -622,6 +624,13 @@ const Expense = () => {
                 // setBussinessPlace(response.data.data.businessPlacesSet.results);
                 // setSideLoading(false);
                 handleClearAfterSubmit();
+                setLoading(false);
+            } else if (url.includes('getCmpCodes')) {
+                console.log(response);
+                console.log(response.data.data.Bukrs);
+                // setPostData.b(response.data.data.Bukrs);
+                setPostData(prev => ({ ...prev, Bukrs: response.data.data.Bukrs }));
+                setgetcocode(response.data.data.Bukrs + '  ('+response.data.data.Description+')');
                 setLoading(false);
             }
         } catch (error) {
@@ -648,16 +657,28 @@ const Expense = () => {
         const url = '/public/costCenter';
         getCalling(url);
     };
-    const handleCompanyCode = () => {
-        setLoading(true);
-        const url = '/public/cmpCodes';
-        getCalling(url);
-    };
+    // const handleCompanyCode = () => {
+    //     setLoading(true);
+    //     const url = '/public/cmpCodes';
+    //     getCalling(url);
+    // };
 
     const handlePostExpense = (body) => {
         setLoading(true);
         // setSideLoading(true);
         const url = '/public/createExpense';
+        // const body = 
+        handlePostData(url, body);
+    }
+    const handleGetCompanyCode = () => {
+        setLoading(true);
+
+        const body = {
+            "mailId": `${localStorage.getItem('email')}`
+        }
+
+        // setSideLoading(true);
+        const url = '/public/getCmpCodes';
         // const body = 
         handlePostData(url, body);
     }
@@ -700,7 +721,8 @@ const Expense = () => {
     useEffect(() => {
         // handleMaterialData();
         handleCostCenter();
-        handleCompanyCode();
+        // handleCompanyCode();
+        handleGetCompanyCode();
 
         currentDate();
     }, [])
@@ -715,7 +737,14 @@ const Expense = () => {
                 {/* <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}> */}
                 <div className='maincomponent' style={{ paddingBottom: '15px', width: '65%' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', flexWrap: 'wrap' }}>
+
                         <div className='basic-margin'>
+                            <p >Company Code</p>
+                            <TextField disabled value={getcocode} style={{ width: '165px' }} size='small' />
+                            {/* <TextField onChange={(e) => { setPostData(prev => ({ ...prev, doctype: e.target.value })) }} size='small' /> */}
+                        </div>
+
+                        {/* <div className='basic-margin'>
                             <p >Company Code</p>
                             <TextField
                                 id="companycode"
@@ -734,7 +763,8 @@ const Expense = () => {
                                     <MenuItem disabled>No options available</MenuItem>
                                 )}
                             </TextField>
-                        </div>
+                        </div> */}
+
                         <div className='basic-margin'>
                             <p >Document type</p>
                             <TextField disabled value={postData.Blart} style={{ width: '165px' }} size='small' />

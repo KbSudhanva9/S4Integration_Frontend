@@ -1,0 +1,20 @@
+.flx-wrap{
+    display: flex; 
+    justify-content: flex-start; 
+    align-items : baseline; 
+    flex-wrap : wrap
+}
+
+.ppadding{
+    margin: 0px;
+    padding: 10px 5px 5px 5px;
+}
+
+.details-font-size{
+    font-size: 14px;
+    width: 100px;
+}
+
+.padding-top-bottom{
+    padding: 5px 0px;
+}

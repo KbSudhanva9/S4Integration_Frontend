@@ -15,7 +15,8 @@ const Travel = () => {
     const [tdata, setTData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [fullLoading, setFullLoading] = useState(false);
-    
+    const email = localStorage.getItem('email');
+
     const columns = [
         { field: 'Docno', headerName: 'SAPDocument No.', width: 170 },
         { field: 'Bldat', headerName: 'Requested Date', width: 140 },
@@ -103,20 +104,22 @@ const Travel = () => {
             if (url.includes('getAllExpense')) {
                 console.log(response);
 
-                const formattedLineItems = response.data.data.results.map((item, index) => ({
-                    id: index + 1,
-                    Docno: item.Docno,
-                    Bldat: convertDate(item.Bldat),
-                    Budat: convertDate(item.Budat),
-                    Xblnr: item.Xblnr,
-                    Bktxt: item.Bktxt,
-                    Dmbtr: item.Dmbtr,
-                    Tflag: item.Tflag,
-                    docTime: item.docTime,
-                    Remarks: item.Remarks,
-                    // approvedOrRejected: item.approvedOrRejected,
-                    // remarks: item.remarks,
-                }));
+                const formattedLineItems = response.data.data.results
+                    .filter(item => item.Smtpadr === email)
+                    .map((item, index) => ({
+                        id: index + 1,
+                        Docno: item.Docno,
+                        Bldat: convertDate(item.Bldat),
+                        Budat: convertDate(item.Budat),
+                        Xblnr: item.Xblnr,
+                        Bktxt: item.Bktxt,
+                        Dmbtr: item.Dmbtr,
+                        Tflag: item.Tflag,
+                        docTime: item.docTime,
+                        Remarks: item.Remarks,
+                        // approvedOrRejected: item.approvedOrRejected,
+                        // remarks: item.remarks,
+                    }));
                 setTData(formattedLineItems);
 
                 setLoading(false);

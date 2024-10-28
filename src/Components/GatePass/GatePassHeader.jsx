@@ -27,6 +27,8 @@ const GatePassHeader = () => {
         nav(-1);
     }
 
+    var gpno = localStorage.getItem('Gpno');
+
 
     return (
         <>
@@ -42,6 +44,9 @@ const GatePassHeader = () => {
                         src="https://tecnics.com/wp-content/uploads/2020/03/logo1.png"
                     />
                 </div>
+                <nav className="nav">
+                    <p style={{paddingRight: '20px'}}>Gate Pass : <b>{gpno}</b></p>
+                </nav>
                 {/* <nav className="nav">
                     <Button style={{ fontSize: '20px' }} size='small' color='error' onClick={signout}><IoPowerOutline /></Button>
                 </nav> */}
