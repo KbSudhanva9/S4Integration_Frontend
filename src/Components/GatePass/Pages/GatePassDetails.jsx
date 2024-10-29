@@ -1,9 +1,10 @@
-import { TextareaAutosize, TextField, Tooltip } from '@mui/material';
+import { Box, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextareaAutosize, TextField, Tooltip } from '@mui/material';
 import './GatePass.css'
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../Utils/ApiCalls/Api';
 import FullScreenLoader from '../../../Utils/Loading/FullScreenLoader';
+import { TbNotesOff } from 'react-icons/tb';
 
 const GatePassDetails = () => {
 
@@ -12,22 +13,49 @@ const GatePassDetails = () => {
     const [gatePassHeader, setGatePassHeader] = useState([]);
     const [gatePassHeaderAddr, setGatePassHeaderAddr] = useState([]);
 
+    const sampleData = [
+        {
+            SalesOrderNumber: "SO12345",
+            OrderDate: "2024-09-15",
+            Total_amount: 1500.75,
+        },
+        {
+            SalesOrderNumber: "SO67890",
+            OrderDate: "2024-10-01",
+            Total_amount: 2500.50,
+        },
+        {
+            SalesOrderNumber: "SO11223",
+            OrderDate: "2024-08-25",
+            Total_amount: 1750.00,
+        },
+    ];
+
+    const [itemsTdata, setItemsTdata] = useState(sampleData);
+
+    const [value, setValue] = useState(0);
+
+    const handleTabChange = (event, newValue) => {
+        setValue(newValue);
+    };
+
     const handlePostData = async (url, body) => {
         var currentURL = `${import.meta.env.VITE_BASE_URL}` + url;
         try {
             const response = await api.post(currentURL, body, {
                 // headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (url.includes('getGatePassHeader')) {
+            if (url.includes('getGatePassHeaderAddr')) {
+                console.log(response.data.data.results);
+                setGatePassHeaderAddr(response.data.data.results[0]);
+                setLoading(false);
+            } else if (url.includes('getGatePassHeader')) {
                 console.log(response.data.data);
                 setGatePassHeader(response.data.data);
                 setLoading(false);
-            } else if (url.includes('getGatePassHeaderAddr')) {
-                console.log(response.data.data);
-                setGatePassHeaderAddr(response.data.data);
-                setLoading(false);
+
             } else if (url.includes('getGatePassHeaderItems')) {
-                console.log(response.data.data);
+                console.log(response);
                 // setGatePassHeader(response.data.data);
                 setLoading(false);
             }
@@ -58,6 +86,20 @@ const GatePassDetails = () => {
         handlePostData(url, body);
     }
 
+    const NoRowsOverlay = () => (
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+            }}
+        >
+            <TbNotesOff size={60} color="gray" />
+            <span style={{ marginTop: "8px", color: "gray" }}>No Rows Added</span>
+        </div>
+    );
 
     useEffect(() => {
         // console.log("asdf");
@@ -114,29 +156,29 @@ const GatePassDetails = () => {
                                 <div className='df padding-top-bottom'>
                                     <p className='ppadding details-font-size'>Code & GST No: </p>
                                     <TextField disabled value={gatePassHeaderAddr.Lifnr} size='small' style={{ width: '120px', paddingRight: '5px' }} />
-                                    <TextField disabled value={gatePassHeaderAddr.Lifnr} size='small' style={{ width: '120px', }} />
+                                    <TextField disabled value={gatePassHeaderAddr.Stcd3} size='small' style={{ width: '120px', }} />
                                 </div>
                                 <div className='df padding-top-bottom'>
                                     <p className='ppadding details-font-size'>Vendor Name: </p>
-                                    <TextField disabled value={gatePassHeaderAddr.Lifnr} size='small' style={{ width: '245px', }} />
+                                    <TextField disabled value={gatePassHeaderAddr.Buname} size='small' style={{ width: '245px', }} />
                                 </div>
                                 <div className='df padding-top-bottom'>
                                     <p className='ppadding details-font-size'>House & Street No: </p>
-                                    <TextField disabled multiline rows={2} value={gatePassHeaderAddr.Lifnr} style={{ width: '245px', }} size='small' />
+                                    <TextField disabled multiline rows={2} value={gatePassHeaderAddr.Stras} style={{ width: '245px', }} size='small' />
                                 </div>
                                 <div className='df padding-top-bottom'>
                                     <p className='ppadding details-font-size'>City & Postal Code: </p>
-                                    <TextField disabled value={gatePassHeaderAddr.Lifnr} size='small' style={{ width: '120px', paddingRight: '5px' }} />
-                                    <TextField disabled value={gatePassHeaderAddr.Lifnr} size='small' style={{ width: '120px', }} />
+                                    <TextField disabled value={gatePassHeaderAddr.Ort01} size='small' style={{ width: '120px', paddingRight: '5px' }} />
+                                    <TextField disabled value={gatePassHeaderAddr.Pstlz} size='small' style={{ width: '120px', }} />
                                 </div>
                                 <div className='df padding-top-bottom'>
                                     <p className='ppadding details-font-size'>State & Country: </p>
-                                    <TextField disabled value={gatePassHeaderAddr.Lifnr} size='small' style={{ width: '120px', paddingRight: '5px' }} />
-                                    <TextField disabled value={gatePassHeaderAddr.Lifnr} size='small' style={{ width: '120px', }} />
+                                    <TextField disabled value={gatePassHeaderAddr.State} size='small' style={{ width: '120px', paddingRight: '5px' }} />
+                                    <TextField disabled value={gatePassHeaderAddr.Landx} size='small' style={{ width: '120px', }} />
                                 </div>
                                 <div className='df padding-top-bottom'>
                                     <p className='ppadding details-font-size'>Phone No: </p>
-                                    <TextField disabled value={gatePassHeaderAddr.Lifnr} style={{ width: '245px', }} size='small' />
+                                    <TextField disabled value={""} style={{ width: '245px', }} size='small' />
                                 </div>
 
                             </div>
@@ -197,8 +239,49 @@ const GatePassDetails = () => {
                             </div>
                         </div>
                     </div>
-
                 </div>
+
+                <div className='maincomponent'>
+                    <Box >
+                        <Tabs value={value} onChange={handleTabChange} >
+                            <Tab label="Items" />
+                            <Tab label="Address" />
+                            <Tab label="Entry Details" />
+
+                            {value === 0 && (
+                                itemsTdata.length > 0 ? (
+                                    <TableContainer component={Paper} style={{ marginTop: '20px' }}>
+                                        <Table size="small" aria-label="a dense table">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>Sales Order Number</TableCell>
+                                                    <TableCell>Order Date</TableCell>
+                                                    <TableCell>Total Amount</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {itemsTdata.map((row, index) => (
+                                                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                                        <TableCell component="th" scope="row">
+                                                            {row.SalesOrderNumber}
+                                                        </TableCell>
+                                                        <TableCell>{row.OrderDate}</TableCell>
+                                                        <TableCell>{row.Total_amount}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                ) : (
+                                    <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
+                                        No data available
+                                    </div>
+                                )
+                            )}
+                        </Tabs>
+                    </Box>
+                </div>
+
             </div>
         </>
     )
