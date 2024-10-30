@@ -139,7 +139,7 @@ const SigninForm = () => {
                 </div>
                 <div className='button-container mr-13'>
                   <NavLink to={"order-to-cash-login"}>Order to Cash</NavLink>
-                  {/* <NavLink to={"vendor-non-po-login"}>Vendor NON-PO</NavLink> */}
+                  <NavLink to={"gate-pass"}>Gate Pass</NavLink>
                 </div>
               </Form>
             )}

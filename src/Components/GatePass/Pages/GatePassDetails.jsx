@@ -1,4 +1,5 @@
 import { Box, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextareaAutosize, TextField, Tooltip } from '@mui/material';
+import PropTypes from 'prop-types';
 import './GatePass.css'
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +12,6 @@ const GatePassDetails = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [gatePassHeader, setGatePassHeader] = useState([]);
-    const [gatePassHeaderAddr, setGatePassHeaderAddr] = useState([]);
 
     const sampleData = [
         {
@@ -31,7 +31,21 @@ const GatePassDetails = () => {
         },
     ];
 
-    const [itemsTdata, setItemsTdata] = useState(sampleData);
+    const [itemsTdata, setItemsTdata] = useState([]);
+    const [gatePassHeaderAddr, setGatePassHeaderAddr] = useState([]);
+    const [addressTdata, setAddressTdata] = useState([]);
+
+    // const [createdDateTime, setCreatedDateTime] = useState("");
+    // const [ctime, setCtime] = useState("");
+
+    const timestamp = (( gatePassHeader==null || gatePassHeader==undefined || gatePassHeader=="") ? "" : parseInt((gatePassHeader.Edate).match(/\d+/)[0]));
+    const date = new Date(timestamp);
+    const createdDateTime = (date.toLocaleString());
+
+    // const isoDuration = gatePassHeader.Ctime;
+    // const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
+    // const [, hours = 0, minutes = 0, seconds = 0] = (!gatePassHeader ? "" : isoDuration.match(regex).map(Number));
+    // const ctime = (`${hours}h ${minutes}m ${seconds}s`);
 
     const [value, setValue] = useState(0);
 
@@ -48,16 +62,17 @@ const GatePassDetails = () => {
             if (url.includes('getGatePassHeaderAddr')) {
                 console.log(response.data.data.results);
                 setGatePassHeaderAddr(response.data.data.results[0]);
+                setAddressTdata(response.data.data.results);
+                setLoading(false);
+            } else if (url.includes('getGatePassHeaderItems')) {
+                console.log(response.data.data.results);
+                setItemsTdata(response.data.data.results);
                 setLoading(false);
             } else if (url.includes('getGatePassHeader')) {
                 console.log(response.data.data);
                 setGatePassHeader(response.data.data);
                 setLoading(false);
 
-            } else if (url.includes('getGatePassHeaderItems')) {
-                console.log(response);
-                // setGatePassHeader(response.data.data);
-                setLoading(false);
             }
         } catch (error) {
             console.error('unable to get the response', error);
@@ -100,6 +115,39 @@ const GatePassDetails = () => {
             <span style={{ marginTop: "8px", color: "gray" }}>No Rows Added</span>
         </div>
     );
+
+    // table-----------
+
+    function CustomTabPanel(props) {
+        const { children, value, index, ...other } = props;
+
+        return (
+            <div
+                role="tabpanel"
+                hidden={value !== index}
+                id={`simple-tabpanel-${index}`}
+                aria-labelledby={`simple-tab-${index}`}
+                {...other}
+            >
+                {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+            </div>
+        );
+    }
+
+    CustomTabPanel.propTypes = {
+        children: PropTypes.node,
+        index: PropTypes.number.isRequired,
+        value: PropTypes.number.isRequired,
+    };
+
+    function a11yProps(index) {
+        return {
+            id: `simple-tab-${index}`,
+            'aria-controls': `simple-tabpanel-${index}`,
+        };
+    }
+
+    //   -------------------
 
     useEffect(() => {
         // console.log("asdf");
@@ -178,7 +226,7 @@ const GatePassDetails = () => {
                                 </div>
                                 <div className='df padding-top-bottom'>
                                     <p className='ppadding details-font-size'>Phone No: </p>
-                                    <TextField disabled value={""} style={{ width: '245px', }} size='small' />
+                                    <TextField disabled value={gatePassHeaderAddr.Telf1} style={{ width: '245px', }} size='small' />
                                 </div>
 
                             </div>
@@ -244,42 +292,119 @@ const GatePassDetails = () => {
                 <div className='maincomponent'>
                     <Box >
                         <Tabs value={value} onChange={handleTabChange} >
-                            <Tab label="Items" />
-                            <Tab label="Address" />
-                            <Tab label="Entry Details" />
-
-                            {value === 0 && (
-                                itemsTdata.length > 0 ? (
-                                    <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-                                        <Table size="small" aria-label="a dense table">
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell>Sales Order Number</TableCell>
-                                                    <TableCell>Order Date</TableCell>
-                                                    <TableCell>Total Amount</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {itemsTdata.map((row, index) => (
-                                                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                                        <TableCell component="th" scope="row">
-                                                            {row.SalesOrderNumber}
-                                                        </TableCell>
-                                                        <TableCell>{row.OrderDate}</TableCell>
-                                                        <TableCell>{row.Total_amount}</TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                ) : (
-                                    <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
-                                        No data available
-                                    </div>
-                                )
-                            )}
+                            <Tab label={`Items (${itemsTdata.length})`} {...a11yProps(0)} />
+                            <Tab label={`Address (${addressTdata.length})`} {...a11yProps(1)} />
+                            <Tab label="Entry Details" {...a11yProps(3)} />
                         </Tabs>
                     </Box>
+                    <CustomTabPanel value={value} index={0} style={{ padding: '0px' }}>
+                        {value === 0 && (
+                            itemsTdata.length > 0 ? (
+                                <TableContainer component={Paper} >
+                                    <Table size="small" aria-label="a dense table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>Item Number</TableCell>
+                                                <TableCell>Item Name</TableCell>
+                                                <TableCell>Quantity</TableCell>
+                                                <TableCell>UOM</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {itemsTdata.map((row, index) => (
+                                                <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                                    <TableCell > {row.Itemno} </TableCell>
+                                                    <TableCell>{row.Maktx}</TableCell>
+                                                    <TableCell>{row.Menge}</TableCell>
+                                                    <TableCell>{row.Meins}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
+                                    No data available
+                                </div>
+                            )
+                        )}
+                    </CustomTabPanel>
+                    <CustomTabPanel value={value} index={1}>
+                        {value === 1 && (
+                            addressTdata.length > 0 ? (
+                                <TableContainer component={Paper} >
+                                    <Table size="small" aria-label="a dense table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>Address No</TableCell>
+                                                <TableCell>Vendor</TableCell>
+                                                <TableCell>Name</TableCell>
+                                                <TableCell>House & Street No</TableCell>
+                                                <TableCell>City</TableCell>
+                                                <TableCell>Postal Code</TableCell>
+                                                <TableCell>State</TableCell>
+                                                <TableCell>Country</TableCell>
+                                                <TableCell>Phone No</TableCell>
+                                                <TableCell>GST No</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {addressTdata.map((row, index) => (
+                                                <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                                    <TableCell > {row.Adrno} </TableCell>
+                                                    <TableCell>{row.Lifnr}</TableCell>
+                                                    <TableCell>{row.Buname}</TableCell>
+                                                    <TableCell>{row.Stras}</TableCell>
+                                                    <TableCell>{row.Ort01}</TableCell>
+                                                    <TableCell>{row.Pstlz}</TableCell>
+                                                    <TableCell>{row.State}</TableCell>
+                                                    <TableCell>{row.Landx}</TableCell>
+                                                    <TableCell>{row.Telf1}</TableCell>
+                                                    <TableCell>{row.Stcd3}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
+                                    No data available
+                                </div>
+                            )
+                        )}
+                    </CustomTabPanel>
+                    <CustomTabPanel value={value} index={2}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', border: '1px solid #ccc', borderRadius: '5px', padding: '0px 50px' }}>
+                            <div >
+                                <div className='df'>
+                                    <p style={{ width: '180px', fontSize: '14px' }}>Created By: </p>
+                                    <p style={{ fontSize: '14px' }}>{gatePassHeader.CreatedBy}</p>
+                                </div>
+                                <div className='df'>
+                                    <p style={{ width: '180px', fontSize: '14px' }}>Created User Mobile: </p>
+                                    <p style={{ fontSize: '14px' }}>{gatePassHeader.Mobile}</p>
+                                </div>
+                                <div className='df'>
+                                    <p style={{ width: '180px', fontSize: '14px' }}>Created Date Time: </p>
+                                    <p style={{ fontSize: '14px' }}>{createdDateTime}</p>
+                                </div>
+                            </div>
+                            <div >
+                                <div className='df'>
+                                    <p style={{ width: '180px', fontSize: '14px' }}>Released By: </p>
+                                    <p style={{ fontSize: '14px' }}>{gatePassHeader.Reluser}</p>
+                                </div>
+                                <div className='df'>
+                                    <p style={{ width: '180px', fontSize: '14px' }}>Released Date Time: </p>
+                                    <p style={{ fontSize: '14px' }}>{createdDateTime}</p>
+                                </div>
+                                <div className='df'>
+                                    <p style={{ width: '180px', fontSize: '14px' }}>Released Comments: </p>
+                                    <p style={{ fontSize: '14px' }}>{gatePassHeader.Relcomments}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </CustomTabPanel>
                 </div>
 
             </div>
@@ -289,3 +414,35 @@ const GatePassDetails = () => {
 }
 
 export default GatePassDetails;
+
+
+
+
+// export default function GatePassDetails() {
+//   const [value, setValue] = React.useState(0);
+
+//   const handleChange = (event, newValue) => {
+//     setValue(newValue);
+//   };
+
+//   return (
+//     <Box sx={{ width: '100%' }}>
+//       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+//         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+//           <Tab label="Item One" {...a11yProps(0)} />
+//           <Tab label="Item Two" {...a11yProps(1)} />
+//           <Tab label="Item Three" {...a11yProps(2)} />
+//         </Tabs>
+//       </Box>
+//       <CustomTabPanel value={value} index={0}>
+//         Item One
+//       </CustomTabPanel>
+//   <CustomTabPanel value={value} index={1}>
+//     Item Two
+//   </CustomTabPanel>
+//   <CustomTabPanel value={value} index={2}>
+//     Item Three
+//   </CustomTabPanel>
+//     </Box>
+//   );
+// }
